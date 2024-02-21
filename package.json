@@ -1,0 +1,22 @@
+{
+  "name": "gold_front",
+  "version": "0.1.0",
+  "description": "Front for service Gold",
+  "scripts": {
+    "start": "webpack-dev-server --config ./webpack.dev.config.js --mode development --open --hot",
+    "build": "webpack --config ./webpack.prod.config.js --mode production"
+  },
+  "author": "Fabrice Rosito<fabrice.rosito@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "dotenv": "^16.4.5",
+    "file-loader": "^6.2.0",
+    "html-loader": "^5.0.0",
+    "html-webpack-plugin": "^5.6.0",
+    "ts-loader": "^9.5.1",
+    "typescript": "^5.3.3",
+    "webpack": "^5.90.3",
+    "webpack-cli": "^5.1.4",
+    "webpack-dev-server": "^5.0.2"
+  }
+}

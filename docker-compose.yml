@@ -1,0 +1,11 @@
+## Fichier : docker-compose.yml
+version: '3.8'
+
+services:
+  gold_front:
+    container_name: gold_front
+    build:
+      dockerfile: Dockerfile
+    ports:
+      - "8080:80"
+    restart: always
