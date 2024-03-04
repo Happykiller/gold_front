@@ -1,0 +1,23 @@
+/* Footer Style */
+.footer {
+  font-size: clamp(8px, 2vw, 16px);
+  width: 100%;
+  color: #555;
+  text-align: center;
+  padding: 5px;
+  overflow:hidden;
+  position: fixed;
+  bottom: 0px;
+  left: 50%;                   /* center link horizontally */
+  transform: translateX(-50%); /* center link horizontally */
+  div {
+    all: unset;
+  }
+  a {
+    color: #007bff;
+    text-decoration: none;
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}

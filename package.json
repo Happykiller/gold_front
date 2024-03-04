@@ -1,6 +1,6 @@
 {
   "name": "gold_front",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Front for service Gold",
   "scripts": {
     "start": "webpack-dev-server --config ./webpack.dev.config.js --mode development --open --hot",
@@ -9,14 +9,37 @@
   "author": "Fabrice Rosito<fabrice.rosito@gmail.com>",
   "license": "MIT",
   "devDependencies": {
+    "@emotion/react": "^11.11.3",
+    "@emotion/styled": "^11.11.0",
+    "@mui/icons-material": "^5.15.10",
+    "@mui/material": "^5.15.10",
+    "@types/eslint": "^8.56.3",
+    "@types/jest": "^29.5.12",
+    "@types/react": "^18.2.58",
+    "@types/react-dom": "^18.2.19",
+    "auto-zustand-selectors-hook": "^2.0.0",
+    "axios": "^1.6.7",
+    "css-loader": "^6.10.0",
     "dotenv": "^16.4.5",
     "file-loader": "^6.2.0",
+    "graphql": "^16.8.1",
     "html-loader": "^5.0.0",
     "html-webpack-plugin": "^5.6.0",
+    "i18next-browser-languagedetector": "^7.2.0",
+    "immer": "^10.0.3",
+    "jest-mock-extended": "^3.0.5",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-i18next": "^14.0.5",
+    "react-router-dom": "^6.22.1",
+    "sass": "^1.71.1",
+    "sass-loader": "^14.1.1",
+    "style-loader": "^3.3.4",
     "ts-loader": "^9.5.1",
     "typescript": "^5.3.3",
     "webpack": "^5.90.3",
     "webpack-cli": "^5.1.4",
-    "webpack-dev-server": "^5.0.2"
+    "webpack-dev-server": "^5.0.2",
+    "zustand": "^4.5.1"
   }
 }

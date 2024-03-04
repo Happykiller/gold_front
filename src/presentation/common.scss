@@ -1,0 +1,23 @@
+.app {
+  width: 100%;
+  .parent_container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 85vh; /* Adjust to your needs */
+      padding: 10px;
+      max-width: 800px;
+      .title {
+        font-size: clamp(28px, 7vw, 40px);
+        font-weight: bold;
+        margin-bottom: 10px;
+        text-align: center;
+      }
+    }
+  }
+}

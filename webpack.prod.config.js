@@ -1,8 +1,13 @@
 const path = require("path") 
-const dotenv = require('dotenv')
 const { DefinePlugin } = require('webpack')
 const HtmlWebpackPlugin = require("html-webpack-plugin") 
-const configuration = require("./src/config")
+
+const dotenv = require('dotenv').config().parsed;
+const dotenvlocal = require('dotenv').config({
+  path: '.env.local'
+ , override: true 
+}).parsed;
+const config = Object.assign({}, dotenv, dotenvlocal);
  
 module.exports = { 
   entry: "./src/index.tsx",
@@ -15,7 +20,9 @@ module.exports = {
     extensions: [".ts", ".tsx", ".js", ".json", '.scss', '.svg'],
     alias: {
       '@src': path.resolve(__dirname, 'src/'),
-      '@component': path.resolve(__dirname, 'src/component/'),
+      '@presentation': path.resolve(__dirname, 'src/presentation/'),
+      '@usecase': path.resolve(__dirname, 'src/usecase/'),
+      '@service': path.resolve(__dirname, 'src/service/'),
     },
   }, 
   output: { 
@@ -75,7 +82,7 @@ module.exports = {
       favicon: './src/public/favicon.ico',
     }),
     new DefinePlugin({
-      'process.env': JSON.stringify(configuration.config(dotenv.config().parsed))
+      'process.env': JSON.stringify(config)
     })
   ]
 }

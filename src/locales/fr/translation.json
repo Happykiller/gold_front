@@ -1,0 +1,36 @@
+{
+  "bar": {
+    "accounts": "Les comptes",
+    "logout": "Quitter",
+    "settings": "Réglages"
+  },
+  "common": {
+    "done": "Valider",
+    "cancel": "Annuler",
+    "create": "Créer",
+    "loading": "Chargement..."
+  },
+  "error": {
+    "credentials_wrong": "Identification impossible"
+  },
+  "footer": {
+    "issues": "Anomalies",
+    "roadmap": "Roadmap",
+    "version": {
+      "front": "Web: ",
+      "back": "Apis: "
+    }
+  },
+  "home": {
+    "title": "Service Gold"
+  },
+  "login": {
+    "title": "Authentification",
+    "login": "Entrer votre nom",
+    "password": "Entrer votre mot de passe",
+    "AUTH_FAIL_WRONG_CREDENTIAL": "Identifiants incorrects"
+  },
+  "operations": {
+    "title": "Les opérations"
+  }
+}

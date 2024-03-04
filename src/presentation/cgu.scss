@@ -1,0 +1,8 @@
+.scrollable-container {
+  width: 400px; /* ajustez la largeur selon vos besoins */
+  height: 400px; /* ajustez la hauteur selon vos besoins */
+  overflow: auto;
+  border: 1px solid #ccc;
+  padding: 10px;
+  text-align: left;
+}
