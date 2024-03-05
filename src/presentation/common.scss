@@ -11,7 +11,7 @@
       justify-content: center;
       height: 85vh; /* Adjust to your needs */
       padding: 10px;
-      max-width: 800px;
+      max-width: 1024px;
       .title {
         font-size: clamp(28px, 7vw, 40px);
         font-weight: bold;
@@ -20,4 +20,26 @@
       }
     }
   }
+}
+
+.gray {
+  color: #95a5a6
+}
+.green {
+  color: #27ae60
+}
+.lightGreen {
+  color: #90EE90
+}
+.red {
+  color: #e74c3c
+}
+.lightRed {
+  color: #FF7F7F
+}
+.blue {
+  color: #2980b9
+}
+.violet {
+  color: #9b59b6
 }

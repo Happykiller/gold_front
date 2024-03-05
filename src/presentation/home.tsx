@@ -46,13 +46,14 @@ const searchChild = (dto: {
 
   for(let account of dto.accounts) {
     if (account.parent_account_id === dto.parent.id) {
-      dto.parent.balance_reconcilied += account.balance_reconcilied;
-      dto.parent.balance_not_reconcilied += account.balance_not_reconcilied;
 
       const childs = searchChild({
         parent: account,
         accounts: dto.accounts
       });
+
+      dto.parent.balance_reconcilied += childs.parent_balance_reconcilied;
+      dto.parent.balance_not_reconcilied += childs.parent_balance_not_reconcilied;
 
       const accountFormated:any = {
         ... account,
@@ -96,6 +97,15 @@ export const Home = () => {
         ))}
       </ul>
     }
+
+    let colorReco = 'green';
+    if (account.balance_reconcilied < 0) {
+      colorReco = 'red';
+    }
+    let colorNoReco = 'lightGreen';
+    if (account.balance_not_reconcilied < 0) {
+      colorNoReco = 'lightRed';
+    }
   
     return (
       <li>
@@ -109,7 +119,7 @@ export const Home = () => {
               }).toString()
             });
           }}
-        >{account.id} | {account.label}</Link> | {account.balance_reconcilied}€ | {account.balance_not_reconcilied}€
+        >{account.id} | {account.label}</Link> | <span className={colorReco}>{Math.round(account.balance_reconcilied * 100) / 100} €</span> | <span className={colorNoReco}>{Math.round(account.balance_not_reconcilied * 100) / 100} €</span>
         {child}
       </li>
     )

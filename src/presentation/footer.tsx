@@ -1,6 +1,6 @@
 import * as React from 'react';
+import { Link } from '@mui/material';
 import { Trans } from 'react-i18next';
-import { Link } from 'react-router-dom';
 
 import '@presentation/footer.scss';
 import { CODES } from '@src/common/codes';
@@ -28,12 +28,12 @@ export const Footer = () => {
   return (
     <div className='footer'>
       Projet Gold 
-      &nbsp;- <a href="mailto:fabrice.rosito@gmail.com">Envoyer Email</a> 
+      &nbsp;- <Link href="mailto:fabrice.rosito@gmail.com">Envoyer Email</Link> 
       &nbsp;- <Trans>footer.version.front</Trans>{version} 
       &nbsp;- <Trans>footer.version.back</Trans><Trans>{backVersion}</Trans> 
-      &nbsp;- <a href="https://github.com/Happykiller/gold_front/issues" target="_blank"><Trans>footer.issues</Trans></a> 
-      &nbsp;- <a href="https://github.com/users/Happykiller/projects/3/views/1" target="_blank"><Trans>footer.roadmap</Trans></a>
-      &nbsp;- <Link to="/CGU" target="_blank" rel="noopener noreferrer">CGU</Link>
+      &nbsp;- <Link href="https://github.com/Happykiller/gold_front/issues" target="_blank"><Trans>footer.issues</Trans></Link> 
+      &nbsp;- <Link href="https://github.com/users/Happykiller/projects/3/views/1" target="_blank"><Trans>footer.roadmap</Trans></Link>
+      &nbsp;- <Link href="/CGU" target="_blank" rel="noopener noreferrer">CGU</Link>
     </div>
   )
 }

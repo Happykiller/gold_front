@@ -11,15 +11,20 @@ export class GetOperationsUsecase {
 
   async execute(dto: GetOperationsUsecaseDto): Promise<GetOperationsUsecaseModel>  {
     try {
+      const finalDto:any = {
+        account_id: dto.account_id,
+        offset: dto.page * 15
+      }
       const response:any = await this.inversify.graphqlService.send(
         {
           operationName: 'operations',
-          variables: dto,
-          query: `query operations($account_id: Int!) {
+          variables: finalDto,
+          query: `query operations($account_id: Int!, $offset: Int!) {
             operations (
               dto: {
                 account_id: $account_id
-                limit: 25
+                limit: 15
+                offset: $offset
               }
             ) {
               id

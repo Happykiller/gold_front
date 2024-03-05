@@ -1,8 +1,14 @@
 import * as React from 'react';
 import * as dayjs from 'dayjs';
 import { Trans } from 'react-i18next';
-import { Typography } from '@mui/material';
+import CheckIcon from '@mui/icons-material/Check';
 import { useSearchParams } from 'react-router-dom';
+import RefreshIcon from '@mui/icons-material/Refresh';
+import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
+import ArrowRightIcon from '@mui/icons-material/ArrowRight';
+import { Grid, IconButton, Typography } from '@mui/material';
+import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 
 import '@presentation/common.scss';
 import Bar from '@presentation/bar';
@@ -15,6 +21,7 @@ import { GetOperationsUsecaseModel } from '@usecase/getOperations/getOperations.
 
 export const Operations = () => {
   const [searchParams] = useSearchParams();
+  const [page, setPage] = React.useState<any>(0);
   const [account, setAccount] = React.useState<any>(null);
   const [operations, setOperations] = React.useState<any[]>(null);
   const [qryAccount, setQryAccount] = React.useState({
@@ -42,79 +49,66 @@ export const Operations = () => {
     const { operation } = props;
 
     // Amount
-    var color = "color1";
-    var opera = "+";
-    if (operation.type_id == 1)
-    {
-        // Crédit Bleu
-        if (operation.status_id == 1)
-        {
-            color = "color2";
-        }
-        else
-        {
-            color = "color3";
-        }
-    }
-    else if (operation.type_id == 2)
-    {
-        // Débit rouge
-        if (operation.status_id == 1)
-        {
-            color = "color4";
-        }
-        else
-        {
-            color = "color5";
-        }
-        opera = "-";
-    }
-    else if (operation.type_id == 3 && operation.account_id_dest == searchParams.get('account_id'))
-    {
-        // Vir crédit
-        color = "color6";
-    }
-    else
-    {
-        // Vir débit
-        color = "color7";
-        opera = "-";
+    let color = "gray";
+    let opera = "+";
+    let dest = <div></div>;
+    if (operation.type_id == 1) {
+      // Crédit Vert
+      if (operation.status_id == 1) {
+        color = "lightGreen";
+      } else {
+        color = "green";
+      }
+    } else if (operation.type_id == 2) {
+      // Débit rouge
+      if (operation.status_id == 1) {
+        color = "lightRed";
+      } else {
+        color = "red";
+      }
+      opera = "-";
+    } else if (operation.type_id == 3 && operation.account_id_dest == searchParams.get('account_id')) {
+      // Vir crédit
+      color = "blue";
+      dest = <div><ArrowLeftIcon/>{operation.account?.label}</div>;
+    } else {
+      // Vir débit
+      color = "violet";
+      opera = "-";
+      dest = <div><ArrowRightIcon/>{operation.account_dest?.label}</div>;
     }
 
     // Third
     var third = operation.third?.label;
-    if (operation.third_id == 1)
-    {
+    if (operation.third_id == 1) {
         third = "Autre créditeur";
-    }
-    else if (operation.third_id == 2)
-    {
+    } else if (operation.third_id == 2) {
         third = "Autre débiteur";
     }
 
     // Category
     var category = operation.category?.label;
-    if (operation.category_id == 1)
-    {
+    if (operation.category_id == 1) {
         category = "Autre";
     }
   
     return (
       <tr>
         <td>{operation.id}</td>
-        <td>{dayjs(operation.date).format('DD/MM/YYYY')}</td>
-        <td className={color}>{opera+operation.amount}€</td>
-        <td>{operation.account?.label}</td>
-        <td>{operation.account_dest?.label}</td>
+        <td>{dayjs(parseInt(operation.date)).format('DD/MM/YYYY')}</td>
+        <td className={color}>{opera+operation.amount} €</td>
+        <td>{dest}</td>
         <td>{third}</td>
         <td>{category}</td>
-        <td className='desc'><Typography noWrap>{operation.description}</Typography></td>
-        <td>{(operation.status_id == 1)?<button onClick={(e) => {
-          e.preventDefault();
-          reco({
-            operation_id: operation.id
-          });
-        }}>Réconcilier</button>:''}
+        <td className='desc' title={operation.description}><Typography noWrap>{operation.description}</Typography></td>
+        <td>{(operation.status_id == 1)?<IconButton 
+          size="small"
+          onClick={(e) => {
+            e.preventDefault();
+            reco({
+              operation_id: operation.id
+            });
+          }}><CheckIcon /></IconButton>:''}
         </td>
       </tr>
     )
@@ -127,7 +121,8 @@ export const Operations = () => {
       loading: true
     }));
     inversify.getOperationsUsecase.execute({
-      account_id: parseInt(searchParams.get('account_id'))
+      account_id: parseInt(searchParams.get('account_id')),
+      page
     })
       .then((response:GetOperationsUsecaseModel) => {
         if(response.message === CODES.SUCCESS) {
@@ -194,11 +189,71 @@ export const Operations = () => {
   } if(qryAccount.error) {
     contentAccount = <div><Trans>operations.{qryAccount.error}</Trans></div>
   } else if (account) {
-    contentAccount = <div>
-      <h2>{account.label}</h2>
-      <h3>Balance reconcilé : {account.balance_reconcilied}€</h3>
-      <h3>Balance non-reconcilé : {account.balance_not_reconcilied}€</h3>  
-    </div>;
+    let colorReco = 'green';
+    if (account.balance_reconcilied < 0) {
+      colorReco = 'red';
+    }
+    let colorNoReco = 'lightGreen';
+    if (account.balance_not_reconcilied < 0) {
+      colorNoReco = 'lightRed';
+    }
+
+    contentAccount = <Grid
+      container
+      display="flex"
+      justifyContent="center"
+      alignItems="center"
+      textAlign="center"
+    >
+      <Grid
+        xs={12}
+        item
+      >
+        <h2>{account.label}<IconButton 
+          size="small"
+          onClick={(e) => {
+            e.preventDefault();
+            setOperations(null);
+          }}><RefreshIcon /></IconButton></h2>
+      </Grid>
+      <Grid
+        xs={12}
+        item
+      >
+        Balance reconcilé : <span className={colorReco}>{account.balance_reconcilied} €</span>
+      </Grid>
+      <Grid
+        xs={2}
+        item
+      >
+        {(page!==0)?page:''}<IconButton 
+          size="small"
+          disabled={(page === 0)}
+          onClick={(e) => {
+            e.preventDefault();
+            setPage(page-1);
+            setOperations(null);
+          }}><ArrowBackIosIcon /></IconButton>
+      </Grid>
+      <Grid
+        xs={6}
+        item
+      >
+        Balance non-reconcilé : <span className={colorNoReco}>{account.balance_not_reconcilied} €</span>
+      </Grid>
+      <Grid
+        xs={2}
+        item
+      >
+        <IconButton 
+          size="small"
+          onClick={(e) => {
+            e.preventDefault();
+            setPage(page+1);
+            setOperations(null);
+          }}><ArrowForwardIosIcon /></IconButton>{page+2}
+      </Grid>
+    </Grid>;
   } 
 
   let contentOperations = <div></div>;
@@ -207,28 +262,25 @@ export const Operations = () => {
   } if(qryOperations.error) {
     contentOperations = <div><Trans>operations.{qryOperations.error}</Trans></div>
   } else if (operations) {
-    contentOperations = <div>
-      <table>
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Date</th>
-                <th>Amount</th>
-                <th>Account</th>
-                <th>Dest</th>
-                <th>Third</th>
-                <th>Category</th>
-                <th>Description</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-          {operations?.map((operation:any) => (
-            <Operation key={operation.id} operation={operation} />
-          ))}
-        </tbody>
-      </table>
-    </div>;
+    contentOperations = <table className='table'>
+      <thead>
+        <tr>
+          <th>Id</th>
+          <th>Date</th>
+          <th>Amount</th>
+          <th>Account</th>
+          <th>Third</th>
+          <th>Category</th>
+          <th>Description</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {operations?.map((operation:any) => (
+          <Operation key={operation.id} operation={operation} />
+        ))}
+      </tbody>
+    </table>;
   } 
 
   return (

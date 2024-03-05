@@ -1,3 +1,5 @@
+import * as dayjs from 'dayjs';
+
 import { CODES } from '@src/common/codes';
 import { Inversify } from '@src/common/inversify';
 import { SetRecoUsecaseDto } from '@usecase/setReco/setReco.usecase.dto';
@@ -14,12 +16,16 @@ export class SetRecoUsecase {
       const response:any = await this.inversify.graphqlService.send(
         {
           operationName: 'updateOperation',
-          variables: dto,
-          query: `mutation updateOperation($operation_id: Int!) {
+          variables: {
+            ...dto,
+            date: dayjs().format('YYYY-MM-DD')
+          },
+          query: `mutation updateOperation($operation_id: Int!, $tody: String!) {
             updateOperation (
               dto: {
                 operation_id: $operation_id
                 status_id: 2
+                date: $tody
               }
             ) {
               id
