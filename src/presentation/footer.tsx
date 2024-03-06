@@ -32,7 +32,7 @@ export const Footer = () => {
       &nbsp;- <Trans>footer.version.front</Trans>{version} 
       &nbsp;- <Trans>footer.version.back</Trans><Trans>{backVersion}</Trans> 
       &nbsp;- <Link href="https://github.com/Happykiller/gold_front/issues" target="_blank"><Trans>footer.issues</Trans></Link> 
-      &nbsp;- <Link href="https://github.com/users/Happykiller/projects/3/views/1" target="_blank"><Trans>footer.roadmap</Trans></Link>
+      &nbsp;- <Link href="https://github.com/users/Happykiller/projects/2/views/1" target="_blank"><Trans>footer.roadmap</Trans></Link>
       &nbsp;- <Link href="/CGU" target="_blank" rel="noopener noreferrer">CGU</Link>
     </div>
   )

@@ -11,15 +11,26 @@ import { CGU } from '@presentation/cgu';
 import { Home } from '@presentation/home';
 import { Login } from '@presentation/login';
 import { Guard } from '@presentation/guard';
+import { Clone } from '@presentation/clone';
+import { CreateVir } from '@presentation/createVir';
 import { Operations } from '@presentation/operations';
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <Guard><Home /></Guard>,
-  },  {
+  }, 
+  {
     path: "/operations",
     element: <Guard><Operations /></Guard>,
+  }, 
+  {
+    path: "/createVir",
+    element: <Guard><CreateVir /></Guard>,
+  },
+  {
+    path: "/clone",
+    element: <Guard><Clone /></Guard>,
   },
   {
     path: "/login",

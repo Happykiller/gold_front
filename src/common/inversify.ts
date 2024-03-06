@@ -11,6 +11,8 @@ import { GraphqlServiceFetch } from '@service/graphql/graphql.service.fetch';
 import { SessionInfoUsecase } from '@usecase/sessionInfo/systemInfo.usecase';
 import { GetAccountsUsecase } from '@usecase/getAccounts/getAccounts.usecase';
 import { GetOperationsUsecase } from '@usecase/getOperations/getOperations.usecase';
+import { CreateOperationUsecase } from '@usecase/createOperation/createOperation.usecase';
+import { CloneOperationsUsecase } from '@usecase/cloneOperations/cloneOperations.usecase';
 
 export class Inversify {
   authUsecase: AuthUsecase;
@@ -22,6 +24,8 @@ export class Inversify {
   getAccountUsecase: GetAccountUsecase;
   getAccountsUsecase: GetAccountsUsecase;
   getOperationsUsecase: GetOperationsUsecase;
+  createOperationUsecase: CreateOperationUsecase;
+  cloneOperationsUsecase: CloneOperationsUsecase;
 
   constructor() {
     // Usecases
@@ -33,6 +37,8 @@ export class Inversify {
     this.getAccountUsecase = new GetAccountUsecase(this);
     this.getAccountsUsecase = new GetAccountsUsecase(this);
     this.getOperationsUsecase = new GetOperationsUsecase(this);
+    this.cloneOperationsUsecase = new CloneOperationsUsecase(this);
+    this.createOperationUsecase = new CreateOperationUsecase(this);
 
     // Services
     if (config.mode === 'prod') {

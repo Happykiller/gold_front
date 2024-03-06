@@ -2,13 +2,26 @@
   "bar": {
     "accounts": "Les comptes",
     "logout": "Quitter",
-    "settings": "Réglages"
+    "settings": "Réglages",
+    "createVir": "Virement",
+    "clone": "Clone"
   },
   "common": {
     "done": "Valider",
     "cancel": "Annuler",
     "create": "Créer",
     "loading": "Chargement..."
+  },
+  "clone": {
+    "title": "Clonage",
+    "send": "Cloner",
+    "succeed": "Clonage réussi",
+    "template": "Template"
+  },
+  "createVir":  {
+    "title": "Virement",
+    "send": "Envoyer",
+    "succeed": "Virement créé : "
   },
   "error": {
     "credentials_wrong": "Identification impossible"
@@ -29,6 +42,19 @@
     "login": "Entrer votre nom",
     "password": "Entrer votre mot de passe",
     "AUTH_FAIL_WRONG_CREDENTIAL": "Identifiants incorrects"
+  },
+  "operation": {
+    "third-otherDebit": "Débiteur",
+    "third-otherCredit": "Créditeur",
+    "category-other": "Autre",
+    "amount": "Montant",
+    "description": "Description",
+    "date": "Date",
+    "account": "Compte",
+    "account_dest": "Destination",
+    "status": "Status",
+    "third": "Tier",
+    "category": "Catégorie"
   },
   "operations": {
     "title": "Les opérations"

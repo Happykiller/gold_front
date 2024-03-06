@@ -77,20 +77,6 @@ export const Operations = () => {
       opera = "-";
       dest = <div><ArrowRightIcon/>{operation.account_dest?.label}</div>;
     }
-
-    // Third
-    var third = operation.third?.label;
-    if (operation.third_id == 1) {
-        third = "Autre créditeur";
-    } else if (operation.third_id == 2) {
-        third = "Autre débiteur";
-    }
-
-    // Category
-    var category = operation.category?.label;
-    if (operation.category_id == 1) {
-        category = "Autre";
-    }
   
     return (
       <tr>
@@ -98,8 +84,8 @@ export const Operations = () => {
         <td>{dayjs(parseInt(operation.date)).format('DD/MM/YYYY')}</td>
         <td className={color}>{opera+operation.amount} €</td>
         <td>{dest}</td>
-        <td>{third}</td>
-        <td>{category}</td>
+        <td><Trans>{operation.third?.label}</Trans></td>
+        <td><Trans>{operation.category?.label}</Trans></td>
         <td className='desc' title={operation.description}><Typography noWrap>{operation.description}</Typography></td>
         <td>{(operation.status_id == 1)?<IconButton 
           size="small"
@@ -214,6 +200,7 @@ export const Operations = () => {
           onClick={(e) => {
             e.preventDefault();
             setOperations(null);
+            setAccount(null);
           }}><RefreshIcon /></IconButton></h2>
       </Grid>
       <Grid

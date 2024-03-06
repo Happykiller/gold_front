@@ -17,7 +17,7 @@ import { Trans, useTranslation } from 'react-i18next';
 import '@presentation/bar.scss';
 import { ContextStoreModel, contextStore } from '@presentation/contextStore';
 
-const pages = ['accounts'];
+const pages = ['accounts', 'createVir', 'clone'];
 const settings = ['logout'];
 
 function Bar() {
@@ -40,6 +40,12 @@ function Bar() {
     switch(event.currentTarget.innerText.toLowerCase()) { 
       case t('bar.accounts').toLowerCase(): {
         navigate("/");
+        break; 
+      } case t('bar.createVir').toLowerCase(): {
+        navigate("/createVir");
+        break; 
+      } case t('bar.clone').toLowerCase(): {
+        navigate("/clone");
         break; 
       }
     } 

@@ -20,12 +20,12 @@ export class SetRecoUsecase {
             ...dto,
             date: dayjs().format('YYYY-MM-DD')
           },
-          query: `mutation updateOperation($operation_id: Int!, $tody: String!) {
+          query: `mutation updateOperation($operation_id: Int!, $date: String!) {
             updateOperation (
               dto: {
                 operation_id: $operation_id
                 status_id: 2
-                date: $tody
+                date: $date
               }
             ) {
               id
