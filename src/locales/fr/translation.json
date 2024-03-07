@@ -23,6 +23,11 @@
     "send": "Envoyer",
     "succeed": "Virement créé : "
   },
+  "editOperation": {
+    "title": "Edition",
+    "send": "Mettre à jour",
+    "succeed": "Mise à jour réussi"
+  },
   "error": {
     "credentials_wrong": "Identification impossible"
   },
@@ -57,6 +62,8 @@
     "category": "Catégorie"
   },
   "operations": {
-    "title": "Les opérations"
+    "title": "Les opérations",
+    "recoSucced": "Reconciliation réussi",
+    "deleteSucced": "Suppression réussi"
   }
 }

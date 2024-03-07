@@ -14,6 +14,7 @@ import { Guard } from '@presentation/guard';
 import { Clone } from '@presentation/clone';
 import { CreateVir } from '@presentation/createVir';
 import { Operations } from '@presentation/operations';
+import { EditOperation } from '@presentation/editOperation';
 
 const router = createBrowserRouter([
   {
@@ -31,6 +32,10 @@ const router = createBrowserRouter([
   {
     path: "/clone",
     element: <Guard><Clone /></Guard>,
+  },
+  {
+    path: "/editOperation",
+    element: <Guard><EditOperation /></Guard>,
   },
   {
     path: "/login",

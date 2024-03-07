@@ -10,9 +10,12 @@ import { GetAccountUsecase } from '@usecase/getAccount/getAccount.usecase';
 import { GraphqlServiceFetch } from '@service/graphql/graphql.service.fetch';
 import { SessionInfoUsecase } from '@usecase/sessionInfo/systemInfo.usecase';
 import { GetAccountsUsecase } from '@usecase/getAccounts/getAccounts.usecase';
+import { GetOperationUsecase } from '@usecase/getOperation/getOperation.usecaset';
 import { GetOperationsUsecase } from '@usecase/getOperations/getOperations.usecase';
 import { CreateOperationUsecase } from '@usecase/createOperation/createOperation.usecase';
 import { CloneOperationsUsecase } from '@usecase/cloneOperations/cloneOperations.usecase';
+import { UpdateOperationUsecase } from '@usecase/updateOperation/updateOperation.usecase';
+import { DeleteOperationUsecase } from '@usecase/deleteOperation/deleteOperation.usecase';
 
 export class Inversify {
   authUsecase: AuthUsecase;
@@ -23,9 +26,12 @@ export class Inversify {
   systemInfoUsecase: SystemInfoUsecase;
   getAccountUsecase: GetAccountUsecase;
   getAccountsUsecase: GetAccountsUsecase;
+  getOperationUsecase: GetOperationUsecase;
   getOperationsUsecase: GetOperationsUsecase;
   createOperationUsecase: CreateOperationUsecase;
   cloneOperationsUsecase: CloneOperationsUsecase;
+  updateOperationUsecase: UpdateOperationUsecase;
+  deleteOperationUsecase: DeleteOperationUsecase;
 
   constructor() {
     // Usecases
@@ -36,9 +42,12 @@ export class Inversify {
     this.systemInfoUsecase = new SystemInfoUsecase(this);
     this.getAccountUsecase = new GetAccountUsecase(this);
     this.getAccountsUsecase = new GetAccountsUsecase(this);
+    this.getOperationUsecase = new GetOperationUsecase(this);
     this.getOperationsUsecase = new GetOperationsUsecase(this);
     this.cloneOperationsUsecase = new CloneOperationsUsecase(this);
     this.createOperationUsecase = new CreateOperationUsecase(this);
+    this.updateOperationUsecase = new UpdateOperationUsecase(this);
+    this.deleteOperationUsecase = new DeleteOperationUsecase(this);
 
     // Services
     if (config.mode === 'prod') {

@@ -1,11 +1,11 @@
 import * as React from 'react';
+import { Trans } from 'react-i18next';
 import { useLocation, Navigate } from "react-router-dom";
 
 import { CODES } from '@src/common/codes';
 import inversify from '@src/common/inversify';
 import { ContextStoreModel, contextStore } from '@presentation/contextStore';
 import { SessionInfoUsecaseModel } from '@usecase/sessionInfo/model/sessionInfo.usecase.model';
-import { Trans } from 'react-i18next';
 
 export function Guard({ children }: { children: JSX.Element }) {
   let location = useLocation();

@@ -2,7 +2,9 @@ import * as React from 'react';
 import { Trans } from 'react-i18next';
 import { Done } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
-import { Box, Button, TextField } from '@mui/material';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+import { Box, Button, InputAdornment, TextField } from '@mui/material';
 
 import '@presentation/login.scss';
 import { CODES } from '@src/common/codes';
@@ -19,6 +21,7 @@ export const Login = () => {
     error: null
   });
   const [currentLogin, setCurrentLogin] = React.useState('');
+  const [passVisible, setPassVisible] = React.useState(false);
   const [currentPassword, setCurrentPassword] = React.useState('');
 
   const handleClick = async (event: React.SyntheticEvent) => {
@@ -77,6 +80,7 @@ export const Login = () => {
         gap: '10px;'
       }}
     >
+      {/* Field Login */}
       <TextField
         sx={{ marginRight:1}}
         label={<Trans>login.login</Trans>}
@@ -87,16 +91,34 @@ export const Login = () => {
           setCurrentLogin(e.target.value);
         }}
       />
+      
+      {/* Field Password */}
       <TextField
         sx={{ marginRight:1}}
         label={<Trans>login.password</Trans>}
         variant="standard"
         size="small"
+        type={(passVisible)?'text':'password'}
         onChange={(e) => { 
           e.preventDefault();
           setCurrentPassword(e.target.value);
         }}
+        InputProps={{
+          endAdornment: (
+            <InputAdornment 
+              position="end"
+              onClick={(e) => { 
+                e.preventDefault();
+                setPassVisible(!passVisible);
+              }}
+            >
+              {(passVisible?<VisibilityOffIcon/>:<VisibilityIcon />)}
+            </InputAdornment>
+          ),
+        }}
       />
+
+      {/* Submit button */}
       <Button 
         type="submit"
         variant="contained"

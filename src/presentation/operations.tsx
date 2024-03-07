@@ -1,13 +1,16 @@
 import * as React from 'react';
 import * as dayjs from 'dayjs';
-import { Trans } from 'react-i18next';
 import CheckIcon from '@mui/icons-material/Check';
 import { useSearchParams } from 'react-router-dom';
+import DeleteIcon from '@mui/icons-material/Delete';
 import RefreshIcon from '@mui/icons-material/Refresh';
+import { Trans, useTranslation } from 'react-i18next';
+import EditNoteIcon from '@mui/icons-material/EditNote';
 import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import { Grid, IconButton, Typography } from '@mui/material';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
+import { createSearchParams, useNavigate } from 'react-router-dom';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 
 import '@presentation/common.scss';
@@ -16,10 +19,14 @@ import '@presentation/operations.scss';
 import { CODES } from '@src/common/codes';
 import { Footer } from '@presentation/footer';
 import inversify from '@src/common/inversify';
+import { FlashStore, flashStore} from '@presentation/flash';
 import { GetAccountUsecaseModel } from '@usecase/getAccount/getAccount.usecase.model';
 import { GetOperationsUsecaseModel } from '@usecase/getOperations/getOperations.usecase.model';
 
 export const Operations = () => {
+  const navigate = useNavigate();
+  const { t } = useTranslation();
+  const flash:FlashStore = flashStore();
   const [searchParams] = useSearchParams();
   const [page, setPage] = React.useState<any>(0);
   const [account, setAccount] = React.useState<any>(null);
@@ -41,6 +48,18 @@ export const Operations = () => {
     await inversify.setRecoUsecase.execute({
       operation_id: parseInt(dto.operation_id)
     });
+    flash.open(t('operations.recoSucced'));
+    setOperations(null);
+    setAccount(null);
+  }
+
+  const deleteOperation = async (dto: {
+    operation_id: string
+  }) => {
+    await inversify.deleteOperationUsecase.execute({
+      operation_id: parseInt(dto.operation_id)
+    });
+    flash.open(t('operations.deleteSucced'));
     setOperations(null);
     setAccount(null);
   }
@@ -87,7 +106,32 @@ export const Operations = () => {
         <td><Trans>{operation.third?.label}</Trans></td>
         <td><Trans>{operation.category?.label}</Trans></td>
         <td className='desc' title={operation.description}><Typography noWrap>{operation.description}</Typography></td>
-        <td>{(operation.status_id == 1)?<IconButton 
+        <td>
+          <IconButton 
+            size="small"
+            onClick={(e) => {
+              e.preventDefault();
+              deleteOperation({
+                operation_id: operation.id
+              });
+            }}><DeleteIcon />
+          </IconButton>
+
+          <IconButton 
+            size="small"
+            onClick={(e) => {
+              e.preventDefault();
+              navigate({
+                pathname: '/editOperation',
+                search: createSearchParams({
+                  account_id: searchParams.get('account_id'),
+                  operation_id: operation.id
+                }).toString()
+              });
+            }}><EditNoteIcon />
+          </IconButton>
+
+          {(operation.status_id == 1)?<IconButton 
           size="small"
           onClick={(e) => {
             e.preventDefault();
