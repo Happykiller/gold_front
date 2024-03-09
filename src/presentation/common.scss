@@ -8,10 +8,10 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
       height: 85vh; /* Adjust to your needs */
+      overflow: auto;
       padding: 10px;
-      max-width: 1024px;
+      width: 100%;
       .title {
         font-size: clamp(28px, 7vw, 40px);
         font-weight: bold;
