@@ -75,7 +75,6 @@ const searchChild = (dto: {
 
 export const Home = () => {
   const navigate = useNavigate();
-  const flash:FlashStore = flashStore();
   const [accounts, setAccounts] = React.useState<AccountUsecaseModel[]>(null);
   let accountsFormated = [];
   const [qry, setQry] = React.useState({

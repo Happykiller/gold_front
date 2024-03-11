@@ -98,6 +98,7 @@ export const Login = () => {
         label={<Trans>login.password</Trans>}
         variant="standard"
         size="small"
+        autoComplete='false'
         type={(passVisible)?'text':'password'}
         onChange={(e) => { 
           e.preventDefault();
