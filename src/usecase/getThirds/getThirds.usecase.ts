@@ -1,32 +1,29 @@
 import { CODES } from '@src/common/codes';
 import { Inversify } from '@src/common/inversify';
-import { AccountUsecaseModel } from '@usecase/model/account.usecase.model';
-import { GetAccountsUsecaseModel } from '@usecase/getAccounts/getAccounts.usecase.model';
+import { GetThirdsUsecaseModel } from '@usecase/getThirds/getThirds.usecase.model';
+import { OperationThridUsecaseModel } from '@usecase/model/operationThrid.usecase.model';
 
-export class GetAccountsUsecase {
+export class GetThirdsUsecase {
 
   constructor(
     private inversify:Inversify
   ){}
 
-  accounts:AccountUsecaseModel[] = [];
+  thirds:OperationThridUsecaseModel[] = [];
 
-  async execute(): Promise<GetAccountsUsecaseModel>  {
+  async execute(): Promise<GetThirdsUsecaseModel>  {
     try {
-      if (this.accounts.length === 0) {
+      if (this.thirds.length === 0) {
         const response:any = await this.inversify.graphqlService.send(
           {
-            operationName: 'accounts',
+            operationName: 'operationThirds',
             variables: {},
-            query: `query accounts {  
-              accounts {
+            query: `query operationThirds {  
+              operationThirds {
                 id
-                type_id
-                parent_account_id
                 label
                 description
-                balance_reconcilied
-                balance_not_reconcilied
+                active
                 creator_id
                 creation_date
                 modificator_id
@@ -40,12 +37,12 @@ export class GetAccountsUsecase {
           throw new Error(response.errors[0].message);
         }
 
-        this.accounts = response.data.accounts;
+        this.thirds = response.data.operationThirds;
       }
 
       return {
         message: CODES.SUCCESS,
-        data: this.accounts
+        data: this.thirds
       }
     } catch (e: any) {
       return {

@@ -1,18 +1,20 @@
 import * as React from 'react';
 import * as dayjs from 'dayjs';
-import { Send } from '@mui/icons-material';
+import { Delete, Send } from '@mui/icons-material';
 import { Trans, useTranslation } from 'react-i18next';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { createSearchParams, useNavigate } from 'react-router-dom';
-import { Button, FormControl, Grid, InputLabel, MenuItem, Select, TextField } from '@mui/material';
+import { Button, FormControl, Grid, InputLabel, MenuItem, Select, TextField, Typography } from '@mui/material';
 
 import Bar from '@presentation/bar';
 import { CODES } from '@src/common/codes';
 import inversify from '@src/common/inversify';
 import { Footer } from '@presentation/footer';
 import { FlashStore, flashStore} from '@presentation/flash';
+import { AccountsSelect } from '@presentation/accountsSelect';
+import { GetOperationsUsecaseModel } from '@usecase/getOperations/getOperations.usecase.model';
 import { CreateOperationUsecaseModel } from '@usecase/createOperation/createOperation.usecase.model';
 
 export const CreateVir = () => {
@@ -22,10 +24,17 @@ export const CreateVir = () => {
     data: null,
     error: null
   });
+  const [qryOps, setQryLOps] = React.useState({
+    loading: false,
+    data: null,
+    error: null
+  });
   const { t } = useTranslation();
   const flash:FlashStore = flashStore();
-  const [currentMsg, setCurrentMsg] = React.useState('');
+  const [operations, setOperations] = React.useState<any[]>(null);
+  const [selectedOperations, setSelectedOperations] = React.useState<any[]>([]);
   const [currentDsc, setCurrentDsc] = React.useState('');
+  const [opeSelected, setOpeSelected] = React.useState('');
   const [currentThird, setCurrentThird] = React.useState('2');
   const [currentCategory, setCurrentCategory] = React.useState('1');
   const [currentAccount, setCurrentAccount] = React.useState('2');
@@ -51,7 +60,8 @@ export const CreateVir = () => {
       type_id: 3,
       third_id: parseInt(currentThird),
       category_id: parseInt(currentCategory),
-      account_dest_id: parseInt(currentAccountDest)
+      account_dest_id: parseInt(currentAccountDest),
+      linkedOps: selectedOperations.map((ope) => ope.id)
     })
       .then((response:CreateOperationUsecaseModel) => {
         if(response.message === CODES.SUCCESS) {
@@ -85,6 +95,84 @@ export const CreateVir = () => {
   }
 
   let content = <div></div>;
+  let sumOps = <div></div>;
+  let listOperations = <div></div>;
+
+  const sum = Math.round(selectedOperations.reduce((n, {amount}) => n + amount, 0) * 100) / 100;
+  if (sum > 0) {
+    sumOps = (<div>
+      {sum} €
+    </div>)
+  }
+
+  if(qryOps.loading) {
+    listOperations = <div><Trans>common.loading</Trans></div>;
+  } else if(qryOps.error) {
+    listOperations = <div><Trans>createVir.{qry.error}</Trans></div>
+  } else if (operations === null) {
+    setQryLOps(qry => ({
+      ...qry,
+      loading: true
+    }));
+    inversify.getOperationsUsecase.execute({
+      account_id: parseInt(currentAccountDest),
+      page: 0
+    })
+      .then((response:GetOperationsUsecaseModel) => {
+        if(response.message === CODES.SUCCESS) {
+          setOperations(response.data);
+        } else {
+          inversify.loggerService.debug(response.error);
+          setQryLOps(qry => ({
+            ...qry,
+            error: response.message
+          }));
+        }
+      })
+      .catch((error:any) => {
+        setQryLOps(qry => ({
+          ...qry,
+          error: error.message
+        }));
+      })
+      .finally(() => {
+        setQryLOps(qry => ({
+          ...qry,
+          loading: false
+        }));
+      });
+  } else {
+    listOperations = (<FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
+      <InputLabel><Trans>createVir.operations</Trans></InputLabel>
+      <Select
+        variant="standard"
+        size="small"
+        value={opeSelected}
+        onChange={(e) => { 
+          e.preventDefault();
+          setOpeSelected(e.target.value);
+          selectedOperations.push(e.target.value)
+          setSelectedOperations(selectedOperations);
+        }}
+      >
+        <MenuItem value="">Aucune</MenuItem>
+        {
+          operations.map((operation) => {
+            if (operation.type_id === 2) {
+              return <MenuItem 
+                key={operation.id} 
+                value={operation}
+                sx={{
+                  width: '300px'
+                }}
+              ><Typography noWrap>{operation.amount}€ {operation.description}</Typography></MenuItem>;
+            }
+          })
+        }
+      </Select>
+    </FormControl>)
+  }
+
   if(qry.loading) {
     content = <div><Trans>common.loading</Trans></div>;
   } if(qry.error) {
@@ -169,40 +257,13 @@ export const CreateVir = () => {
           justifyContent="center"
           alignItems="center"
         >
-          <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
-            <InputLabel><Trans>operation.account</Trans></InputLabel>
-            <Select
-              value={currentAccount}
-              variant="standard"
-              size="small"
-              onChange={(e) => { 
-                e.preventDefault();
-                setCurrentAccount(e.target.value);
-              }}
-            >
-              <MenuItem value='2'>Courant</MenuItem>
-              <MenuItem value='4'>Alimentation</MenuItem>
-              <MenuItem value='5'>Assurances</MenuItem>
-              <MenuItem value='15'>Cadeaux</MenuItem>
-              <MenuItem value='17'>Capital</MenuItem>
-              <MenuItem value='33'>Chap42</MenuItem>
-              <MenuItem value='6'>Charges</MenuItem>
-              <MenuItem value='38'>Cluses</MenuItem>
-              <MenuItem value='7'>Distribution</MenuItem>
-              <MenuItem value='8'>Fabrice</MenuItem>
-              <MenuItem value='9'>Geek</MenuItem>
-              <MenuItem value='11'>Illidan</MenuItem>
-              <MenuItem value='34'>Impôts</MenuItem>
-              <MenuItem value='14'>Jeux</MenuItem>
-              <MenuItem value='18'>Mobilité</MenuItem>
-              <MenuItem value='10'>Régie Eau</MenuItem>
-              <MenuItem value='20'>Santé</MenuItem>
-              <MenuItem value='19'>Sorties</MenuItem>
-              <MenuItem value='21'>Taxe foncière</MenuItem>
-              <MenuItem value='22'>Taxe habitation</MenuItem>
-              <MenuItem value='23'>Vacances</MenuItem>
-            </Select>
-          </FormControl>
+          <AccountsSelect
+            value={currentAccount}
+            label={<Trans>operation.account</Trans>}
+            onChange={(e:any) => { 
+              setCurrentAccount(e.target.value);
+            }}
+          />
         </Grid>
 
         {/* Field account_dest */}
@@ -213,41 +274,16 @@ export const CreateVir = () => {
           justifyContent="center"
           alignItems="center"
         >
-          <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
-            <InputLabel><Trans>operation.account_dest</Trans></InputLabel>
-            <Select
-              value={currentAccountDest}
-              variant="standard"
-              size="small"
-              onChange={(e) => { 
-                e.preventDefault();
+          <AccountsSelect
+            value={currentAccountDest}
+            label={<Trans>operation.account_dest</Trans>}
+            onChange={(e:any) => { 
+              e.preventDefault();
                 setCurrentAccountDest(e.target.value);
-              }}
-            >
-              <MenuItem value=''>Aucun</MenuItem>
-              <MenuItem value='2'>Courant</MenuItem>
-              <MenuItem value='4'>Alimentation</MenuItem>
-              <MenuItem value='5'>Assurances</MenuItem>
-              <MenuItem value='15'>Cadeaux</MenuItem>
-              <MenuItem value='17'>Capital</MenuItem>
-              <MenuItem value='33'>Chap42</MenuItem>
-              <MenuItem value='6'>Charges</MenuItem>
-              <MenuItem value='38'>Cluses</MenuItem>
-              <MenuItem value='7'>Distribution</MenuItem>
-              <MenuItem value='8'>Fabrice</MenuItem>
-              <MenuItem value='9'>Geek</MenuItem>
-              <MenuItem value='11'>Illidan</MenuItem>
-              <MenuItem value='34'>Impôts</MenuItem>
-              <MenuItem value='14'>Jeux</MenuItem>
-              <MenuItem value='18'>Mobilité</MenuItem>
-              <MenuItem value='10'>Régie Eau</MenuItem>
-              <MenuItem value='20'>Santé</MenuItem>
-              <MenuItem value='19'>Sorties</MenuItem>
-              <MenuItem value='21'>Taxe foncière</MenuItem>
-              <MenuItem value='22'>Taxe habitation</MenuItem>
-              <MenuItem value='23'>Vacances</MenuItem>
-            </Select>
-          </FormControl>
+                setOperations(null);
+                setSelectedOperations([]);
+            }}
+          />
         </Grid>
 
         {/* Field status */}
@@ -383,6 +419,54 @@ export const CreateVir = () => {
               <MenuItem value='7'>Vacances</MenuItem>
             </Select>
           </FormControl>
+        </Grid>
+
+        {/* Operations */}
+        <Grid 
+          xs={6}
+          item
+          textAlign='center'
+        >
+          {listOperations}
+        </Grid>
+
+        {/* Linked operation */}
+        <Grid 
+          item
+          xs={12}
+          container
+          spacing={1}
+          display='flex'
+          justifyContent='center'
+        >
+          {
+            selectedOperations.map((operation) => {
+              return (
+                <Grid
+                  item
+                  key={operation.id}
+                >
+                  <Button 
+                    variant="contained"
+                    size="small"
+                    startIcon={<Delete />}
+                  >
+                    <Typography noWrap>{operation.amount}€ {operation.description}</Typography>
+                  </Button>
+                </Grid>
+              )
+            })
+          }
+        </Grid>
+        <Grid 
+          item
+          xs={12}
+          container
+          spacing={1}
+          display='flex'
+          justifyContent='center'
+        >
+          {sumOps}
         </Grid>
 
         {/* Button submit */}

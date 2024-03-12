@@ -8,4 +8,5 @@ export interface CreateOperationUsecaseDto {
   type_id: number
   third_id: number
   category_id: number
+  linkedOps: any[]
 }

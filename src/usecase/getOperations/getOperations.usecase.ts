@@ -13,7 +13,7 @@ export class GetOperationsUsecase {
     try {
       const finalDto:any = {
         account_id: dto.account_id,
-        offset: dto.page * 15
+        offset: dto.page * 25
       }
       const response:any = await this.inversify.graphqlService.send(
         {
@@ -23,7 +23,7 @@ export class GetOperationsUsecase {
             operations (
               dto: {
                 account_id: $account_id
-                limit: 15
+                limit: 25
                 offset: $offset
               }
             ) {

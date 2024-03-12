@@ -21,7 +21,8 @@
   "createVir":  {
     "title": "Virement",
     "send": "Envoyer",
-    "succeed": "Virement créé : "
+    "succeed": "Virement créé : ",
+    "operations": "Les opérations"
   },
   "editOperation": {
     "title": "Edition",
