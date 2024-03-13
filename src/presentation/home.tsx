@@ -5,11 +5,11 @@ import { createSearchParams, useNavigate } from 'react-router-dom';
 
 import '@presentation/home.scss';
 import '@presentation/common.scss';
-import Bar from '@presentation/bar';
+import Bar from '@src/presentation/molecule/bar';
 import { CODES } from '@src/common/codes';
 import inversify from '@src/common/inversify';
 import { Footer } from '@presentation/footer';
-import { FlashStore, flashStore} from '@presentation/flash';
+import { FlashStore, flashStore} from '@src/presentation/molecule/flash';
 import { AccountUsecaseModel } from '@usecase/model/account.usecase.model';
 import { GetAccountsUsecaseModel } from '@usecase/getAccounts/getAccounts.usecase.model';
 

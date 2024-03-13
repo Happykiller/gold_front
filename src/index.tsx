@@ -6,7 +6,7 @@ import { RouterProvider, createBrowserRouter } from "react-router-dom";
 
 import '@src/i18n';
 import '@src/index.scss';
-import Flash from '@presentation/flash';
+import Flash from '@src/presentation/molecule/flash';
 import { CGU } from '@presentation/cgu';
 import { Home } from '@presentation/home';
 import { Login } from '@presentation/login';

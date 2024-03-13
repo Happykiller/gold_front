@@ -14,12 +14,12 @@ import { createSearchParams, useNavigate } from 'react-router-dom';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 
 import '@presentation/common.scss';
-import Bar from '@presentation/bar';
+import Bar from '@src/presentation/molecule/bar';
 import '@presentation/operations.scss';
 import { CODES } from '@src/common/codes';
 import { Footer } from '@presentation/footer';
 import inversify from '@src/common/inversify';
-import { FlashStore, flashStore} from '@presentation/flash';
+import { FlashStore, flashStore} from '@src/presentation/molecule/flash';
 import { GetAccountUsecaseModel } from '@usecase/getAccount/getAccount.usecase.model';
 import { GetOperationsUsecaseModel } from '@usecase/getOperations/getOperations.usecase.model';
 

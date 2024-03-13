@@ -8,11 +8,11 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { createSearchParams, useNavigate } from 'react-router-dom';
 import { Button, FormControl, Grid, InputLabel, MenuItem, Select, TextField } from '@mui/material';
 
-import Bar from '@presentation/bar';
+import Bar from '@src/presentation/molecule/bar';
 import { CODES } from '@src/common/codes';
 import inversify from '@src/common/inversify';
 import { Footer } from '@presentation/footer';
-import { FlashStore, flashStore} from '@presentation/flash';
+import { FlashStore, flashStore} from '@src/presentation/molecule/flash';
 import { CloneOperationsUsecaseModel } from '@usecase/cloneOperations/cloneOperations.usecase.model';
 
 export const Clone = () => {

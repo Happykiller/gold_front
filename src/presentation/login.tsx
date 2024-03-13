@@ -10,7 +10,7 @@ import '@presentation/login.scss';
 import { CODES } from '@src/common/codes';
 import { Footer } from '@presentation/footer';
 import inversify from '@src/common/inversify';
-import { contextStore } from '@presentation/contextStore';
+import { contextStore } from '@src/presentation/store/contextStore';
 import { AuthUsecaseModel } from '@usecase/auth/model/auth.usecase.model';
 
 export const Login = () => {

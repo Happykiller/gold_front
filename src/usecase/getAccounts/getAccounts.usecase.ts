@@ -40,7 +40,7 @@ export class GetAccountsUsecase {
           throw new Error(response.errors[0].message);
         }
 
-        this.accounts = response.data.accounts;
+        this.accounts = response.data.accounts.sort((elt1:AccountUsecaseModel, elt2:AccountUsecaseModel) => elt1.label.localeCompare(elt2.label));
       }
 
       return {

@@ -16,6 +16,8 @@ import { CreateOperationUsecase } from '@usecase/createOperation/createOperation
 import { CloneOperationsUsecase } from '@usecase/cloneOperations/cloneOperations.usecase';
 import { UpdateOperationUsecase } from '@usecase/updateOperation/updateOperation.usecase';
 import { DeleteOperationUsecase } from '@usecase/deleteOperation/deleteOperation.usecase';
+import { GetThirdsUsecase } from '../usecase/getThirds/getThirds.usecase';
+import { GetOpeCategoriesUsecase } from '../usecase/getOpeCategories/getOpeCategories.usecase';
 
 export class Inversify {
   authUsecase: AuthUsecase;
@@ -23,6 +25,7 @@ export class Inversify {
   graphqlService: GraphqlService;
   setRecoUsecase: SetRecoUsecase;
   sessionInfo: SessionInfoUsecase;
+  getThirdsUsecase: GetThirdsUsecase;
   systemInfoUsecase: SystemInfoUsecase;
   getAccountUsecase: GetAccountUsecase;
   getAccountsUsecase: GetAccountsUsecase;
@@ -32,6 +35,7 @@ export class Inversify {
   cloneOperationsUsecase: CloneOperationsUsecase;
   updateOperationUsecase: UpdateOperationUsecase;
   deleteOperationUsecase: DeleteOperationUsecase;
+  getOpeCategoriesUsecase: GetOpeCategoriesUsecase;
 
   constructor() {
     // Usecases
@@ -39,6 +43,7 @@ export class Inversify {
     this.loggerService = new LoggerServiceReal();
     this.setRecoUsecase = new SetRecoUsecase(this);
     this.sessionInfo = new SessionInfoUsecase(this);
+    this.getThirdsUsecase = new GetThirdsUsecase(this);
     this.systemInfoUsecase = new SystemInfoUsecase(this);
     this.getAccountUsecase = new GetAccountUsecase(this);
     this.getAccountsUsecase = new GetAccountsUsecase(this);
@@ -48,6 +53,7 @@ export class Inversify {
     this.createOperationUsecase = new CreateOperationUsecase(this);
     this.updateOperationUsecase = new UpdateOperationUsecase(this);
     this.deleteOperationUsecase = new DeleteOperationUsecase(this);
+    this.getOpeCategoriesUsecase = new GetOpeCategoriesUsecase(this);
 
     // Services
     if (config.mode === 'prod') {

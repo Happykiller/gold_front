@@ -14,8 +14,8 @@ import Typography from '@mui/material/Typography';
 import { Link, useNavigate } from "react-router-dom";
 import { Trans, useTranslation } from 'react-i18next';
 
-import '@presentation/bar.scss';
-import { ContextStoreModel, contextStore } from '@presentation/contextStore';
+import '@presentation/molecule/bar.scss';
+import { ContextStoreModel, contextStore } from '@presentation/store/contextStore';
 
 const pages = ['accounts', 'createVir', 'clone'];
 const settings = ['logout'];

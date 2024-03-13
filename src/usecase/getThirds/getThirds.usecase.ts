@@ -22,12 +22,6 @@ export class GetThirdsUsecase {
               operationThirds {
                 id
                 label
-                description
-                active
-                creator_id
-                creation_date
-                modificator_id
-                modification_date
               }
             }`
           }
@@ -37,7 +31,7 @@ export class GetThirdsUsecase {
           throw new Error(response.errors[0].message);
         }
 
-        this.thirds = response.data.operationThirds;
+        this.thirds = response.data.operationThirds.sort((elt1:OperationThridUsecaseModel, elt2:OperationThridUsecaseModel) => elt1.label.localeCompare(elt2.label));
       }
 
       return {
