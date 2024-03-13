@@ -26,7 +26,7 @@ export const OpeCategoriesSelect = (props:any) => {
       ...qry,
       loading: true
     }));
-    inversify.getThirdsUsecase.execute()
+    inversify.getOpeCategoriesUsecase.execute()
       .then((response:GetOpeCategoriesUsecaseModel) => {
         if(response.message === CODES.SUCCESS) {
           setCategories(response.data);
@@ -63,7 +63,7 @@ export const OpeCategoriesSelect = (props:any) => {
             props.onChange(e);
           }}
         >
-          <MenuItem value="">Aucun</MenuItem>
+          <MenuItem value=''><Trans>common.clear</Trans></MenuItem>
           {
             categories.map((category) => {
               return <MenuItem 

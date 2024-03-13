@@ -112,6 +112,9 @@ export const Login = () => {
                 e.preventDefault();
                 setPassVisible(!passVisible);
               }}
+              sx={{
+                cursor: 'pointer'
+              }}
             >
               {(passVisible?<VisibilityOffIcon/>:<VisibilityIcon />)}
             </InputAdornment>

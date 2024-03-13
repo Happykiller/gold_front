@@ -281,9 +281,9 @@ export const CreateVir = () => {
             label={<Trans>operation.account_dest</Trans>}
             onChange={(e:any) => { 
               e.preventDefault();
-                setCurrentAccountDest(e.target.value);
-                setOperations(null);
-                setSelectedOperations([]);
+              setCurrentAccountDest(e.target.value);
+              setOperations(null);
+              setSelectedOperations([]);
             }}
           />
         </Grid>

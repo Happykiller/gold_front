@@ -63,7 +63,7 @@ export const ThirdsSelect = (props:any) => {
             props.onChange(e);
           }}
         >
-          <MenuItem value="">Aucun</MenuItem>
+          <MenuItem value=''><Trans>common.clear</Trans></MenuItem>
           {
             thirds.map((third) => {
               return <MenuItem 

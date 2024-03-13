@@ -20,7 +20,7 @@ export const AccountsSelect = (props:any) => {
   if(qry.loading) {
     content = <div><Trans>common.loading</Trans></div>;
   } else if(qry.error) {
-    content = <div><Trans>createVir.{qry.error}</Trans></div>
+    content = <div><Trans>common.{qry.error}</Trans></div>
   } else if (accounts === null) {
     setQry(qry => ({
       ...qry,
@@ -57,13 +57,14 @@ export const AccountsSelect = (props:any) => {
         <Select
           variant="standard"
           size="small"
+          displayEmpty
           value={props.value}
           onChange={(e) => { 
             e.preventDefault();
             props.onChange(e);
           }}
         >
-          <MenuItem value="">Aucun</MenuItem>
+          <MenuItem value=''><Trans>common.clear</Trans></MenuItem>
           {
             accounts.map((account) => {
               if (account.type_id === 1) {

@@ -6,13 +6,14 @@ import { LocalizationProvider } from '@mui/x-date-pickers';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { createSearchParams, useNavigate } from 'react-router-dom';
-import { Button, FormControl, Grid, InputLabel, MenuItem, Select, TextField } from '@mui/material';
+import { Button, FormControl, Grid, InputLabel, MenuItem, Select } from '@mui/material';
 
-import Bar from '@src/presentation/molecule/bar';
 import { CODES } from '@src/common/codes';
+import Bar from '@presentation/molecule/bar';
 import inversify from '@src/common/inversify';
 import { Footer } from '@presentation/footer';
-import { FlashStore, flashStore} from '@src/presentation/molecule/flash';
+import { AccountsSelect } from '@presentation/molecule/accountsSelect';
+import { FlashStore, flashStore} from '@presentation/molecule/flash';
 import { CloneOperationsUsecaseModel } from '@usecase/cloneOperations/cloneOperations.usecase.model';
 
 export const Clone = () => {
@@ -25,7 +26,7 @@ export const Clone = () => {
   const { t } = useTranslation();
   const flash:FlashStore = flashStore();
   const [currentAccount, setCurrentAccount] = React.useState('2');
-  const [currentTemplate, setCurrentTemplate] = React.useState('2');
+  const [currentTemplate, setCurrentTemplate] = React.useState('');
   const [currentDate, setCurrentDate] = React.useState(dayjs());
 
   const handleClick = async (event: React.SyntheticEvent) => {
@@ -95,40 +96,13 @@ export const Clone = () => {
           justifyContent="center"
           alignItems="center"
         >
-          <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
-            <InputLabel><Trans>operation.account</Trans></InputLabel>
-            <Select
-              value={currentAccount}
-              variant="standard"
-              size="small"
-              onChange={(e) => { 
-                e.preventDefault();
-                setCurrentAccount(e.target.value);
-              }}
-            >
-              <MenuItem value='2'>Courant</MenuItem>
-              <MenuItem value='4'>Alimentation</MenuItem>
-              <MenuItem value='5'>Assurances</MenuItem>
-              <MenuItem value='15'>Cadeaux</MenuItem>
-              <MenuItem value='17'>Capital</MenuItem>
-              <MenuItem value='33'>Chap42</MenuItem>
-              <MenuItem value='6'>Charges</MenuItem>
-              <MenuItem value='38'>Cluses</MenuItem>
-              <MenuItem value='7'>Distribution</MenuItem>
-              <MenuItem value='8'>Fabrice</MenuItem>
-              <MenuItem value='9'>Geek</MenuItem>
-              <MenuItem value='11'>Illidan</MenuItem>
-              <MenuItem value='34'>Impôts</MenuItem>
-              <MenuItem value='14'>Jeux</MenuItem>
-              <MenuItem value='18'>Mobilité</MenuItem>
-              <MenuItem value='10'>Régie Eau</MenuItem>
-              <MenuItem value='20'>Santé</MenuItem>
-              <MenuItem value='19'>Sorties</MenuItem>
-              <MenuItem value='21'>Taxe foncière</MenuItem>
-              <MenuItem value='22'>Taxe habitation</MenuItem>
-              <MenuItem value='23'>Vacances</MenuItem>
-            </Select>
-          </FormControl>
+          <AccountsSelect
+            value={currentAccount}
+            label={<Trans>operation.account</Trans>}
+            onChange={(e:any) => { 
+              setCurrentAccount(e.target.value);
+            }}
+          />
         </Grid>
 
         {/* Field template */}
@@ -150,7 +124,7 @@ export const Clone = () => {
                 setCurrentTemplate(e.target.value);
               }}
             >
-              <MenuItem value=''>Aucun</MenuItem>
+              <MenuItem value=''><Trans>common.clear</Trans></MenuItem>
               <MenuItem value='26'>Prélèvement automatique</MenuItem>
               <MenuItem value='27'>Ventilation</MenuItem>
               <MenuItem value='29'>Echéances</MenuItem>
