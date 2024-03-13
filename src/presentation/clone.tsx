@@ -11,7 +11,7 @@ import { Button, FormControl, Grid, InputLabel, MenuItem, Select } from '@mui/ma
 import { CODES } from '@src/common/codes';
 import Bar from '@presentation/molecule/bar';
 import inversify from '@src/common/inversify';
-import { Footer } from '@presentation/footer';
+import { Footer } from '@presentation/molecule/footer';
 import { AccountsSelect } from '@presentation/molecule/accountsSelect';
 import { FlashStore, flashStore} from '@presentation/molecule/flash';
 import { CloneOperationsUsecaseModel } from '@usecase/cloneOperations/cloneOperations.usecase.model';

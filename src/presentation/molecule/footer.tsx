@@ -2,10 +2,10 @@ import * as React from 'react';
 import { Link } from '@mui/material';
 import { Trans } from 'react-i18next';
 
-import '@presentation/footer.scss';
 import { CODES } from '@src/common/codes';
-import { version } from '../../package.json';
+import '@presentation/molecule/footer.scss';
 import inversify from '@src/common/inversify';
+import { version } from '../../../package.json';
 import { SystemInfoUsecaseModel } from '@usecase/system/model/systemInfo.usecase.model';
 
 export const Footer = () => {

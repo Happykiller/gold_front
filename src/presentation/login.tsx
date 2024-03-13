@@ -8,8 +8,8 @@ import { Box, Button, InputAdornment, TextField } from '@mui/material';
 
 import '@presentation/login.scss';
 import { CODES } from '@src/common/codes';
-import { Footer } from '@presentation/footer';
 import inversify from '@src/common/inversify';
+import { Footer } from '@presentation/molecule/footer';
 import { contextStore } from '@src/presentation/store/contextStore';
 import { AuthUsecaseModel } from '@usecase/auth/model/auth.usecase.model';
 
