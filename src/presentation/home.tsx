@@ -129,7 +129,9 @@ export const Home = () => {
       ...qry,
       loading: true
     }));
-    inversify.getAccountsUsecase.execute()
+    inversify.getAccountsUsecase.execute({
+      cached: false
+    })
       .then((response:GetAccountsUsecaseModel) => {
         if(response.message === CODES.SUCCESS) {
           setAccounts(response.data);

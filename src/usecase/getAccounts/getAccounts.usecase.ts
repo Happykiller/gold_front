@@ -1,6 +1,7 @@
 import { CODES } from '@src/common/codes';
 import { Inversify } from '@src/common/inversify';
 import { AccountUsecaseModel } from '@usecase/model/account.usecase.model';
+import { GetAccountsUsecaseDto } from '@usecase/getAccounts/getAccounts.usecase.dto';
 import { GetAccountsUsecaseModel } from '@usecase/getAccounts/getAccounts.usecase.model';
 
 export class GetAccountsUsecase {
@@ -11,9 +12,9 @@ export class GetAccountsUsecase {
 
   accounts:AccountUsecaseModel[] = [];
 
-  async execute(): Promise<GetAccountsUsecaseModel>  {
+  async execute(dto?: GetAccountsUsecaseDto): Promise<GetAccountsUsecaseModel>  {
     try {
-      if (this.accounts.length === 0) {
+      if (dto?.cached === false || this.accounts.length === 0) {
         const response:any = await this.inversify.graphqlService.send(
           {
             operationName: 'accounts',
@@ -48,6 +49,7 @@ export class GetAccountsUsecase {
         data: this.accounts
       }
     } catch (e: any) {
+      console.log(e.message)
       return {
         message: CODES.FAIL,
         error: e.message

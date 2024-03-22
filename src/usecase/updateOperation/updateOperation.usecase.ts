@@ -1,5 +1,3 @@
-import * as dayjs from 'dayjs';
-
 import { CODES } from '@src/common/codes';
 import { Inversify } from '@src/common/inversify';
 import { OperationUsecaseModel } from '@usecase/model/operation.usecase.model';
@@ -15,8 +13,7 @@ export class UpdateOperationUsecase {
     try {
       const finalDto:any = {
         operation_id: dto.id,
-        ... dto,
-        date: dayjs(parseInt(dto.date)).format('YYYY-MM-DD')
+        ... dto
       };
 
       const response:any = await this.inversify.graphqlService.send(
