@@ -40,7 +40,12 @@ export const EditOperation = () => {
       loading: true
     }));
 
-    inversify.updateOperationUsecase.execute(operation)
+    const dto:any = {
+      ... operation,
+      date: dayjs(parseInt(operation.date)).format('YYYY-MM-DD')
+    };
+
+    inversify.updateOperationUsecase.execute(dto)
       .then((response:CreateOperationUsecaseModel) => {
         if(response.message === CODES.SUCCESS) {
           flash.open(t('editOperation.succeed'));
