@@ -1,3 +1,4 @@
+import { Dayjs } from 'dayjs';
 import * as React from 'react';
 import * as dayjs from 'dayjs';
 import { Trans, useTranslation } from 'react-i18next';
@@ -31,6 +32,7 @@ export const EditOperation = () => {
   const flash:FlashStore = flashStore();
   const [searchParams] = useSearchParams();
   const [operation, setOperation] = React.useState<OperationUsecaseModel>(null);
+  const [opDate, setOpDate] = React.useState<Dayjs>(dayjs());
 
   const handleClick = async (event: React.SyntheticEvent) => {
     event.preventDefault();
@@ -42,7 +44,7 @@ export const EditOperation = () => {
 
     const dto:any = {
       ... operation,
-      date: dayjs(parseInt(operation.date)).format('YYYY-MM-DD')
+      date: opDate.format('YYYY-MM-DD')
     };
 
     inversify.updateOperationUsecase.execute(dto)
@@ -93,6 +95,7 @@ export const EditOperation = () => {
     })
       .then((response:GetOperationUsecaseModel) => {
         if(response.message === CODES.SUCCESS) {
+          setOpDate(dayjs(parseInt(response.data.date)));
           setOperation(response.data);
         } else {
           inversify.loggerService.debug(response.error);
@@ -161,12 +164,9 @@ export const EditOperation = () => {
             <DatePicker
               format="DD/MM/YYYY"
               label={<Trans>operation.date</Trans>}
-              value={dayjs(parseInt(operation.date))}
+              value={opDate}
               onChange={(newValue) => 
-                setOperation({
-                  ... operation,
-                  date: newValue.format('YYYY-MM-DD')
-                })
+                setOpDate(newValue)
               }
             />
           </LocalizationProvider>
