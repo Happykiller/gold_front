@@ -1,6 +1,6 @@
 {
   "name": "gold_front",
-  "version": "0.11.0",
+  "version": "0.12.0",
   "description": "Front for service Gold",
   "scripts": {
     "start": "webpack-dev-server --config ./webpack.dev.config.js --mode development --open --hot",
@@ -9,7 +9,6 @@
   "author": "Fabrice Rosito<fabrice.rosito@gmail.com>",
   "license": "MIT",
   "devDependencies": {
-    "dayjs": "^1.11.10",
     "@emotion/react": "^11.11.3",
     "@emotion/styled": "^11.11.0",
     "@mui/icons-material": "^5.15.10",
@@ -20,8 +19,10 @@
     "@types/react": "^18.2.58",
     "@types/react-dom": "^18.2.19",
     "auto-zustand-selectors-hook": "^2.0.0",
+    "@passwordless-id/webauthn": "^1.5.0",
     "axios": "^1.6.7",
     "css-loader": "^6.10.0",
+    "dayjs": "^1.11.10",
     "dotenv": "^16.4.5",
     "file-loader": "^6.2.0",
     "graphql": "^16.8.1",

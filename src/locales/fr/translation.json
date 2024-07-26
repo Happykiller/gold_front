@@ -4,7 +4,8 @@
     "logout": "Quitter",
     "settings": "Réglages",
     "createVir": "Virement",
-    "clone": "Clone"
+    "clone": "Clone",
+    "profile": "Profil"
   },
   "common": {
     "done": "Valider",
@@ -67,5 +68,28 @@
     "title": "Les opérations",
     "recoSucced": "Reconciliation réussi",
     "deleteSucced": "Suppression réussi"
+  },
+  "profile": {
+    "addPasskey": "Ajouter une clé",
+    "code": "Identifiant: ",
+    "confPassword": "Confirmer mot de passe",
+    "keys": "Voir les clés du système",
+    "name_first": "Prénom: ",
+    "name_last": "Nom: ",
+    "newPassword": "Nouveau mot de passe",
+    "oldPassword": "Mot de passe actuel",
+    "passkey": {
+      "table": {
+        "label": "Nom",
+        "delete": "Supprimer",
+        "active": "Activer"
+      }
+    },
+    "passkeys": "Clés d'accés",
+    "passkey_label": "Nom de l'appareil",
+    "password": "Changer mot de passe",
+    "passwordUpdated": "Mise à jour du mot de passe réussi",
+    "title": "Profil",
+    "UPDATE_PASSWORD_FAIL": "Echec du changement de mot de passe"
   }
 }
