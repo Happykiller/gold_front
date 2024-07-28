@@ -108,6 +108,7 @@ export const Home = () => {
     return (
       <li>
         <Link 
+          style={{ cursor: 'pointer' }}
           onClick={(e) => {
             e.preventDefault();
             navigate({
@@ -117,7 +118,7 @@ export const Home = () => {
               }).toString()
             });
           }}
-        >{account.id} | {account.label}</Link> | <span className={colorReco}>{Math.round(account.balance_reconcilied * 100) / 100} €</span> | <span className={colorNoReco}>{Math.round(account.balance_not_reconcilied * 100) / 100} €</span>
+        >{account.label}</Link> | <span className={colorReco}>{Math.round(account.balance_reconcilied * 100) / 100} €</span> | <span className={colorNoReco}>{Math.round(account.balance_not_reconcilied * 100) / 100} €</span>
         {child}
       </li>
     )
@@ -164,9 +165,6 @@ export const Home = () => {
       <Bar/>
       <div className="parent_container">
         <div className="container">
-          <div className='title'>
-            <Trans>home.title</Trans>
-          </div>
           <div>
             {accountsFormated?.map((accountFormated:any) => (
               <Account key={accountFormated.id} account={accountFormated} />

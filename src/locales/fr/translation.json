@@ -53,6 +53,7 @@
     "passkey": "Clés d'accés"
   },
   "operation": {
+    "id": "ID",
     "third-otherDebit": "Débiteur",
     "third-otherCredit": "Créditeur",
     "category-other": "Autre",
@@ -68,7 +69,8 @@
   "operations": {
     "title": "Les opérations",
     "recoSucced": "Reconciliation réussi",
-    "deleteSucced": "Suppression réussi"
+    "deleteSucced": "Suppression réussi",
+    "actions": "Actions"
   },
   "profile": {
     "addPasskey": "Ajouter une clé",

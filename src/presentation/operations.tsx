@@ -14,10 +14,10 @@ import { createSearchParams, useNavigate } from 'react-router-dom';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 
 import '@presentation/common.scss';
-import Bar from '@src/presentation/molecule/bar';
 import '@presentation/operations.scss';
 import { CODES } from '@src/common/codes';
 import inversify from '@src/common/inversify';
+import Bar from '@src/presentation/molecule/bar';
 import { Footer } from '@presentation/molecule/footer';
 import { FlashStore, flashStore} from '@src/presentation/molecule/flash';
 import { GetAccountUsecaseModel } from '@usecase/getAccount/getAccount.usecase.model';
@@ -70,7 +70,8 @@ export const Operations = () => {
     // Amount
     let color = "gray";
     let opera = "+";
-    let dest = <div></div>;
+    let dest = <span></span>;
+    let dateStr = dayjs(parseInt(operation.date)).format('DD/MM/YYYY');
     if (operation.type_id == 1) {
       // Crédit Vert
       if (operation.status_id == 1) {
@@ -89,58 +90,139 @@ export const Operations = () => {
     } else if (operation.type_id == 3 && operation.account_id_dest == searchParams.get('account_id')) {
       // Vir crédit
       color = "blue";
-      dest = <div><ArrowLeftIcon/>{operation.account?.label}</div>;
+      dest = <span><ArrowLeftIcon/>{operation.account?.label}</span>;
     } else {
       // Vir débit
       color = "violet";
       opera = "-";
-      dest = <div><ArrowRightIcon/>{operation.account_dest?.label}</div>;
+      dest = <span><ArrowRightIcon/>{operation.account_dest?.label}</span>;
     }
   
     return (
-      <tr>
-        <td>{operation.id}</td>
-        <td>{dayjs(parseInt(operation.date)).format('DD/MM/YYYY')}</td>
-        <td className={color}>{opera+operation.amount} €</td>
-        <td>{dest}</td>
-        <td><Trans>{operation.third?.label}</Trans></td>
-        <td><Trans>{operation.category?.label}</Trans></td>
-        <td className='desc' title={operation.description}><Typography noWrap>{operation.description}</Typography></td>
-        <td>
-          <IconButton 
+      <Grid
+        key={operation.id}
+        container
+        sx={{
+          backgroundColor: '#3C4042',
+          marginBottom:'1px',
+          "&:hover": {
+            backgroundColor: "#606368"
+          }
+        }}
+      >
+        <Grid 
+          md={1}
+          item
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          title={operation.id}
+        >
+          <Typography noWrap>{operation.id}</Typography>
+        </Grid>
+        <Grid 
+          md={1}
+          item
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          title={dateStr}
+        >
+          <Typography noWrap>{dateStr}</Typography>
+        </Grid>
+        <Grid 
+          md={1}
+          item
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          title={opera+operation.amount+ '€'}
+        >
+          <Typography noWrap><span className={color}>{opera+operation.amount} €</span></Typography>
+        </Grid>
+        <Grid 
+          md={1}
+          item
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          title={operation.account_dest}
+        >
+          <Typography noWrap>{dest}</Typography>
+        </Grid>
+        <Grid 
+          md={1}
+          item
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          title={operation.third?.label}
+        >
+          <Typography noWrap><Trans>{operation.third?.label}</Trans></Typography>
+        </Grid>
+        <Grid 
+          md={1}
+          item
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          title={operation.category?.label}
+        >
+          <Typography noWrap><Trans>{operation.category?.label}</Trans></Typography>
+        </Grid>
+        <Grid 
+          item
+          md={4}
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          title={operation.description}
+        >
+          <Typography noWrap>{operation.description}</Typography>
+        </Grid>
+        <Grid 
+          md={2}
+          item
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+        >
+          <Typography noWrap>
+            <IconButton 
+              size="small"
+              onClick={(e) => {
+                e.preventDefault();
+                deleteOperation({
+                  operation_id: operation.id
+                });
+              }}><DeleteIcon />
+            </IconButton>
+
+            <IconButton 
+              size="small"
+              onClick={(e) => {
+                e.preventDefault();
+                navigate({
+                  pathname: '/editOperation',
+                  search: createSearchParams({
+                    account_id: searchParams.get('account_id'),
+                    operation_id: operation.id
+                  }).toString()
+                });
+              }}><EditNoteIcon />
+            </IconButton>
+
+            {(operation.status_id == 1)?<IconButton 
             size="small"
             onClick={(e) => {
               e.preventDefault();
-              deleteOperation({
+              reco({
                 operation_id: operation.id
               });
-            }}><DeleteIcon />
-          </IconButton>
-
-          <IconButton 
-            size="small"
-            onClick={(e) => {
-              e.preventDefault();
-              navigate({
-                pathname: '/editOperation',
-                search: createSearchParams({
-                  account_id: searchParams.get('account_id'),
-                  operation_id: operation.id
-                }).toString()
-              });
-            }}><EditNoteIcon />
-          </IconButton>
-
-          {(operation.status_id == 1)?<IconButton 
-          size="small"
-          onClick={(e) => {
-            e.preventDefault();
-            reco({
-              operation_id: operation.id
-            });
-          }}><CheckIcon /></IconButton>:''}
-        </td>
-      </tr>
+            }}><CheckIcon /></IconButton>:''}
+          </Typography>
+        </Grid>
+      </Grid>
     )
   }
 
@@ -293,25 +375,98 @@ export const Operations = () => {
   } if(qryOperations.error) {
     contentOperations = <div><Trans>operations.{qryOperations.error}</Trans></div>
   } else if (operations) {
-    contentOperations = <table className='table'>
-      <thead>
-        <tr>
-          <th>Id</th>
-          <th>Date</th>
-          <th>Amount</th>
-          <th>Account</th>
-          <th>Third</th>
-          <th>Category</th>
-          <th>Description</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
+    contentOperations = <Grid
+        container
+      >
+        <Grid
+          container
+          sx={{
+            color: "#000000",
+            fontWeight: "bold",
+            backgroundColor: "#EA80FC",
+            borderRadius: "5px 5px 0px 0px",
+            fontSize: "0.875rem"
+          }}
+        >
+          <Grid 
+            md={1}
+            item
+            display="flex"
+            justifyContent="center"
+            alignItems="center"
+          >
+            <Trans>operation.id</Trans>
+          </Grid>
+          <Grid 
+            md={1}
+            item
+            display={{ xs: "none", md: "flex" }}
+            justifyContent="center"
+            alignItems="center"
+          >
+            <Trans>operation.date</Trans>
+          </Grid>
+          <Grid
+            item
+            md={1}
+            display="flex"
+            justifyContent="center"
+            alignItems="center"
+          >
+            <Trans>operation.amount</Trans>
+          </Grid>
+          <Grid
+            item
+            md={1}
+            display="flex"
+            justifyContent="center"
+            alignItems="center"
+          >
+            <Trans>operation.account_dest</Trans>
+          </Grid>
+          <Grid
+            item
+            md={1}
+            display="flex"
+            justifyContent="center"
+            alignItems="center"
+          >
+            <Trans>operation.third</Trans>
+          </Grid>
+          <Grid
+            item
+            md={1}
+            display="flex"
+            justifyContent="center"
+            alignItems="center"
+          >
+            <Trans>operation.category</Trans>
+          </Grid>
+          <Grid
+            item
+            md={4}
+            display="flex"
+            justifyContent="center"
+            alignItems="center"
+          >
+            <Trans>operation.description</Trans>
+          </Grid>
+          <Grid
+            item
+            display="flex"
+            justifyContent="center"
+            alignItems="center"
+            md={2}
+          >
+            <Trans>operations.actions</Trans>
+          </Grid>
+        </Grid>
+
         {operations?.map((operation:any) => (
           <Operation key={operation.id} operation={operation} />
         ))}
-      </tbody>
-    </table>;
+
+      </Grid>;
   } 
 
   return (
