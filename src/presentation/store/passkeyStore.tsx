@@ -9,7 +9,7 @@ const passkeyPersist = persist<any>(
     reset: () => set(initialState)
   }),
   {
-    name: "siguri-passkey-storage",
+    name: "gold-passkey-storage",
     storage: createJSONStorage(() => localStorage),
   }
 );

@@ -8,7 +8,6 @@ export interface AuthPasskeyUsecaseModel {
     name_last: string;
     description: string;
     mail: string;
-    role: string;
   },
   error?: string;
 }

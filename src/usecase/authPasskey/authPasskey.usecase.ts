@@ -21,14 +21,13 @@ export class AuthPasskeyUsecase {
             auth_passkey (
               dto: $dto
             ) {
-              access_token
+              accessToken
               id
               code
               name_first
               name_last
               description
               mail
-              role
             }
           }`
         }
