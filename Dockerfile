@@ -1,5 +1,5 @@
 # Base image
-FROM node:18-alpine as build
+FROM node:18-alpine AS build
 
 # Create app directory
 WORKDIR /usr/src/app
@@ -16,12 +16,22 @@ RUN npm ci
 COPY --chown=node:node . .
 
 # Set NODE_ENV environment variable
-ENV NODE_ENV prod
+ENV NODE_ENV=prod
 
+# Build the application
 RUN npm run build
 
 # Start the server
 FROM nginx:alpine
+
+# Copy build artifacts
 COPY --from=build /usr/src/app/dist /usr/share/nginx/html
+
+# Copy the public folder (or specific files you need)
+COPY --from=build /usr/src/app/src/public /usr/share/nginx/html
+
+# Copy nginx configuration
 COPY ./nginx.conf /etc/nginx/conf.d/default.conf
+
+# Expose port 80
 EXPOSE 80

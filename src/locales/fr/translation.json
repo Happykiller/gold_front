@@ -1,98 +1,103 @@
 {
   "bar": {
-    "accounts": "Les comptes",
-    "logout": "Quitter",
-    "settings": "Réglages",
+    "accounts": "Comptes",
+    "clone": "Cloner",
     "createVir": "Virement",
-    "clone": "Clone",
-    "profile": "Profil"
-  },
-  "common": {
-    "done": "Valider",
-    "cancel": "Annuler",
-    "clear": "Aucun",
-    "create": "Créer",
-    "loading": "Chargement..."
+    "logout": "Déconnexion",
+    "profile": "Profil",
+    "settings": "Réglages"
   },
   "clone": {
-    "title": "Clonage",
     "send": "Cloner",
     "succeed": "Clonage réussi",
-    "template": "Template"
+    "template": "Modèle",
+    "title": "Clonage"
   },
-  "createVir":  {
-    "title": "Virement",
+  "common": {
+    "cancel": "Annuler",
+    "clear": "Effacer",
+    "create": "Créer",
+    "done": "Valider",
+    "loading": "Chargement..."
+  },
+  "createVir": {
+    "operations": "Opérations",
     "send": "Envoyer",
     "succeed": "Virement créé : ",
-    "operations": "Les opérations"
+    "title": "Virement"
   },
   "editOperation": {
-    "title": "Edition",
     "send": "Mettre à jour",
-    "succeed": "Mise à jour réussi"
+    "succeed": "Mise à jour réussie",
+    "title": "Édition"
   },
   "error": {
     "credentials_wrong": "Identification impossible"
   },
   "footer": {
-    "issues": "Anomalies",
-    "roadmap": "Roadmap",
+    "issues": "Problèmes",
+    "roadmap": "Feuille de route",
     "version": {
-      "front": "Web: ",
-      "back": "Apis: "
+      "back": "API : ",
+      "front": "Web : "
     }
   },
   "home": {
     "title": "Service Gold"
   },
   "login": {
-    "title": "Authentification",
-    "login": "Entrer votre nom",
-    "password": "Entrer votre mot de passe",
     "AUTH_FAIL_WRONG_CREDENTIAL": "Identifiants incorrects",
-    "passkey": "Clés d'accés"
+    "login": "Entrer votre nom d'utilisateur",
+    "passkey": "Clé d'accès",
+    "password": "Entrer votre mot de passe",
+    "title": "Authentification"
   },
   "operation": {
-    "id": "ID",
-    "third-otherDebit": "Débiteur",
-    "third-otherCredit": "Créditeur",
-    "category-other": "Autre",
-    "amount": "Montant",
-    "description": "Description",
-    "date": "Date",
     "account": "Compte",
     "account_dest": "Destination",
-    "status": "Status",
-    "third": "Tier",
-    "category": "Catégorie"
+    "amount": "Montant",
+    "category": "Catégorie",
+    "category-other": "Autre",
+    "date": "Date",
+    "description": "Description",
+    "id": "ID",
+    "status": "Statut",
+    "third": "Tiers",
+    "third-otherCredit": "Créditeur",
+    "third-otherDebit": "Débiteur"
+  },
+  "operation_create": {
+    "send": "Créer",
+    "title": "Nouvelle opération",
+    "succeed": "Opération créé avec succés"
   },
   "operations": {
-    "title": "Les opérations",
-    "recoSucced": "Reconciliation réussi",
-    "deleteSucced": "Suppression réussi",
-    "actions": "Actions"
+    "actions": "Actions",
+    "deleteSucced": "Suppression réussie",
+    "recoSucced": "Réconciliation réussie",
+    "title": "Opérations"
   },
   "profile": {
     "addPasskey": "Ajouter une clé",
-    "code": "Identifiant: ",
-    "confPassword": "Confirmer mot de passe",
+    "code": "Identifiant : ",
+    "confPassword": "Confirmer le mot de passe",
     "keys": "Voir les clés du système",
-    "name_first": "Prénom: ",
-    "name_last": "Nom: ",
+    "name_first": "Prénom : ",
+    "name_last": "Nom : ",
     "newPassword": "Nouveau mot de passe",
     "oldPassword": "Mot de passe actuel",
     "passkey": {
       "table": {
-        "label": "Nom",
+        "active": "Activer",
         "delete": "Supprimer",
-        "active": "Activer"
+        "label": "Nom"
       }
     },
-    "passkeys": "Clés d'accés",
     "passkey_label": "Nom de l'appareil",
-    "password": "Changer mot de passe",
-    "passwordUpdated": "Mise à jour du mot de passe réussi",
+    "passkeys": "Clés d'accès",
+    "password": "Changer le mot de passe",
+    "passwordUpdated": "Mise à jour du mot de passe réussie",
     "title": "Profil",
-    "UPDATE_PASSWORD_FAIL": "Echec du changement de mot de passe"
+    "UPDATE_PASSWORD_FAIL": "Échec du changement de mot de passe"
   }
 }

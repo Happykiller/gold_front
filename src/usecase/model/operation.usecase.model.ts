@@ -20,7 +20,7 @@ export interface OperationUsecaseModel {
     lable: string;
   }
   category_id: number;
-  ategory: {
+  category: {
     id: number;
     lable: string;
   }

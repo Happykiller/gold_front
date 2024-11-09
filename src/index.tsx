@@ -15,6 +15,7 @@ import { Clone } from '@presentation/clone';
 import { Profile } from '@presentation/profile';
 import { CreateVir } from '@presentation/createVir';
 import { Operations } from '@presentation/operations';
+import { OperationNew } from '@presentation/operation_new';
 import { EditOperation } from '@presentation/editOperation';
 
 const router = createBrowserRouter([
@@ -37,6 +38,10 @@ const router = createBrowserRouter([
   {
     path: "/editOperation",
     element: <Guard><EditOperation /></Guard>,
+  },
+  {
+    path: "/operation_new",
+    element: <Guard><OperationNew /></Guard>,
   },
   {
     path: "/profile",

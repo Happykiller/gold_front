@@ -1,5 +1,6 @@
 import * as React from 'react';
 import * as dayjs from 'dayjs';
+import AddIcon from '@mui/icons-material/Add';
 import CheckIcon from '@mui/icons-material/Check';
 import { useSearchParams } from 'react-router-dom';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -321,13 +322,29 @@ export const Operations = () => {
         xs={12}
         item
       >
-        <h2>{account.label}<IconButton 
-          size="small"
-          onClick={(e) => {
-            e.preventDefault();
-            setOperations(null);
-            setAccount(null);
-          }}><RefreshIcon /></IconButton></h2>
+        <h2>
+          {account.label}
+          <IconButton 
+            size="small"
+            onClick={(e) => {
+              e.preventDefault();
+              setOperations(null);
+              setAccount(null);
+            }}><RefreshIcon />
+          </IconButton>
+          <IconButton 
+            size="small"
+            onClick={(e) => {
+              e.preventDefault();
+              navigate({
+                pathname: '/operation_new',
+                search: createSearchParams({
+                  account_id: searchParams.get('account_id')
+                }).toString()
+              });
+            }}><AddIcon />
+          </IconButton>
+        </h2>
       </Grid>
       <Grid
         xs={12}

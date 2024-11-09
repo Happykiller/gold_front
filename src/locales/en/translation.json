@@ -1,1 +1,103 @@
-{}
+{
+  "bar": {
+    "accounts": "Accounts",
+    "clone": "Clone",
+    "createVir": "Transfer",
+    "logout": "Logout",
+    "profile": "Profile",
+    "settings": "Settings"
+  },
+  "clone": {
+    "send": "Clone",
+    "succeed": "Cloning successful",
+    "template": "Template",
+    "title": "Cloning"
+  },
+  "common": {
+    "cancel": "Cancel",
+    "clear": "Clear",
+    "create": "Create",
+    "done": "Submit",
+    "loading": "Loading..."
+  },
+  "createVir": {
+    "operations": "Operations",
+    "send": "Send",
+    "succeed": "Transfer created: ",
+    "title": "Transfer"
+  },
+  "editOperation": {
+    "send": "Update",
+    "succeed": "Update successful",
+    "title": "Edit"
+  },
+  "error": {
+    "credentials_wrong": "Unable to authenticate"
+  },
+  "footer": {
+    "issues": "Issues",
+    "roadmap": "Roadmap",
+    "version": {
+      "back": "APIs: ",
+      "front": "Web: "
+    }
+  },
+  "home": {
+    "title": "Gold Service"
+  },
+  "login": {
+    "AUTH_FAIL_WRONG_CREDENTIAL": "Incorrect credentials",
+    "login": "Enter your username",
+    "passkey": "Access key",
+    "password": "Enter your password",
+    "title": "Authentication"
+  },
+  "operation": {
+    "account": "Account",
+    "account_dest": "Destination",
+    "amount": "Amount",
+    "category": "Category",
+    "category-other": "Other",
+    "date": "Date",
+    "description": "Description",
+    "id": "ID",
+    "status": "Status",
+    "third": "Third party",
+    "third-otherCredit": "Creditor",
+    "third-otherDebit": "Debtor"
+  },
+  "operation_create": {
+    "send": "Create",
+    "title": "New Operation",
+    "succeed": "Operation create"
+  },
+  "operations": {
+    "actions": "Actions",
+    "deleteSucced": "Deletion successful",
+    "recoSucced": "Reconciliation successful",
+    "title": "Operations"
+  },
+  "profile": {
+    "addPasskey": "Add a key",
+    "code": "Identifier: ",
+    "confPassword": "Confirm password",
+    "keys": "View system keys",
+    "name_first": "First name: ",
+    "name_last": "Last name: ",
+    "newPassword": "New password",
+    "oldPassword": "Current password",
+    "passkey": {
+      "table": {
+        "active": "Activate",
+        "delete": "Delete",
+        "label": "Name"
+      }
+    },
+    "passkey_label": "Device name",
+    "passkeys": "Access keys",
+    "password": "Change password",
+    "passwordUpdated": "Password update successful",
+    "title": "Profile",
+    "UPDATE_PASSWORD_FAIL": "Password change failed"
+  }
+}

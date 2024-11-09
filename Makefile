@@ -19,7 +19,7 @@ install:
 	docker rm gold_front
 	docker image rm gold_front
 	docker load -i gold_front.tar
-	docker run -d --restart=always -p 8083:80 --name gold_front gold_front
+	docker compose -f docker-compose.prod.yml up -d
 
 help:
 	@echo ""

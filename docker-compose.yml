@@ -1,6 +1,4 @@
-## Fichier : docker-compose.yml
-version: '3.8'
-
+# docker-compose.yml
 services:
   gold_front:
     container_name: gold_front
