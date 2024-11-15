@@ -62,7 +62,7 @@ export const CreateVir = () => {
       type_id: 3,
       third_id: parseInt(currentThird),
       category_id: parseInt(currentCategory),
-      account_dest_id: parseInt(currentAccountDest),
+      account_id_dest: parseInt(currentAccountDest),
       linkedOps: selectedOperations.map((ope) => ope.id)
     })
       .then((response:CreateOperationUsecaseModel) => {

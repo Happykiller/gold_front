@@ -16,7 +16,7 @@ import { Profile } from '@presentation/profile';
 import { CreateVir } from '@presentation/createVir';
 import { Operations } from '@presentation/operations';
 import { OperationNew } from '@presentation/operation_new';
-import { EditOperation } from '@presentation/editOperation';
+import { EditOperation } from '@src/presentation/operation_edit';
 
 const router = createBrowserRouter([
   {
@@ -36,7 +36,7 @@ const router = createBrowserRouter([
     element: <Guard><Clone /></Guard>,
   },
   {
-    path: "/editOperation",
+    path: "/operation_edit",
     element: <Guard><EditOperation /></Guard>,
   },
   {

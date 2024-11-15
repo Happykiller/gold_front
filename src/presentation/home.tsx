@@ -118,7 +118,7 @@ export const Home = () => {
               }).toString()
             });
           }}
-        >{account.label}</Link> | <span className={colorReco}>{Math.round(account.balance_reconcilied * 100) / 100} €</span> | <span className={colorNoReco}>{Math.round(account.balance_not_reconcilied * 100) / 100} €</span>
+        >{account.label}</Link> {(account.type_id === 2)?'| Modèle':''} | <span className={colorReco}>{Math.round(account.balance_reconcilied * 100) / 100} €</span> | <span className={colorNoReco}>{Math.round(account.balance_not_reconcilied * 100) / 100} €</span>
         {child}
       </li>
     )

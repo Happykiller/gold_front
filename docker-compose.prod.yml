@@ -1,5 +1,6 @@
+# docker-compose.prod.yml
 services:
-  vergo_front:  # Define the service name
+  gold_front:  # Define the service name
     container_name: gold_front  # Name of the container
     image: gold_front
     ports:

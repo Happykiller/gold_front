@@ -18,8 +18,8 @@ import { FlashStore, flashStore} from '@presentation/molecule/flash';
 import { AccountsSelect } from '@presentation/molecule/accountsSelect';
 import { OperationUsecaseModel } from '@usecase/model/operation.usecase.model';
 import { OpeCategoriesSelect } from '@presentation/molecule/opeCategoriesSelect';
+import { contextStore, ContextStoreModel } from '@presentation/store/contextStore';
 import { CreateOperationUsecaseModel } from '@usecase/createOperation/createOperation.usecase.model';
-import { contextStore, ContextStoreModel } from './store/contextStore';
 
 export const OperationNew = () => {
   const navigate = useNavigate();
@@ -218,6 +218,7 @@ export const OperationNew = () => {
         >
           <AccountsSelect
             value={operation.account_id}
+            type={0}
             label={<Trans>operation.account</Trans>}
             onChange={(e:any) => { 
               e.preventDefault();
@@ -244,7 +245,7 @@ export const OperationNew = () => {
               e.preventDefault();
               setOperation({
                 ... operation,
-                account_id_dest: e.target.value as number
+                account_id_dest: parseInt(e.target.value)
               });
             }}
           />

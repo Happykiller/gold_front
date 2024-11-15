@@ -68,7 +68,7 @@ export class Inversify {
     this.getPasskeyForUserUsecase = new GetPasskeyForUserUsecase(this);
 
     // Services
-    if (config.mode === 'prod') {
+    if (process.env.APP_MODE === 'prod' || process.env.APP_MODE === 'dev') {
       this.graphqlService = new GraphqlServiceFetch(this);
     } else {
       this.graphqlService = new GraphqlServiceFake();

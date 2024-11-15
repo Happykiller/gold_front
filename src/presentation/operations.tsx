@@ -6,6 +6,7 @@ import { useSearchParams } from 'react-router-dom';
 import DeleteIcon from '@mui/icons-material/Delete';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import { Trans, useTranslation } from 'react-i18next';
+import MoveDownIcon from '@mui/icons-material/MoveDown';
 import EditNoteIcon from '@mui/icons-material/EditNote';
 import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
@@ -73,6 +74,7 @@ export const Operations = () => {
     let opera = "+";
     let dest = <span></span>;
     let dateStr = dayjs(parseInt(operation.date)).format('DD/MM/YYYY');
+    let shortDateStr = dayjs(parseInt(operation.date)).format('DD/MM');
     if (operation.type_id == 1) {
       // Crédit Vert
       if (operation.status_id == 1) {
@@ -112,9 +114,11 @@ export const Operations = () => {
         }}
       >
         <Grid 
-          md={1}
           item
-          display="flex"
+          sx={{
+            display: { xs: 'none', sm: 'none', md: 'flex' },
+          }}
+          md={1}
           justifyContent="center"
           alignItems="center"
           title={operation.id}
@@ -122,18 +126,27 @@ export const Operations = () => {
           <Typography noWrap>{operation.id}</Typography>
         </Grid>
         <Grid 
-          md={1}
           item
+          xs={3} sm={2} md={1}
           display="flex"
           justifyContent="center"
           alignItems="center"
           title={dateStr}
         >
-          <Typography noWrap>{dateStr}</Typography>
+          <Typography noWrap
+            sx={{
+              display: { xs: 'none', sm: 'block' },
+            }}
+          >{dateStr}</Typography>
+          <Typography noWrap
+            sx={{
+              display: { xs: 'block', sm: 'none' },
+            }}
+          >{shortDateStr}</Typography>
         </Grid>
         <Grid 
-          md={1}
           item
+          xs={3} sm={2} md={1}
           display="flex"
           justifyContent="center"
           alignItems="center"
@@ -142,9 +155,11 @@ export const Operations = () => {
           <Typography noWrap><span className={color}>{opera+operation.amount} €</span></Typography>
         </Grid>
         <Grid 
-          md={1}
           item
-          display="flex"
+          sx={{
+            display: { xs: 'none', sm: 'none', md: 'flex' },
+          }}
+          md={1}
           justifyContent="center"
           alignItems="center"
           title={operation.account_dest}
@@ -152,9 +167,11 @@ export const Operations = () => {
           <Typography noWrap>{dest}</Typography>
         </Grid>
         <Grid 
-          md={1}
           item
-          display="flex"
+          sx={{
+            display: { xs: 'none', sm: 'none', md: 'flex' },
+          }}
+          md={1}
           justifyContent="center"
           alignItems="center"
           title={operation.third?.label}
@@ -162,8 +179,8 @@ export const Operations = () => {
           <Typography noWrap><Trans>{operation.third?.label}</Trans></Typography>
         </Grid>
         <Grid 
-          md={1}
           item
+          xs={3} sm={2} md={1}
           display="flex"
           justifyContent="center"
           alignItems="center"
@@ -173,8 +190,10 @@ export const Operations = () => {
         </Grid>
         <Grid 
           item
-          md={4}
-          display="flex"
+          sx={{
+            display: { xs: 'none', sm: 'flex', md: 'flex' },
+          }}
+          sm={4} md={5}
           justifyContent="center"
           alignItems="center"
           title={operation.description}
@@ -182,46 +201,47 @@ export const Operations = () => {
           <Typography noWrap>{operation.description}</Typography>
         </Grid>
         <Grid 
-          md={2}
           item
+          xs={3} sm={2} md={1}
           display="flex"
           justifyContent="center"
           alignItems="center"
         >
-          <Typography noWrap>
-            <IconButton 
-              size="small"
-              onClick={(e) => {
-                e.preventDefault();
-                deleteOperation({
-                  operation_id: operation.id
-                });
-              }}><DeleteIcon />
-            </IconButton>
-
-            <IconButton 
-              size="small"
-              onClick={(e) => {
-                e.preventDefault();
-                navigate({
-                  pathname: '/editOperation',
-                  search: createSearchParams({
-                    account_id: searchParams.get('account_id'),
-                    operation_id: operation.id
-                  }).toString()
-                });
-              }}><EditNoteIcon />
-            </IconButton>
-
-            {(operation.status_id == 1)?<IconButton 
+          <IconButton 
             size="small"
             onClick={(e) => {
               e.preventDefault();
-              reco({
+              deleteOperation({
                 operation_id: operation.id
               });
-            }}><CheckIcon /></IconButton>:''}
-          </Typography>
+            }}><DeleteIcon />
+          </IconButton>
+
+          <IconButton 
+            size="small"
+            onClick={(e) => {
+              e.preventDefault();
+              navigate({
+                pathname: '/operation_edit',
+                search: createSearchParams({
+                  account_id: searchParams.get('account_id'),
+                  operation_id: operation.id
+                }).toString()
+              });
+            }}><EditNoteIcon />
+          </IconButton>
+
+          {(operation.status_id == 1)?<IconButton 
+          size="small"
+          sx={{
+            display: { xs: 'none', sm: 'block' },
+          }}
+          onClick={(e) => {
+            e.preventDefault();
+            reco({
+              operation_id: operation.id
+            });
+          }}><CheckIcon /></IconButton>:''}
         </Grid>
       </Grid>
     )
@@ -344,6 +364,18 @@ export const Operations = () => {
               });
             }}><AddIcon />
           </IconButton>
+          <IconButton 
+            size="small"
+            onClick={(e) => {
+              e.preventDefault();
+              navigate({
+                pathname: '/clone',
+                search: createSearchParams({
+                  account_id: searchParams.get('account_id')
+                }).toString()
+              });
+            }}><MoveDownIcon />
+          </IconButton>
         </h2>
       </Grid>
       <Grid
@@ -406,18 +438,20 @@ export const Operations = () => {
           }}
         >
           <Grid 
+            sx={{
+              display: { xs: 'none', sm: 'none', md: 'flex' },
+            }}
             md={1}
             item
-            display="flex"
             justifyContent="center"
             alignItems="center"
           >
             <Trans>operation.id</Trans>
           </Grid>
           <Grid 
-            md={1}
             item
-            display={{ xs: "none", md: "flex" }}
+            xs={3} sm={2} md={1}
+            display="flex"
             justifyContent="center"
             alignItems="center"
           >
@@ -425,7 +459,7 @@ export const Operations = () => {
           </Grid>
           <Grid
             item
-            md={1}
+            xs={3} sm={2} md={1}
             display="flex"
             justifyContent="center"
             alignItems="center"
@@ -434,8 +468,10 @@ export const Operations = () => {
           </Grid>
           <Grid
             item
+            sx={{
+              display: { xs: 'none', sm: 'none', md: 'flex' },
+            }}
             md={1}
-            display="flex"
             justifyContent="center"
             alignItems="center"
           >
@@ -443,8 +479,10 @@ export const Operations = () => {
           </Grid>
           <Grid
             item
+            sx={{
+              display: { xs: 'none', sm: 'none', md: 'flex' },
+            }}
             md={1}
-            display="flex"
             justifyContent="center"
             alignItems="center"
           >
@@ -452,7 +490,7 @@ export const Operations = () => {
           </Grid>
           <Grid
             item
-            md={1}
+            xs={3} sm={2} md={1}
             display="flex"
             justifyContent="center"
             alignItems="center"
@@ -461,8 +499,10 @@ export const Operations = () => {
           </Grid>
           <Grid
             item
-            md={4}
-            display="flex"
+            sx={{
+              display: { xs: 'none', sm: 'flex', md: 'flex' },
+            }}
+            sm={4} md={5}
             justifyContent="center"
             alignItems="center"
           >
@@ -470,10 +510,10 @@ export const Operations = () => {
           </Grid>
           <Grid
             item
+            xs={3} sm={2} md={1}
             display="flex"
             justifyContent="center"
             alignItems="center"
-            md={2}
           >
             <Trans>operations.actions</Trans>
           </Grid>

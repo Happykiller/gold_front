@@ -64,10 +64,11 @@ export const AccountsSelect = (props:any) => {
             props.onChange(e);
           }}
         >
-          <MenuItem value=''><Trans>common.clear</Trans></MenuItem>
+          <MenuItem value={0}><Trans>common.clear</Trans></MenuItem>
           {
             accounts.map((account) => {
-              if (account.type_id === 1) {
+              const type = props.type??1;
+              if (type === 0 || account.type_id === type) {
                 return <MenuItem 
                   key={account.id} 
                   value={account.id}

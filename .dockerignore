@@ -1,0 +1,45 @@
+# Node.js specific
+node_modules
+npm-debug.log
+yarn-error.log
+
+# Build output
+build
+
+# TypeScript specific
+*.tsbuildinfo
+
+# Logs
+logs
+*.log
+
+# Docker files
+Dockerfile
+docker-compose.yml
+docker-compose.prod.yml
+
+# IDEs and editors
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# Testing
+coverage
+*.test.ts
+*.spec.ts
+*.test.tsx
+*.spec.tsx
+
+# Miscellaneous
+.DS_Store
+.git
+.gitignore
+
+docs
+*.tar
+
+# Ignorer les fichiers sensibles
+.env.local

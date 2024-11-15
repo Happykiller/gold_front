@@ -1,19 +1,19 @@
 import * as React from 'react';
 import * as dayjs from 'dayjs';
 import { Send } from '@mui/icons-material';
+import { Button, Grid } from '@mui/material';
 import { Trans, useTranslation } from 'react-i18next';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { createSearchParams, useNavigate } from 'react-router-dom';
-import { Button, FormControl, Grid, InputLabel, MenuItem, Select } from '@mui/material';
 
 import { CODES } from '@src/common/codes';
 import Bar from '@presentation/molecule/bar';
 import inversify from '@src/common/inversify';
 import { Footer } from '@presentation/molecule/footer';
-import { AccountsSelect } from '@presentation/molecule/accountsSelect';
 import { FlashStore, flashStore} from '@presentation/molecule/flash';
+import { AccountsSelect } from '@presentation/molecule/accountsSelect';
 import { CloneOperationsUsecaseModel } from '@usecase/cloneOperations/cloneOperations.usecase.model';
 
 export const Clone = () => {
@@ -25,8 +25,8 @@ export const Clone = () => {
   });
   const { t } = useTranslation();
   const flash:FlashStore = flashStore();
-  const [currentAccount, setCurrentAccount] = React.useState('2');
-  const [currentTemplate, setCurrentTemplate] = React.useState('');
+  const [currentAccount, setCurrentAccount] = React.useState('0');
+  const [currentTemplate, setCurrentTemplate] = React.useState('0');
   const [currentDate, setCurrentDate] = React.useState(dayjs());
 
   const handleClick = async (event: React.SyntheticEvent) => {
@@ -113,23 +113,14 @@ export const Clone = () => {
           justifyContent="center"
           alignItems="center"
         >
-          <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
-            <InputLabel><Trans>clone.template</Trans></InputLabel>
-            <Select
-              value={currentTemplate}
-              variant="standard"
-              size="small"
-              onChange={(e) => { 
-                e.preventDefault();
-                setCurrentTemplate(e.target.value);
-              }}
-            >
-              <MenuItem value=''><Trans>common.clear</Trans></MenuItem>
-              <MenuItem value='26'>Prélèvement automatique</MenuItem>
-              <MenuItem value='27'>Ventilation</MenuItem>
-              <MenuItem value='29'>Echéances</MenuItem>
-            </Select>
-          </FormControl>
+          <AccountsSelect
+            value={currentTemplate}
+            type={2}
+            label={<Trans>clone.template</Trans>}
+            onChange={(e:any) => { 
+              setCurrentTemplate(e.target.value);
+            }}
+          />
         </Grid>
 
         {/* Field date */}
@@ -160,6 +151,7 @@ export const Clone = () => {
             type="submit"
             variant="contained"
             size="small"
+            disabled={(currentAccount === '0' || currentTemplate === '0')}
             startIcon={<Send />}
           ><Trans>clone.send</Trans></Button>
         </Grid>

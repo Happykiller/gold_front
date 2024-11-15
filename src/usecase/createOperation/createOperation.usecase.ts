@@ -11,16 +11,10 @@ export class CreateOperationUsecase {
 
   async execute(dto: CreateOperationUsecaseDto): Promise<CreateOperationUsecaseModel>  {
     try {
-      const graphqlDto:any = {
-        ...dto,
-        account_id_dest: dto.account_dest_id
-      };
-      delete graphqlDto.account_dest_id;
-
       const response:any = await this.inversify.graphqlService.send( 
         {
           operationName: 'createOperation',
-          variables: graphqlDto,
+          variables: dto,
           query: `mutation createOperation(
             $account_id: Int!
             $account_id_dest: Int

@@ -71,6 +71,9 @@
     "title": "Nouvelle opération",
     "succeed": "Opération créé avec succés"
   },
+  "operation_new": {
+    "succeed": "Opération créé avec succés"
+  },
   "operations": {
     "actions": "Actions",
     "deleteSucced": "Suppression réussie",
