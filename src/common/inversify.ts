@@ -1,4 +1,6 @@
-import config from '@src/config/';
+// src\common\inversify.ts
+import { StateStorage } from 'zustand/middleware';
+
 import { AuthUsecase } from '@usecase/auth/auth.usecase';
 import LoggerService from '@service/logger/logger.service';
 import GraphqlService from '@service/graphql/graphql.service';
@@ -12,6 +14,7 @@ import { GraphqlServiceFetch } from '@service/graphql/graphql.service.fetch';
 import { SessionInfoUsecase } from '@usecase/sessionInfo/systemInfo.usecase';
 import { GetAccountsUsecase } from '@usecase/getAccounts/getAccounts.usecase';
 import { AuthPasskeyUsecase } from '@usecase/authPasskey/authPasskey.usecase';
+import { StorageServiceCookie } from '@service/storage/storage.service.cookie';
 import { GetOperationUsecase } from '@usecase/getOperation/getOperation.usecaset';
 import { DeletePasskeyUsecase } from '@usecase/deletePasskey/deletePasskey.usecase';
 import { CreatePasskeyUsecase } from '@usecase/createPasskey/createPasskey.usecase';
@@ -26,6 +29,7 @@ import { GetPasskeyForUserUsecase } from '@usecase/getPasskeyForUser/getPasskeyF
 export class Inversify {
   authUsecase: AuthUsecase;
   loggerService: LoggerService;
+  storageService: StateStorage;
   graphqlService: GraphqlService;
   setRecoUsecase: SetRecoUsecase;
   sessionInfo: SessionInfoUsecase;
@@ -55,9 +59,9 @@ export class Inversify {
     this.systemInfoUsecase = new SystemInfoUsecase(this);
     this.getAccountUsecase = new GetAccountUsecase(this);
     this.getAccountsUsecase = new GetAccountsUsecase(this);
+    this.authPasskeyUsecase = new AuthPasskeyUsecase(this);
     this.getOperationUsecase = new GetOperationUsecase(this);
     this.getOperationsUsecase = new GetOperationsUsecase(this);
-    this.authPasskeyUsecase = new AuthPasskeyUsecase(this);
     this.deletePasskeyUsecase = new DeletePasskeyUsecase(this);
     this.createPasskeyUsecase = new CreatePasskeyUsecase(this);
     this.cloneOperationsUsecase = new CloneOperationsUsecase(this);
@@ -68,6 +72,7 @@ export class Inversify {
     this.getPasskeyForUserUsecase = new GetPasskeyForUserUsecase(this);
 
     // Services
+    this.storageService = new StorageServiceCookie();
     if (process.env.APP_MODE === 'prod' || process.env.APP_MODE === 'dev') {
       this.graphqlService = new GraphqlServiceFetch(this);
     } else {

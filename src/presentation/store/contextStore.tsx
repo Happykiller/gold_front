@@ -1,5 +1,8 @@
+// src\presentation\store\contextStore.tsx
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
+
+import inversify from '@src/common/inversify';
 
 export interface ContextStoreModel {
   id: string;
@@ -7,10 +10,6 @@ export interface ContextStoreModel {
   access_token: string,
   name_first: string,
   name_last: string,
-  chests_secret: {
-    id: string;
-    secret: string;
-  }[]
   reset: () => void
 }
 
@@ -20,7 +19,6 @@ const initialState:any = {
   access_token: null,
   name_first: null,
   name_last: null,
-  chests_secret: null,
 }
 
 const contextPersist = persist<ContextStoreModel>(
@@ -30,7 +28,7 @@ const contextPersist = persist<ContextStoreModel>(
   }),
   {
     name: "gold-storage",
-    storage: createJSONStorage(() => localStorage),
+    storage: createJSONStorage(() => inversify.storageService),
   }
 );
 

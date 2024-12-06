@@ -14,42 +14,39 @@ export class GetAccountsUsecase {
 
   async execute(dto?: GetAccountsUsecaseDto): Promise<GetAccountsUsecaseModel>  {
     try {
-      if (dto?.cached === false || this.accounts.length === 0) {
-        const response:any = await this.inversify.graphqlService.send(
-          {
-            operationName: 'accounts',
-            variables: {},
-            query: `query accounts {  
-              accounts {
-                id
-                type_id
-                parent_account_id
-                label
-                description
-                balance_reconcilied
-                balance_not_reconcilied
-                creator_id
-                creation_date
-                modificator_id
-                modification_date
-              }
-            }`
-          }
-        );
-
-        if(response.errors) {
-          throw new Error(response.errors[0].message);
+      const response:any = await this.inversify.graphqlService.send(
+        {
+          operationName: 'accounts',
+          variables: {},
+          query: `query accounts {  
+            accounts {
+              id
+              type_id
+              parent_account_id
+              label
+              description
+              balance_reconcilied
+              balance_not_reconcilied
+              creator_id
+              creation_date
+              modificator_id
+              modification_date
+            }
+          }`
         }
+      );
 
-        this.accounts = response.data.accounts.sort((elt1:AccountUsecaseModel, elt2:AccountUsecaseModel) => elt1.label.localeCompare(elt2.label));
+      if(response.errors) {
+        throw new Error(response.errors[0].message);
       }
+
+      this.accounts = response.data.accounts.sort((elt1:AccountUsecaseModel, elt2:AccountUsecaseModel) => elt1.label.localeCompare(elt2.label));
 
       return {
         message: CODES.SUCCESS,
         data: this.accounts
       }
     } catch (e: any) {
-      console.log(e.message)
       return {
         message: CODES.FAIL,
         error: e.message

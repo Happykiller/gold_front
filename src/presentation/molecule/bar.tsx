@@ -23,7 +23,7 @@ const settings = ['profile', 'logout'];
 function Bar() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const context:ContextStoreModel = contextStore();
+  const context: ContextStoreModel = contextStore();
   const reset = contextStore((state) => state.reset);
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
@@ -31,37 +31,42 @@ function Bar() {
   const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElNav(event.currentTarget);
   };
+
   const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElUser(event.currentTarget);
   };
 
-  const handleCloseNavMenu = (event: React.MouseEvent<HTMLElement>) => {
+  const handleCloseNavMenu = (event: React.MouseEvent<HTMLElement> | React.TouchEvent<HTMLElement>) => {
     setAnchorElNav(null);
-    switch(event.currentTarget.innerText.toLowerCase()) { 
-      case t('bar.accounts').toLowerCase(): {
+    const selectedPage = event.currentTarget.innerText.toLowerCase();
+    switch (selectedPage) {
+      case t('bar.accounts').toLowerCase():
         navigate("/");
-        break; 
-      } case t('bar.createVir').toLowerCase(): {
+        break;
+      case t('bar.createVir').toLowerCase():
         navigate("/createVir");
-        break; 
-      } case t('bar.clone').toLowerCase(): {
+        break;
+      case t('bar.clone').toLowerCase():
         navigate("/clone");
-        break; 
-      }
-    } 
+        break;
+      default:
+        break;
+    }
   };
 
-  const handleCloseUserMenu = (event: React.MouseEvent<HTMLElement>) => {
+  const handleCloseUserMenu = (event: React.MouseEvent<HTMLElement> | React.TouchEvent<HTMLElement>) => {
     setAnchorElUser(null);
-    switch(event.currentTarget.innerText.toLowerCase()) { 
-      case t('bar.logout').toLowerCase(): {
+    const selectedSetting = event.currentTarget.innerText.toLowerCase();
+    switch (selectedSetting) {
+      case t('bar.logout').toLowerCase():
         reset();
-        break; 
-      } case t('bar.profile').toLowerCase(): {
+        break;
+      case t('bar.profile').toLowerCase():
         navigate("/profile");
-        break; 
-      }
-    } 
+        break;
+      default:
+        break;
+    }
   };
 
   return (
@@ -73,10 +78,10 @@ function Bar() {
             noWrap
             sx={{
               mr: 2,
-              display: { xs: 'none', md: 'flex' }
+              display: { xs: 'none', md: 'flex' },
             }}
           >
-            <Link to="/" className='title'>Gold</Link>
+            <Link to="/" className="title">Gold</Link>
           </Typography>
 
           <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
@@ -109,32 +114,44 @@ function Bar() {
               }}
             >
               {pages.map((page) => (
-                <MenuItem key={page} onClick={handleCloseNavMenu}>
-                  <Typography textAlign="center"><Trans>bar.{page}</Trans></Typography>
+                <MenuItem
+                  key={page}
+                  onClick={handleCloseNavMenu}
+                  onTouchEnd={handleCloseNavMenu}
+                >
+                  <Typography textAlign="center">
+                    <Trans>bar.{page}</Trans>
+                  </Typography>
                 </MenuItem>
               ))}
             </Menu>
           </Box>
+
           <Typography
             variant="h5"
             noWrap
             sx={{
               mr: 2,
               display: { xs: 'flex', md: 'none' },
-              flexGrow: 1
+              flexGrow: 1,
             }}
           >
-            <Link to="/" className='title'>Gold</Link>
+            <Link to="/" className="title">Gold</Link>
           </Typography>
+
           <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
             {pages.map((page) => (
-              <Button
+              <Link
                 key={page}
-                onClick={handleCloseNavMenu}
-                sx={{ my: 2, color: 'white', display: 'block' }}
+                to={`/${page}`}
+                style={{ textDecoration: 'none', color: 'inherit' }}
               >
-                <Trans>bar.{page}</Trans>
-              </Button>
+                <Button
+                  sx={{ my: 2, color: 'white', display: 'block' }}
+                >
+                  <Trans>bar.{page}</Trans>
+                </Button>
+              </Link>
             ))}
           </Box>
 
@@ -161,8 +178,14 @@ function Bar() {
               onClose={handleCloseUserMenu}
             >
               {settings.map((setting) => (
-                <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                  <Typography textAlign="center"><Trans>bar.{setting}</Trans></Typography>
+                <MenuItem
+                  key={setting}
+                  onClick={handleCloseUserMenu}
+                  onTouchEnd={handleCloseUserMenu}
+                >
+                  <Typography textAlign="center">
+                    <Trans>bar.{setting}</Trans>
+                  </Typography>
                 </MenuItem>
               ))}
             </Menu>
@@ -172,4 +195,5 @@ function Bar() {
     </AppBar>
   );
 }
+
 export default Bar;

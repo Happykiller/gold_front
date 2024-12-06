@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { Link } from '@mui/material';
-import { Trans } from 'react-i18next';
 import { createSearchParams, useNavigate } from 'react-router-dom';
 
 import '@presentation/home.scss';
@@ -12,64 +11,68 @@ import { Footer } from '@presentation/molecule/footer';
 import { AccountUsecaseModel } from '@usecase/model/account.usecase.model';
 import { GetAccountsUsecaseModel } from '@usecase/getAccounts/getAccounts.usecase.model';
 
+type Account = {
+  id: number;
+  type_id: number;
+  parent_account_id: number | null;
+  label: string;
+  description: string | null;
+  balance_reconcilied: number;
+  balance_not_reconcilied: number;
+  creator_id: number;
+  creation_date: string;
+  modificator_id: number | null;
+  modification_date: string;
+  children?: Account[];
+  balance_reconcilied_aggregate?: number;
+  balance_not_reconcilied_aggregate?: number;
+};
+
 const formatAccount = (accounts:AccountUsecaseModel[]):any => {
-  let accountsFormated = [];
+  // Étape 1 : Organiser les données en arborescence
+  const buildTree = (accounts: Account[]): Account[] => {
+    const map: { [key: number]: Account } = {};
+    const roots: Account[] = [];
 
-  for(let account of accounts) {
-    if (account.parent_account_id === null) {
+    accounts.forEach(account => {
+        map[account.id] = { ...account, children: [] };
+    });
 
-      const childs = searchChild({
-        parent: account,
-        accounts: accounts
-      });
+    accounts.forEach(account => {
+        if (account.parent_account_id) {
+            map[account.parent_account_id]?.children?.push(map[account.id]);
+        } else {
+            roots.push(map[account.id]);
+        }
+    });
 
-      const accountFormated:any = {
-        ... account,
-        balance_reconcilied: childs.parent_balance_reconcilied,
-        balance_not_reconcilied: childs.parent_balance_not_reconcilied,
-        child: childs.accountsFormated
-      }
+    return roots;
+  };
 
-      accountsFormated.push(accountFormated);
+  // Étape 2 : Calculer les sommes agrégées pour chaque nœud
+  const calculateAggregates = (node: Account): void => {
+    if (!node.children || node.children.length === 0) {
+        // Si pas d'enfants, les agrégats sont égaux aux soldes actuels
+        node.balance_reconcilied_aggregate = node.balance_reconcilied;
+        node.balance_not_reconcilied_aggregate = node.balance_not_reconcilied;
+    } else {
+        // Calculer les agrégats des enfants récursivement
+        node.balance_reconcilied_aggregate = node.balance_reconcilied;
+        node.balance_not_reconcilied_aggregate = node.balance_not_reconcilied;
+
+        node.children.forEach(child => {
+            calculateAggregates(child);
+            node.balance_reconcilied_aggregate! += child.balance_reconcilied_aggregate!;
+            node.balance_not_reconcilied_aggregate! += child.balance_not_reconcilied_aggregate!;
+        });
     }
-  }
+  };
 
-  return accountsFormated;
-}
+  // Étape 3 : Construire et calculer
+  const tree = buildTree(accounts);
+  tree.forEach(root => calculateAggregates(root));
 
-const searchChild = (dto: {
-  parent: AccountUsecaseModel,
-  accounts: AccountUsecaseModel[]
-}):any => {
-  let accountsFormated = [];
-
-  for(let account of dto.accounts) {
-    if (account.parent_account_id === dto.parent.id) {
-
-      const childs = searchChild({
-        parent: account,
-        accounts: dto.accounts
-      });
-
-      dto.parent.balance_reconcilied += childs.parent_balance_reconcilied;
-      dto.parent.balance_not_reconcilied += childs.parent_balance_not_reconcilied;
-
-      const accountFormated:any = {
-        ... account,
-        balance_reconcilied: childs.parent_balance_reconcilied,
-        balance_not_reconcilied: childs.parent_balance_not_reconcilied,
-        child: childs.accountsFormated
-      }
-
-      accountsFormated.push(accountFormated);
-    }
-  }
-
-  return {
-    parent_balance_reconcilied: dto.parent.balance_reconcilied,
-    parent_balance_not_reconcilied: dto.parent.balance_not_reconcilied,
-    accountsFormated
-  }
+  return tree;
 }
 
 export const Home = () => {
@@ -85,12 +88,12 @@ export const Home = () => {
   const Account = (props: { account: any }) => {
     const { account } = props;
   
-    let child = <div></div>;
+    let children = <div></div>;
   
-    if (account.child.length > 0) {
-      child =
+    if (account.children.length > 0) {
+      children =
       <ul className='account-ul'>
-        {account.child?.map((account:any) => (
+        {account.children?.map((account:any) => (
           <Account key={account.id} account={account} />
         ))}
       </ul>
@@ -118,8 +121,10 @@ export const Home = () => {
               }).toString()
             });
           }}
-        >{account.label}</Link> {(account.type_id === 2)?'| Modèle':''} | <span className={colorReco}>{Math.round(account.balance_reconcilied * 100) / 100} €</span> | <span className={colorNoReco}>{Math.round(account.balance_not_reconcilied * 100) / 100} €</span>
-        {child}
+        >{account.label}</Link> 
+          {(account.children.length === 0 && <>{(account.type_id === 2)?'| Modèle':''} | <span className={colorReco}>{Math.round(account.balance_reconcilied * 100) / 100} €</span> | <span className={colorNoReco}>{Math.round(account.balance_not_reconcilied * 100) / 100} €</span></>)}
+          {(account.children.length > 0 && <>{(account.type_id === 2)?'| Modèle':''} | <span className={colorReco}>{Math.round(account.balance_reconcilied_aggregate * 100) / 100} €</span> | <span className={colorNoReco}>{Math.round(account.balance_not_reconcilied_aggregate * 100) / 100} €</span></>)}
+        {children}
       </li>
     )
   }
@@ -130,9 +135,7 @@ export const Home = () => {
       ...qry,
       loading: true
     }));
-    inversify.getAccountsUsecase.execute({
-      cached: false
-    })
+    inversify.getAccountsUsecase.execute()
       .then((response:GetAccountsUsecaseModel) => {
         if(response.message === CODES.SUCCESS) {
           setAccounts(response.data);

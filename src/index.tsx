@@ -6,13 +6,13 @@ import { RouterProvider, createBrowserRouter } from "react-router-dom";
 
 import '@src/i18n';
 import '@src/index.scss';
-import Flash from '@src/presentation/molecule/flash';
 import { CGU } from '@presentation/cgu';
 import { Home } from '@presentation/home';
 import { Login } from '@presentation/login';
-import { Guard } from '@presentation/guard';
+import { Guard } from '@src/presentation/molecule/guard';
 import { Clone } from '@presentation/clone';
 import { Profile } from '@presentation/profile';
+import Flash from '@presentation/molecule/flash';
 import { CreateVir } from '@presentation/createVir';
 import { Operations } from '@presentation/operations';
 import { OperationNew } from '@presentation/operation_new';
@@ -21,6 +21,10 @@ import { EditOperation } from '@src/presentation/operation_edit';
 const router = createBrowserRouter([
   {
     path: "/",
+    element: <Guard><Home /></Guard>,
+  }, 
+  {
+    path: "/accounts",
     element: <Guard><Home /></Guard>,
   }, 
   {
