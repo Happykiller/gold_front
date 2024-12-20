@@ -1,4 +1,5 @@
 {
+  "loading": "Loading...",
   "bar": {
     "accounts": "Accounts",
     "clone": "Clone",

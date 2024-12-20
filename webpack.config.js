@@ -4,7 +4,8 @@ const webpack = require('webpack');
 const Dotenv = require('dotenv-webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
-const MiniCssExtractPlugin = require('mini-css-extract-plugin'); // Import MiniCssExtractPlugin
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const FaviconsWebpackPlugin = require('favicons-webpack-plugin');
 
 // Load environment variables from .env and .env.local files
 dotenv.config({ path: '.env' });
@@ -72,6 +73,29 @@ module.exports = (env, argv) => {
     },
 
     plugins: [
+
+      new FaviconsWebpackPlugin({
+        logo: './src/public/logo.png', // Chemin vers votre logo de base
+        mode: 'webapp', // Génère des icônes pour PWA
+        devMode: 'webapp', // Utilisation en développement
+        favicons: {
+          appName: 'Gold Front',
+          appDescription: 'Banking and Budget Management',
+          developerName: 'Fabrice Rosito',
+          developerURL: null, // Peut être défini si vous souhaitez une URL
+          background: '#ffffff',
+          theme_color: '#3367D6',
+          icons: {
+            android: true, // Génère les icônes pour Android
+            appleIcon: true, // Génère les icônes Apple
+            appleStartup: false, // Pas nécessaire pour cette utilisation
+            favicons: true,
+            windows: false, // Peut être désactivé pour des besoins réduits
+            yandex: false // Pas nécessaire
+          }
+        }
+      }),
+
       new CleanWebpackPlugin(),  // Nettoie le dossier dist avant chaque build
 
       // Plugin to generate an HTML file from a template, and include the bundled assets.

@@ -1,0 +1,16 @@
+{
+  "name": "Gold Front",
+  "short_name": "GoldFront",
+  "description": "Banking and Budget Management",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#3367D6",
+  "icons": [
+    {
+      "src": "logo.png",
+      "type": "image/png",
+      "sizes": "256x256"
+    }
+  ]
+}

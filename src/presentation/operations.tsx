@@ -1,3 +1,4 @@
+// src\presentation\operations.tsx
 import * as React from 'react';
 import * as dayjs from 'dayjs';
 import AddIcon from '@mui/icons-material/Add';
@@ -21,14 +22,14 @@ import { CODES } from '@src/common/codes';
 import inversify from '@src/common/inversify';
 import Bar from '@src/presentation/molecule/bar';
 import { Footer } from '@presentation/molecule/footer';
-import { FlashStore, flashStore} from '@src/presentation/molecule/flash';
+import { FlashStore, flashStore } from '@src/presentation/molecule/flash';
 import { GetAccountUsecaseModel } from '@usecase/getAccount/getAccount.usecase.model';
 import { GetOperationsUsecaseModel } from '@usecase/getOperations/getOperations.usecase.model';
 
 export const Operations = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const flash:FlashStore = flashStore();
+  const flash: FlashStore = flashStore();
   const [searchParams] = useSearchParams();
   const [page, setPage] = React.useState<any>(0);
   const [account, setAccount] = React.useState<any>(null);
@@ -93,27 +94,40 @@ export const Operations = () => {
     } else if (operation.type_id == 3 && operation.account_id_dest == searchParams.get('account_id')) {
       // Vir crédit
       color = "blue";
-      dest = <span><ArrowLeftIcon/>{operation.account?.label}</span>;
+      dest = <span><ArrowLeftIcon />{operation.account?.label}</span>;
     } else {
       // Vir débit
       color = "violet";
       opera = "-";
-      dest = <span><ArrowRightIcon/>{operation.account_dest?.label}</span>;
+      dest = <span><ArrowRightIcon />{operation.account_dest?.label}</span>;
     }
-  
+
+    const goEdit = () => {
+      navigate({
+        pathname: '/operation_edit',
+        search: createSearchParams({
+          account_id: searchParams.get('account_id'),
+          operation_id: operation.id
+        }).toString()
+      });
+    };
+
     return (
       <Grid
         key={operation.id}
         container
+        onClick={(e) => {
+          goEdit();
+        }}
         sx={{
           backgroundColor: '#3C4042',
-          marginBottom:'1px',
+          marginBottom: '1px',
           "&:hover": {
             backgroundColor: "#606368"
           }
         }}
       >
-        <Grid 
+        <Grid
           item
           sx={{
             display: { xs: 'none', sm: 'none', md: 'flex' },
@@ -125,7 +139,7 @@ export const Operations = () => {
         >
           <Typography noWrap>{operation.id}</Typography>
         </Grid>
-        <Grid 
+        <Grid
           item
           xs={3} sm={2} md={1}
           display="flex"
@@ -144,17 +158,17 @@ export const Operations = () => {
             }}
           >{shortDateStr}</Typography>
         </Grid>
-        <Grid 
+        <Grid
           item
           xs={3} sm={2} md={1}
           display="flex"
           justifyContent="center"
           alignItems="center"
-          title={opera+operation.amount+ '€'}
+          title={opera + operation.amount + '€'}
         >
-          <Typography noWrap><span className={color}>{opera+operation.amount} €</span></Typography>
+          <Typography noWrap><span className={color}>{opera + operation.amount} €</span></Typography>
         </Grid>
-        <Grid 
+        <Grid
           item
           sx={{
             display: { xs: 'none', sm: 'none', md: 'flex' },
@@ -166,7 +180,7 @@ export const Operations = () => {
         >
           <Typography noWrap>{dest}</Typography>
         </Grid>
-        <Grid 
+        <Grid
           item
           sx={{
             display: { xs: 'none', sm: 'none', md: 'flex' },
@@ -178,7 +192,7 @@ export const Operations = () => {
         >
           <Typography noWrap><Trans>{operation.third?.label}</Trans></Typography>
         </Grid>
-        <Grid 
+        <Grid
           item
           xs={3} sm={2} md={1}
           display="flex"
@@ -188,7 +202,7 @@ export const Operations = () => {
         >
           <Typography noWrap><Trans>{operation.category?.label}</Trans></Typography>
         </Grid>
-        <Grid 
+        <Grid
           item
           sx={{
             display: { xs: 'none', sm: 'flex', md: 'flex' },
@@ -200,54 +214,51 @@ export const Operations = () => {
         >
           <Typography noWrap>{operation.description}</Typography>
         </Grid>
-        <Grid 
+        <Grid
           item
           xs={3} sm={2} md={1}
           display="flex"
           justifyContent="center"
           alignItems="center"
         >
-          <IconButton 
+          <IconButton
             size="small"
             onClick={(e) => {
-              e.preventDefault();
+              e.stopPropagation();
               deleteOperation({
                 operation_id: operation.id
               });
             }}><DeleteIcon />
           </IconButton>
 
-          <IconButton 
+          <IconButton
             size="small"
+            sx={{
+              display: { xs: 'none', sm: 'block' },
+            }}
             onClick={(e) => {
-              e.preventDefault();
-              navigate({
-                pathname: '/operation_edit',
-                search: createSearchParams({
-                  account_id: searchParams.get('account_id'),
-                  operation_id: operation.id
-                }).toString()
-              });
+              e.stopPropagation();
+              goEdit();
             }}><EditNoteIcon />
           </IconButton>
 
-          {(operation.status_id == 1)?<IconButton 
-          size="small"
-          sx={{
-            display: { xs: 'none', sm: 'block' },
-          }}
-          onClick={(e) => {
-            e.preventDefault();
-            reco({
-              operation_id: operation.id
-            });
-          }}><CheckIcon /></IconButton>:''}
+          {(operation.status_id == 1) ? <IconButton
+            size="small"
+            sx={{
+              display: { xs: 'none', sm: 'block' },
+            }}
+            onClick={(e) => {
+              e.stopPropagation();
+              reco({
+                operation_id: operation.id
+              });
+            }}><CheckIcon /></IconButton> : ''}
         </Grid>
       </Grid>
     )
   }
 
-  if(operations === null) {
+  if (operations === null) {
     setOperations([]);
     setQryOperations(qry => ({
       ...qry,
@@ -257,8 +268,8 @@ export const Operations = () => {
       account_id: parseInt(searchParams.get('account_id')),
       page
     })
-      .then((response:GetOperationsUsecaseModel) => {
-        if(response.message === CODES.SUCCESS) {
+      .then((response: GetOperationsUsecaseModel) => {
+        if (response.message === CODES.SUCCESS) {
           setOperations(response.data);
         } else {
           inversify.loggerService.debug(response.error);
@@ -268,7 +279,7 @@ export const Operations = () => {
           }));
         }
       })
-      .catch((error:any) => {
+      .catch((error: any) => {
         setQryOperations(qry => ({
           ...qry,
           error: error.message
@@ -282,7 +293,7 @@ export const Operations = () => {
       });
   }
 
-  if(account === null) {
+  if (account === null) {
     setAccount({});
     setQryAccount(qry => ({
       ...qry,
@@ -291,8 +302,8 @@ export const Operations = () => {
     inversify.getAccountUsecase.execute({
       account_id: parseInt(searchParams.get('account_id'))
     })
-      .then((response:GetAccountUsecaseModel) => {
-        if(response.message === CODES.SUCCESS) {
+      .then((response: GetAccountUsecaseModel) => {
+        if (response.message === CODES.SUCCESS) {
           setAccount(response.data);
         } else {
           inversify.loggerService.debug(response.error);
@@ -302,7 +313,7 @@ export const Operations = () => {
           }));
         }
       })
-      .catch((error:any) => {
+      .catch((error: any) => {
         setQryAccount(qry => ({
           ...qry,
           error: error.message
@@ -317,9 +328,9 @@ export const Operations = () => {
   }
 
   let contentAccount = <div></div>;
-  if(qryAccount.loading) {
+  if (qryAccount.loading) {
     contentAccount = <div><Trans>common.loading</Trans></div>;
-  } if(qryAccount.error) {
+  } if (qryAccount.error) {
     contentAccount = <div><Trans>operations.{qryAccount.error}</Trans></div>
   } else if (account) {
     let colorReco = 'green';
@@ -344,18 +355,18 @@ export const Operations = () => {
       >
         <h2>
           {account.label}
-          <IconButton 
+          <IconButton
             size="small"
             onClick={(e) => {
-              e.preventDefault();
+              e.stopPropagation();
               setOperations(null);
               setAccount(null);
             }}><RefreshIcon />
           </IconButton>
-          <IconButton 
+          <IconButton
             size="small"
             onClick={(e) => {
-              e.preventDefault();
+              e.stopPropagation();
               navigate({
                 pathname: '/operation_new',
                 search: createSearchParams({
@@ -364,10 +375,10 @@ export const Operations = () => {
               });
             }}><AddIcon />
           </IconButton>
-          <IconButton 
+          <IconButton
             size="small"
             onClick={(e) => {
-              e.preventDefault();
+              e.stopPropagation();
               navigate({
                 pathname: '/clone',
                 search: createSearchParams({
@@ -388,12 +399,12 @@ export const Operations = () => {
         xs={2}
         item
       >
-        {(page!==0)?page:''}<IconButton 
+        {(page !== 0) ? page : ''}<IconButton
           size="small"
           disabled={(page === 0)}
           onClick={(e) => {
-            e.preventDefault();
-            setPage(page-1);
+            e.stopPropagation();
+            setPage(page - 1);
             setOperations(null);
           }}><ArrowBackIosIcon /></IconButton>
       </Grid>
@@ -407,128 +418,128 @@ export const Operations = () => {
         xs={2}
         item
       >
-        <IconButton 
+        <IconButton
           size="small"
           onClick={(e) => {
-            e.preventDefault();
-            setPage(page+1);
+            e.stopPropagation();
+            setPage(page + 1);
             setOperations(null);
-          }}><ArrowForwardIosIcon /></IconButton>{page+2}
+          }}><ArrowForwardIosIcon /></IconButton>{page + 2}
       </Grid>
     </Grid>;
-  } 
+  }
 
   let contentOperations = <div></div>;
-  if(qryOperations.loading) {
+  if (qryOperations.loading) {
     contentOperations = <div><Trans>common.loading</Trans></div>;
-  } if(qryOperations.error) {
+  } if (qryOperations.error) {
     contentOperations = <div><Trans>operations.{qryOperations.error}</Trans></div>
   } else if (operations) {
     contentOperations = <Grid
+      container
+    >
+      <Grid
         container
+        sx={{
+          color: "#000000",
+          fontWeight: "bold",
+          backgroundColor: "#EA80FC",
+          borderRadius: "5px 5px 0px 0px",
+          fontSize: "0.875rem"
+        }}
       >
         <Grid
-          container
           sx={{
-            color: "#000000",
-            fontWeight: "bold",
-            backgroundColor: "#EA80FC",
-            borderRadius: "5px 5px 0px 0px",
-            fontSize: "0.875rem"
+            display: { xs: 'none', sm: 'none', md: 'flex' },
           }}
+          md={1}
+          item
+          justifyContent="center"
+          alignItems="center"
         >
-          <Grid 
-            sx={{
-              display: { xs: 'none', sm: 'none', md: 'flex' },
-            }}
-            md={1}
-            item
-            justifyContent="center"
-            alignItems="center"
-          >
-            <Trans>operation.id</Trans>
-          </Grid>
-          <Grid 
-            item
-            xs={3} sm={2} md={1}
-            display="flex"
-            justifyContent="center"
-            alignItems="center"
-          >
-            <Trans>operation.date</Trans>
-          </Grid>
-          <Grid
-            item
-            xs={3} sm={2} md={1}
-            display="flex"
-            justifyContent="center"
-            alignItems="center"
-          >
-            <Trans>operation.amount</Trans>
-          </Grid>
-          <Grid
-            item
-            sx={{
-              display: { xs: 'none', sm: 'none', md: 'flex' },
-            }}
-            md={1}
-            justifyContent="center"
-            alignItems="center"
-          >
-            <Trans>operation.account_dest</Trans>
-          </Grid>
-          <Grid
-            item
-            sx={{
-              display: { xs: 'none', sm: 'none', md: 'flex' },
-            }}
-            md={1}
-            justifyContent="center"
-            alignItems="center"
-          >
-            <Trans>operation.third</Trans>
-          </Grid>
-          <Grid
-            item
-            xs={3} sm={2} md={1}
-            display="flex"
-            justifyContent="center"
-            alignItems="center"
-          >
-            <Trans>operation.category</Trans>
-          </Grid>
-          <Grid
-            item
-            sx={{
-              display: { xs: 'none', sm: 'flex', md: 'flex' },
-            }}
-            sm={4} md={5}
-            justifyContent="center"
-            alignItems="center"
-          >
-            <Trans>operation.description</Trans>
-          </Grid>
-          <Grid
-            item
-            xs={3} sm={2} md={1}
-            display="flex"
-            justifyContent="center"
-            alignItems="center"
-          >
-            <Trans>operations.actions</Trans>
-          </Grid>
+          <Trans>operation.id</Trans>
         </Grid>
+        <Grid
+          item
+          xs={3} sm={2} md={1}
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+        >
+          <Trans>operation.date</Trans>
+        </Grid>
+        <Grid
+          item
+          xs={3} sm={2} md={1}
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+        >
+          <Trans>operation.amount</Trans>
+        </Grid>
+        <Grid
+          item
+          sx={{
+            display: { xs: 'none', sm: 'none', md: 'flex' },
+          }}
+          md={1}
+          justifyContent="center"
+          alignItems="center"
+        >
+          <Trans>operation.account_dest</Trans>
+        </Grid>
+        <Grid
+          item
+          sx={{
+            display: { xs: 'none', sm: 'none', md: 'flex' },
+          }}
+          md={1}
+          justifyContent="center"
+          alignItems="center"
+        >
+          <Trans>operation.third</Trans>
+        </Grid>
+        <Grid
+          item
+          xs={3} sm={2} md={1}
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+        >
+          <Trans>operation.category</Trans>
+        </Grid>
+        <Grid
+          item
+          sx={{
+            display: { xs: 'none', sm: 'flex', md: 'flex' },
+          }}
+          sm={4} md={5}
+          justifyContent="center"
+          alignItems="center"
+        >
+          <Trans>operation.description</Trans>
+        </Grid>
+        <Grid
+          item
+          xs={3} sm={2} md={1}
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+        >
+          <Trans>operations.actions</Trans>
+        </Grid>
+      </Grid>
 
-        {operations?.map((operation:any) => (
-          <Operation key={operation.id} operation={operation} />
-        ))}
+      {operations?.map((operation: any) => (
+        <Operation key={operation.id} operation={operation} />
+      ))}
 
-      </Grid>;
-  } 
+    </Grid>;
+  }
 
   return (
     <div className="app">
-      <Bar/>
+      <Bar />
       <div className="parent_container">
         <div className="container">
           <div>
