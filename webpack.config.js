@@ -79,7 +79,7 @@ module.exports = (env, argv) => {
         mode: 'webapp', // Génère des icônes pour PWA
         devMode: 'webapp', // Utilisation en développement
         favicons: {
-          appName: 'Gold Front',
+          appName: 'Gold',
           appDescription: 'Banking and Budget Management',
           developerName: 'Fabrice Rosito',
           developerURL: null, // Peut être défini si vous souhaitez une URL
@@ -101,6 +101,7 @@ module.exports = (env, argv) => {
       // Plugin to generate an HTML file from a template, and include the bundled assets.
       new HtmlWebpackPlugin({
         template: './src/index.html',
+        favicon: './src/public/favicon.ico',
         minify: {
           removeComments: true,
           collapseWhitespace: true,

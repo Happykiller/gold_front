@@ -1,3 +1,7 @@
+# Makefile
+# Mark targets as not file-dependent; they are always executed
+.PHONY: start startall down reset tar install help
+
 start: 
 	docker compose up -d
 
