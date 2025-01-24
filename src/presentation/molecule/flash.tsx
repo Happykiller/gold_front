@@ -6,7 +6,7 @@ import CloseIcon from '@mui/icons-material/Close';
 
 export interface FlashStore {
   visible: boolean,
-  msg: string,
+  msg: string|null,
   close: () => void,
   open: (msg: string) => void
 }

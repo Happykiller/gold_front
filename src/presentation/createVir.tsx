@@ -1,19 +1,19 @@
+import dayjs from 'dayjs';
 import * as React from 'react';
-import * as dayjs from 'dayjs';
 import { Delete, Send } from '@mui/icons-material';
 import { Trans, useTranslation } from 'react-i18next';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { createSearchParams, useNavigate } from 'react-router-dom';
-import { Button, FormControl, Grid, InputLabel, MenuItem, Select, TextField, Typography } from '@mui/material';
+import { Button, FormControl, Grid2, InputLabel, MenuItem, Select, TextField, Typography } from '@mui/material';
 
 import { CODES } from '@src/common/codes';
 import Bar from '@presentation/molecule/bar';
 import inversify from '@src/common/inversify';
 import { Footer } from '@presentation/molecule/footer';
 import { ThirdsSelect } from '@presentation/molecule/thirdsSelect';
-import { FlashStore, flashStore} from '@presentation/molecule/flash';
+import { FlashStore, flashStore } from '@presentation/molecule/flash';
 import { AccountsSelect } from '@presentation/molecule/accountsSelect';
 import { OpeCategoriesSelect } from '@presentation/molecule/opeCategoriesSelect';
 import { GetOperationsUsecaseModel } from '@usecase/getOperations/getOperations.usecase.model';
@@ -21,19 +21,27 @@ import { CreateOperationUsecaseModel } from '@usecase/createOperation/createOper
 
 export const CreateVir = () => {
   const navigate = useNavigate();
-  const [qry, setQry] = React.useState({
-    loading: true,
+  const [qry, setQry] = React.useState<{
+    loading: boolean | null,
+    data: any,
+    error: string | null
+  }>({
+    loading: null,
     data: null,
     error: null
   });
-  const [qryOps, setQryLOps] = React.useState({
-    loading: false,
+  const [qryOps, setQryLOps] = React.useState<{
+    loading: boolean | null,
+    data: any,
+    error: string | null
+  }>({
+    loading: null,
     data: null,
     error: null
   });
   const { t } = useTranslation();
-  const flash:FlashStore = flashStore();
-  const [operations, setOperations] = React.useState<any[]>(null);
+  const flash: FlashStore = flashStore();
+  const [operations, setOperations] = React.useState<any[] | null>(null);
   const [selectedOperations, setSelectedOperations] = React.useState<any[]>([]);
   const [currentDsc, setCurrentDsc] = React.useState('');
   const [opeSelected, setOpeSelected] = React.useState('');
@@ -65,9 +73,9 @@ export const CreateVir = () => {
       account_id_dest: parseInt(currentAccountDest),
       linkedOps: selectedOperations.map((ope) => ope.id)
     })
-      .then((response:CreateOperationUsecaseModel) => {
-        if(response.message === CODES.SUCCESS) {
-          flash.open(t('createVir.succeed')+response.data.id);
+      .then((response: CreateOperationUsecaseModel) => {
+        if (response.message === CODES.SUCCESS && response.data) {
+          flash.open(t('createVir.succeed') + response.data.id);
           navigate({
             pathname: '/operations',
             search: createSearchParams({
@@ -82,7 +90,7 @@ export const CreateVir = () => {
           }));
         }
       })
-      .catch((error:any) => {
+      .catch((error: any) => {
         setQry(qry => ({
           ...qry,
           error: error.message
@@ -100,16 +108,16 @@ export const CreateVir = () => {
   let sumOps = <div></div>;
   let listOperations = <div></div>;
 
-  const sum = Math.round(selectedOperations.reduce((n, {amount}) => n + amount, 0) * 100) / 100;
+  const sum = Math.round(selectedOperations.reduce((n, { amount }) => n + amount, 0) * 100) / 100;
   if (sum > 0) {
     sumOps = (<div>
       {sum} €
     </div>)
   }
 
-  if(qryOps.loading) {
+  if (qryOps.loading) {
     listOperations = <div><Trans>common.loading</Trans></div>;
-  } else if(qryOps.error) {
+  } else if (qryOps.error) {
     listOperations = <div><Trans>createVir.{qry.error}</Trans></div>
   } else if (operations === null) {
     setQryLOps(qry => ({
@@ -120,8 +128,8 @@ export const CreateVir = () => {
       account_id: parseInt(currentAccountDest),
       page: 0
     })
-      .then((response:GetOperationsUsecaseModel) => {
-        if(response.message === CODES.SUCCESS) {
+      .then((response: GetOperationsUsecaseModel) => {
+        if (response.message === CODES.SUCCESS && response.data) {
           setOperations(response.data);
         } else {
           inversify.loggerService.debug(response.error);
@@ -131,7 +139,7 @@ export const CreateVir = () => {
           }));
         }
       })
-      .catch((error:any) => {
+      .catch((error: any) => {
         setQryLOps(qry => ({
           ...qry,
           error: error.message
@@ -150,7 +158,7 @@ export const CreateVir = () => {
         variant="standard"
         size="small"
         value={opeSelected}
-        onChange={(e) => { 
+        onChange={(e) => {
           e.preventDefault();
           setOpeSelected(e.target.value);
           selectedOperations.push(e.target.value)
@@ -161,8 +169,8 @@ export const CreateVir = () => {
         {
           operations.map((operation) => {
             if (operation.type_id === 2) {
-              return <MenuItem 
-                key={operation.id} 
+              return <MenuItem
+                key={operation.id}
                 value={operation}
                 sx={{
                   width: '300px'
@@ -175,46 +183,44 @@ export const CreateVir = () => {
     </FormControl>)
   }
 
-  if(qry.loading) {
+  if (qry.loading) {
     content = <div><Trans>common.loading</Trans></div>;
-  } if(qry.error) {
+  } if (qry.error) {
     content = <div><Trans>createVir.{qry.error}</Trans></div>
   } else {
     content = <form
       onSubmit={handleClick}
     >
-      <Grid 
+      <Grid2
         container
         rowSpacing={1}
         columnSpacing={{ xs: 1, sm: 2, md: 3 }}
-        >
+      >
 
         {/* Field amount */}
-        <Grid 
-          xs={6}
-          item
+        <Grid2
+          size={6}
           display="flex"
           justifyContent="center"
           alignItems="center"
         >
           <TextField
-            sx={{ marginRight:1 }}
+            sx={{ marginRight: 1 }}
             label={<Trans>operation.amount</Trans>}
             variant="standard"
             size="small"
             type='number'
             value={currentAmount}
-            onChange={(e) => { 
+            onChange={(e) => {
               e.preventDefault();
               setCurrentAmount(e.target.value);
             }}
           />
-        </Grid>
+        </Grid2>
 
         {/* Field date */}
-        <Grid 
-          xs={6}
-          item
+        <Grid2
+          size={6}
           display="flex"
           justifyContent="center"
           alignItems="center"
@@ -224,37 +230,35 @@ export const CreateVir = () => {
               format="DD/MM/YYYY"
               label={<Trans>operation.date</Trans>}
               value={currentDate}
-              onChange={(newValue) => setCurrentDate(newValue)}
+              onChange={(newValue:any) => setCurrentDate(newValue)}
             />
           </LocalizationProvider>
-        </Grid>
+        </Grid2>
 
         {/* Field description */}
-        <Grid 
-          xs={12}
-          item
+        <Grid2
+          size={12}
           display="flex"
           justifyContent="center"
           alignItems="center"
         >
           <TextField
-            sx={{ marginRight:1 }}
+            sx={{ marginRight: 1 }}
             fullWidth
             label={<Trans>operation.description</Trans>}
             variant="standard"
             size="small"
             value={currentDsc}
-            onChange={(e) => { 
+            onChange={(e) => {
               e.preventDefault();
               setCurrentDsc(e.target.value);
             }}
           />
-        </Grid>
+        </Grid2>
 
         {/* Field account */}
-        <Grid 
-          xs={6}
-          item
+        <Grid2
+          size={6}
           display="flex"
           justifyContent="center"
           alignItems="center"
@@ -262,16 +266,15 @@ export const CreateVir = () => {
           <AccountsSelect
             value={currentAccount}
             label={<Trans>operation.account</Trans>}
-            onChange={(e:any) => { 
+            onChange={(e: any) => {
               setCurrentAccount(e.target.value);
             }}
           />
-        </Grid>
+        </Grid2>
 
         {/* Field account_dest */}
-        <Grid 
-          xs={6}
-          item
+        <Grid2
+          size={6}
           display="flex"
           justifyContent="center"
           alignItems="center"
@@ -279,19 +282,18 @@ export const CreateVir = () => {
           <AccountsSelect
             value={currentAccountDest}
             label={<Trans>operation.account_dest</Trans>}
-            onChange={(e:any) => { 
+            onChange={(e: any) => {
               e.preventDefault();
               setCurrentAccountDest(e.target.value);
               setOperations(null);
               setSelectedOperations([]);
             }}
           />
-        </Grid>
+        </Grid2>
 
         {/* Field status */}
-        <Grid 
-          xs={6}
-          item
+        <Grid2
+          size={6}
           display="flex"
           justifyContent="center"
           alignItems="center"
@@ -302,7 +304,7 @@ export const CreateVir = () => {
               value={currentStatus}
               variant="standard"
               size="small"
-              onChange={(e) => { 
+              onChange={(e) => {
                 e.preventDefault();
                 setCurrentStatus(e.target.value);
               }}
@@ -311,12 +313,11 @@ export const CreateVir = () => {
               <MenuItem value='2'>Réconcilier</MenuItem>
             </Select>
           </FormControl>
-        </Grid>
+        </Grid2>
 
         {/* Field third */}
-        <Grid 
-          xs={6}
-          item
+        <Grid2
+          size={6}
           display="flex"
           justifyContent="center"
           alignItems="center"
@@ -324,17 +325,16 @@ export const CreateVir = () => {
           <ThirdsSelect
             value={currentThird}
             label={<Trans>operation.third</Trans>}
-            onChange={(e:any) => { 
+            onChange={(e: any) => {
               e.preventDefault();
               setCurrentThird(e.target.value);
             }}
           />
-        </Grid>
+        </Grid2>
 
         {/* Field category */}
-        <Grid 
-          xs={6}
-          item
+        <Grid2
+          size={6}
           display="flex"
           justifyContent="center"
           alignItems="center"
@@ -342,26 +342,24 @@ export const CreateVir = () => {
           <OpeCategoriesSelect
             value={currentCategory}
             label={<Trans>operation.category</Trans>}
-            onChange={(e:any) => { 
+            onChange={(e: any) => {
               e.preventDefault();
               setCurrentCategory(e.target.value);
             }}
           />
-        </Grid>
+        </Grid2>
 
         {/* Operations */}
-        <Grid 
-          xs={6}
-          item
+        <Grid2
+          size={6}
           textAlign='center'
         >
           {listOperations}
-        </Grid>
+        </Grid2>
 
         {/* Linked operation */}
-        <Grid 
-          item
-          xs={12}
+        <Grid2
+          size={12}
           container
           spacing={1}
           display='flex'
@@ -370,56 +368,53 @@ export const CreateVir = () => {
           {
             selectedOperations.map((operation) => {
               return (
-                <Grid
-                  item
+                <Grid2
                   key={operation.id}
                 >
-                  <Button 
+                  <Button
                     variant="contained"
                     size="small"
                     startIcon={<Delete />}
                   >
                     <Typography noWrap>{operation.amount}€ {operation.description}</Typography>
                   </Button>
-                </Grid>
+                </Grid2>
               )
             })
           }
-        </Grid>
-        <Grid 
-          item
-          xs={12}
+        </Grid2>
+        <Grid2
+          size={12}
           container
           spacing={1}
           display='flex'
           justifyContent='center'
         >
           {sumOps}
-        </Grid>
+        </Grid2>
 
         {/* Button submit */}
-        <Grid 
-          xs={12}
-          item
+        <Grid2
+          size={12}
           textAlign='center'
         >
-          <Button 
+          <Button
             type="submit"
             variant="contained"
             size="small"
             startIcon={<Send />}
             disabled={(parseFloat(currentAmount) <= 0 || !currentDsc || currentAccount === currentAccountDest)}
           ><Trans>createVir.send</Trans></Button>
-        </Grid>
+        </Grid2>
 
-      </Grid>
+      </Grid2>
     </form>
-    ;
+      ;
   }
 
   return (
     <div className="app">
-      <Bar/>
+      <Bar />
       <div className="parent_container">
         <div className="container">
           <div className='title'>

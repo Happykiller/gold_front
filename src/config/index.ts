@@ -5,9 +5,9 @@ class Config {
   api_url:string;
 
   constructor(){
-    this.mode = process.env.APP_MODE;
-    this.port = process.env.APP_PORT;
-    this.api_url = process.env.API_URL;
+    this.mode = process.env.APP_MODE ?? 'dev';
+    this.port = process.env.APP_PORT ?? '8080';
+    this.api_url = process.env.API_URL ?? 'http://localhost:3000/graphql';
     this.debug = Boolean(process.env.APP_DEBUG) || false;
   }
 }

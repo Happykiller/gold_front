@@ -1,88 +1,36 @@
-import * as React from 'react';
-import { createRoot } from 'react-dom/client';
-import CssBaseline from '@mui/material/CssBaseline';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
-import { RouterProvider, createBrowserRouter } from "react-router-dom";
+// src\index.tsx
+import React, { useState } from 'react';
+import ReactDOM from 'react-dom/client';
+import { BrowserRouter as Router } from 'react-router-dom';
+import { ThemeProvider, CssBaseline } from '@mui/material';
 
-import '@src/i18n';
-import '@src/index.scss';
-import { CGU } from '@presentation/cgu';
-import { Home } from '@presentation/home';
-import { Login } from '@presentation/login';
-import { Guard } from '@src/presentation/molecule/guard';
-import { Clone } from '@presentation/clone';
-import { Profile } from '@presentation/profile';
-import Flash from '@presentation/molecule/flash';
-import { CreateVir } from '@presentation/createVir';
-import { Operations } from '@presentation/operations';
-import { OperationNew } from '@presentation/operation_new';
-import { EditOperation } from '@src/presentation/operation_edit';
+import App from '@src/app';
+import initI18n from '@src/i18n';
+import getTheme from '@src/theme';
 
-const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <Guard><Home /></Guard>,
-  }, 
-  {
-    path: "/accounts",
-    element: <Guard><Home /></Guard>,
-  }, 
-  {
-    path: "/operations",
-    element: <Guard><Operations /></Guard>,
-  }, 
-  {
-    path: "/createVir",
-    element: <Guard><CreateVir /></Guard>,
-  },
-  {
-    path: "/clone",
-    element: <Guard><Clone /></Guard>,
-  },
-  {
-    path: "/operation_edit",
-    element: <Guard><EditOperation /></Guard>,
-  },
-  {
-    path: "/operation_new",
-    element: <Guard><OperationNew /></Guard>,
-  },
-  {
-    path: "/profile",
-    element: <Guard><Profile /></Guard>,
-  },
-  {
-    path: "/login",
-    element: <Login />,
-  },
-  {
-    path: "/CGU",
-    element: <CGU />,
-  },
-]);
+const Index: React.FC = () => {
+  // State to determine whether dark mode is enabled
+  const [darkMode] = useState(true);
 
-const darkTheme = createTheme({
-  palette: {
-    mode: 'dark',
-    primary: {
-      main: '#03DAC6',
-      light: '#FFB2FF',
-      // dark: will be calculated from palette.secondary.main,
-      contrastText: '#000000',
-    },
-    secondary: {
-      main: '#018786',
-      light: '#F5EBFF',
-      // dark: will be calculated from palette.secondary.main,
-      contrastText: '#000000',
-    }
-  },
+  // Create the theme based on the current mode (dark or light)
+  const theme = getTheme(darkMode ? 'dark' : 'light');
+
+  return (
+    <Router>
+      {/* Provide the theme to the entire application */}
+      <ThemeProvider theme={theme}>
+        {/* Apply CSS baseline to ensure consistent styling across browsers */}
+        <CssBaseline />
+        <App />
+      </ThemeProvider>
+    </Router>
+  );
+};
+
+// Initialize i18n and then render the app
+initI18n().then(() => {
+  // Create a root for rendering with ReactDOM.createRoot
+  const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
+  // Render the Index component into the root element
+  root.render(<Index />);
 });
-
-createRoot(document.getElementById("root")).render(
-  <ThemeProvider theme={darkTheme}>
-    <CssBaseline />
-    <RouterProvider router={router} />
-    <Flash/>
-  </ThemeProvider>
-);

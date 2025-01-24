@@ -1,6 +1,6 @@
+import { AuthenticationJSON } from '@passwordless-id/webauthn/dist/esm/types';
+
 export interface AuthPasskeyUsecaseDto {
   user_code: string;
-  user_id: string;
-  challenge: string;
-  challenge_buffer: string;
+  authentication: AuthenticationJSON;
 }

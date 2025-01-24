@@ -2,7 +2,9 @@ const path = require('path');
 const dotenv = require('dotenv');
 const webpack = require('webpack');
 const Dotenv = require('dotenv-webpack');
+const { version } = require('./package.json');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const FaviconsWebpackPlugin = require('favicons-webpack-plugin');
@@ -42,6 +44,11 @@ module.exports = (env, argv) => {
         '@presentation': path.resolve(__dirname, 'src/presentation'), // Alias for the components directory
         '@usecase': path.resolve(__dirname, 'src/usecase'),
         '@service': path.resolve(__dirname, 'src/service'),
+        '@pages': path.resolve(__dirname, 'src/pages'), // Alias for the pages directory
+        '@components': path.resolve(__dirname, 'src/presentation'), // Alias for the components directory
+        '@usecases': path.resolve(__dirname, 'src/usecase'),
+        '@services': path.resolve(__dirname, 'src/service'),
+        '@stores': path.resolve(__dirname, 'src/stores'),
         // Add other aliases as needed
       },
     },
@@ -108,12 +115,19 @@ module.exports = (env, argv) => {
         },
       }),
 
+      new CopyWebpackPlugin({
+        patterns: [
+          { from: 'src/public', to: '' }, // Copie les favicons et le manifest dans le dossier de build
+        ],
+      }),
+
       // Define global constants for use in the application.
       new webpack.DefinePlugin({
         'process.env.APP_MODE': JSON.stringify(process.env.APP_MODE),
         'process.env.API_URL': JSON.stringify(process.env.API_URL),
         'process.env.APP_PORT': JSON.stringify(process.env.APP_PORT),
         'process.env.APP_DEBUG': JSON.stringify(process.env.APP_DEBUG),
+        'process.env.VERSION': JSON.stringify(version),
       }),
 
       isProduction && new MiniCssExtractPlugin({

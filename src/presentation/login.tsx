@@ -12,17 +12,22 @@ import '@presentation/login.scss';
 import { CODES } from '@src/common/codes';
 import inversify from '@src/common/inversify';
 import { Footer } from '@presentation/molecule/footer';
-import { contextStore } from '@src/presentation/store/contextStore';
+import { passkeyStore } from '@presentation/store/passkeyStore';
+import { contextStore } from '@presentation/store/contextStore';
+import { flashStore, FlashStore } from '@presentation/molecule/flash';
 import { AuthUsecaseModel } from '@usecase/auth/model/auth.usecase.model';
-import { flashStore, FlashStore } from './molecule/flash';
-import { passkeyStore } from './store/passkeyStore';
+import { AuthenticateOptions, AuthenticationJSON } from '@passwordless-id/webauthn/dist/esm/types';
 
 export const Login = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const flash:FlashStore = flashStore();
+  const flash: FlashStore = flashStore();
   const passkey = passkeyStore();
-  const [qry, setQry] = React.useState({
+  const [qry, setQry] = React.useState<{
+    loading: boolean | null,
+    data: any,
+    error: string | null
+  }>({
     loading: null,
     data: null,
     error: null
@@ -40,9 +45,9 @@ export const Login = () => {
     inversify.authUsecase.execute({
       login: currentLogin,
       password: currentPassword
-    }).then((response:AuthUsecaseModel) => {
-      if(response.message === CODES.SUCCESS) {
-        contextStore.setState({ 
+    }).then((response: AuthUsecaseModel) => {
+      if (response.message === CODES.SUCCESS && response.data) {
+        contextStore.setState({
           id: response.data.id,
           code: response.data.code,
           access_token: response.data.access_token,
@@ -58,44 +63,47 @@ export const Login = () => {
         }));
       }
     })
-    .catch((error:any) => {
-      setQry(qry => ({
-        ...qry,
-        error: error.message
-      }));
-    })
-    .finally(() => {
-      setQry(qry => ({
-        ...qry,
-        loading: false
-      }));
-    });
+      .catch((error: any) => {
+        setQry(qry => ({
+          ...qry,
+          error: error.message
+        }));
+      })
+      .finally(() => {
+        setQry(qry => ({
+          ...qry,
+          loading: false
+        }));
+      });
   }
 
   const signPasskey = async () => {
     try {
       inversify.loggerService.debug('perform sign passkey with', passkey);
-      const authentication = await client.authenticate([passkey.credential_id], passkey.challenge, {
-        "authenticatorType": "auto",
-        "userVerification": "required",
-        "timeout": 60000
-      });
-      
+      let options: AuthenticateOptions = {
+        challenge: passkey.challenge ?? '',
+        timeout: 60000
+      }
+      if (passkey.credential_id) {
+        options.allowCredentials = [{ id: passkey.credential_id, transports: ['internal'] }];
+      }
+      const authentication: AuthenticationJSON = await client.authenticate(options);
+
       if (authentication) {
         const session = await inversify.authPasskeyUsecase.execute({
-          ...authentication,
-          user_code: passkey.user_code
+          authentication,
+          user_code: passkey.user_code ?? ''
         });
 
-        if(session.message !== CODES.SUCCESS) {
+        if (session.message !== CODES.SUCCESS || !session.data) {
           inversify.loggerService.error(session.error);
           throw new Error(session.message);
         }
 
-        contextStore.setState({ 
+        contextStore.setState({
           id: session.data.id,
           code: session.data.code,
-          access_token: session.data.accessToken,
+          access_token: session.data.access_token,
           name_first: session.data.name_first,
           name_last: session.data.name_last
         });
@@ -103,96 +111,96 @@ export const Login = () => {
       } else {
         inversify.loggerService.error("signIn, failed to perform Login.");
       }
-    } catch(e) {
+    } catch (e: any) {
       flash.open(t(`login.${e.message}`));
       inversify.loggerService.error(e.error);
     }
-  
+
   };
 
   let form = <div></div>;
-  if(qry.loading) {
+  if (qry.loading) {
     form = <div><Trans>common.loading</Trans></div>;
   } else {
     form = <form
-    onSubmit={handleClick}
-  >
-    <Box
-      display="flex"
-      alignItems="center"
-      sx={{ 
-        flexDirection: 'column',
-        gap: '10px;'
-      }}
+      onSubmit={handleClick}
     >
-      {/* Field Login */}
-      <TextField
-        sx={{ marginRight:1}}
-        label={<Trans>login.login</Trans>}
-        variant="standard"
-        size="small"
-        onChange={(e) => { 
-          e.preventDefault();
-          setCurrentLogin(e.target.value);
+      <Box
+        display="flex"
+        alignItems="center"
+        sx={{
+          flexDirection: 'column',
+          gap: '10px;'
         }}
-      />
-      
-      {/* Field Password */}
-      <TextField
-        sx={{ marginRight:1}}
-        label={<Trans>login.password</Trans>}
-        variant="standard"
-        size="small"
-        autoComplete='false'
-        type={(passVisible)?'text':'password'}
-        onChange={(e) => { 
-          e.preventDefault();
-          setCurrentPassword(e.target.value);
-        }}
-        InputProps={{
-          endAdornment: (
-            <InputAdornment 
-              position="end"
-              onClick={(e) => { 
-                e.preventDefault();
-                setPassVisible(!passVisible);
-              }}
-              sx={{
-                cursor: 'pointer'
-              }}
-            >
-              {(passVisible?<VisibilityOffIcon/>:<VisibilityIcon />)}
-            </InputAdornment>
-          ),
-        }}
-      />
+      >
+        {/* Field Login */}
+        <TextField
+          sx={{ marginRight: 1 }}
+          label={<Trans>login.login</Trans>}
+          variant="standard"
+          size="small"
+          onChange={(e) => {
+            e.preventDefault();
+            setCurrentLogin(e.target.value);
+          }}
+        />
 
-      {/* Submit button */}
-      <Button 
-        type="submit"
-        variant="contained"
-        size="small"
-        startIcon={<Done />}
-        disabled={!(currentLogin.length > 3 && currentPassword.length > 3)}
-      ><Trans>common.done</Trans></Button>
+        {/* Field Password */}
+        <TextField
+          sx={{ marginRight: 1 }}
+          label={<Trans>login.password</Trans>}
+          variant="standard"
+          size="small"
+          autoComplete='false'
+          type={(passVisible) ? 'text' : 'password'}
+          onChange={(e) => {
+            e.preventDefault();
+            setCurrentPassword(e.target.value);
+          }}
+          InputProps={{
+            endAdornment: (
+              <InputAdornment
+                position="end"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setPassVisible(!passVisible);
+                }}
+                sx={{
+                  cursor: 'pointer'
+                }}
+              >
+                {(passVisible ? <VisibilityOffIcon /> : <VisibilityIcon />)}
+              </InputAdornment>
+            ),
+          }}
+        />
 
-      {/* Passkeys button */}
-      <Button 
-        variant="contained"
-        size="small"
-        startIcon={<KeyIcon />}
-        disabled={!passkey.user_code}
-        onClick={(e) => { 
-          e.preventDefault();
-          signPasskey();
-        }}
-      ><Trans>login.passkey</Trans></Button>
-    </Box>
-  </form>
+        {/* Submit button */}
+        <Button
+          type="submit"
+          variant="contained"
+          size="small"
+          startIcon={<Done />}
+          disabled={!(currentLogin.length > 3 && currentPassword.length > 3)}
+        ><Trans>common.done</Trans></Button>
+
+        {/* Passkeys button */}
+        <Button
+          variant="contained"
+          size="small"
+          startIcon={<KeyIcon />}
+          disabled={!passkey.user_code}
+          onClick={(e) => {
+            e.preventDefault();
+            signPasskey();
+          }}
+        ><Trans>login.passkey</Trans></Button>
+      </Box>
+    </form>
   }
 
   let errorMessage = <div></div>;
-  if(qry.error) {
+  if (qry.error) {
     errorMessage = <div><Trans>login.{qry.error}</Trans></div>
   }
 
@@ -207,7 +215,7 @@ export const Login = () => {
       <div>
         {errorMessage}
       </div>
-      <Footer/>
+      <Footer />
     </div>
   )
 };

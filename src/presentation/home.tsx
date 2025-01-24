@@ -4,9 +4,9 @@ import { createSearchParams, useNavigate } from 'react-router-dom';
 
 import '@presentation/home.scss';
 import '@presentation/common.scss';
-import Bar from '@src/presentation/molecule/bar';
 import { CODES } from '@src/common/codes';
 import inversify from '@src/common/inversify';
+import Bar from '@src/presentation/molecule/bar';
 import { Footer } from '@presentation/molecule/footer';
 import { AccountUsecaseModel } from '@usecase/model/account.usecase.model';
 import { GetAccountsUsecaseModel } from '@usecase/getAccounts/getAccounts.usecase.model';
@@ -77,10 +77,14 @@ const formatAccount = (accounts:AccountUsecaseModel[]):any => {
 
 export const Home = () => {
   const navigate = useNavigate();
-  const [accounts, setAccounts] = React.useState<AccountUsecaseModel[]>(null);
+  const [accounts, setAccounts] = React.useState<AccountUsecaseModel[]|null>(null);
   let accountsFormated = [];
-  const [qry, setQry] = React.useState({
-    loading: true,
+  const [qry, setQry] = React.useState<{
+    loading: boolean|null,
+    data: any,
+    error: string|Error|null
+  }>({
+    loading: null,
     data: null,
     error: null
   });
@@ -137,7 +141,7 @@ export const Home = () => {
     }));
     inversify.getAccountsUsecase.execute()
       .then((response:GetAccountsUsecaseModel) => {
-        if(response.message === CODES.SUCCESS) {
+        if(response.message === CODES.SUCCESS && response.data) {
           setAccounts(response.data);
         } else {
           inversify.loggerService.debug(response.error);

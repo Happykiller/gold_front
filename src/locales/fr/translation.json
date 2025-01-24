@@ -1,4 +1,7 @@
 {
+  "ERRORS": {
+    "GET_PASSKEY_FOR_USER_FAIL": "Erreurs lors de récupération des clés d'accèes"
+  },
   "loading": "Chargement...",
   "bar": {
     "accounts": "Comptes",

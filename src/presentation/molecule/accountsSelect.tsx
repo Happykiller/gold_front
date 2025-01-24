@@ -8,12 +8,16 @@ import { AccountUsecaseModel } from '@usecase/model/account.usecase.model';
 import { GetAccountsUsecaseModel } from '@usecase/getAccounts/getAccounts.usecase.model';
 
 export const AccountsSelect = (props:any) => {
-  const [accounts, setAccounts] = React.useState<AccountUsecaseModel[]>(null);
-  const [qry, setQry] = React.useState({
-    loading: null,
-    data: null,
-    error: null
-  });
+  const [accounts, setAccounts] = React.useState<AccountUsecaseModel[]|null>(null);
+  const [qry, setQry] = React.useState<{
+      loading: boolean | null,
+      data: any,
+      error: string | null
+    }>({
+      loading: null,
+      data: null,
+      error: null
+    });
 
   let content = <div></div>;
 
@@ -28,7 +32,7 @@ export const AccountsSelect = (props:any) => {
     }));
     inversify.getAccountsUsecase.execute()
       .then((response:GetAccountsUsecaseModel) => {
-        if(response.message === CODES.SUCCESS) {
+        if(response.message === CODES.SUCCESS && response.data) {
           setAccounts(response.data);
         } else {
           inversify.loggerService.debug(response.error);

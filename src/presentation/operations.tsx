@@ -1,6 +1,6 @@
 // src\presentation\operations.tsx
+import dayjs from 'dayjs';
 import * as React from 'react';
-import * as dayjs from 'dayjs';
 import AddIcon from '@mui/icons-material/Add';
 import CheckIcon from '@mui/icons-material/Check';
 import { useSearchParams } from 'react-router-dom';
@@ -11,7 +11,7 @@ import MoveDownIcon from '@mui/icons-material/MoveDown';
 import EditNoteIcon from '@mui/icons-material/EditNote';
 import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
-import { Grid, IconButton, Typography } from '@mui/material';
+import { Grid2, IconButton, Typography } from '@mui/material';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import { createSearchParams, useNavigate } from 'react-router-dom';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
@@ -33,14 +33,22 @@ export const Operations = () => {
   const [searchParams] = useSearchParams();
   const [page, setPage] = React.useState<any>(0);
   const [account, setAccount] = React.useState<any>(null);
-  const [operations, setOperations] = React.useState<any[]>(null);
-  const [qryAccount, setQryAccount] = React.useState({
-    loading: true,
+  const [operations, setOperations] = React.useState<any[] | null>(null);
+  const [qryAccount, setQryAccount] = React.useState<{
+    loading: boolean | null,
+    data: any,
+    error: string | null
+  }>({
+    loading: null,
     data: null,
     error: null
   });
-  const [qryOperations, setQryOperations] = React.useState({
-    loading: true,
+  const [qryOperations, setQryOperations] = React.useState<{
+    loading: boolean | null,
+    data: any,
+    error: string | null
+  }>({
+    loading: null,
     data: null,
     error: null
   });
@@ -106,14 +114,14 @@ export const Operations = () => {
       navigate({
         pathname: '/operation_edit',
         search: createSearchParams({
-          account_id: searchParams.get('account_id'),
+          account_id: searchParams.get('account_id') ?? '0',
           operation_id: operation.id
         }).toString()
       });
     };
 
     return (
-      <Grid
+      <Grid2
         key={operation.id}
         container
         onClick={(e) => {
@@ -127,21 +135,23 @@ export const Operations = () => {
           }
         }}
       >
-        <Grid
-          item
+        <Grid2
           sx={{
             display: { xs: 'none', sm: 'none', md: 'flex' },
           }}
-          md={1}
+          size={1}
           justifyContent="center"
           alignItems="center"
           title={operation.id}
         >
           <Typography noWrap>{operation.id}</Typography>
-        </Grid>
-        <Grid
-          item
-          xs={3} sm={2} md={1}
+        </Grid2>
+        <Grid2
+          size={{
+            xs: 3,
+            sm: 2,
+            md: 1
+          }}
           display="flex"
           justifyContent="center"
           alignItems="center"
@@ -157,66 +167,75 @@ export const Operations = () => {
               display: { xs: 'block', sm: 'none' },
             }}
           >{shortDateStr}</Typography>
-        </Grid>
-        <Grid
-          item
-          xs={3} sm={2} md={1}
+        </Grid2>
+        <Grid2
+          size={{
+            xs: 3,
+            sm: 2,
+            md: 1
+          }}
           display="flex"
           justifyContent="center"
           alignItems="center"
           title={opera + operation.amount + '€'}
         >
           <Typography noWrap><span className={color}>{opera + operation.amount} €</span></Typography>
-        </Grid>
-        <Grid
-          item
+        </Grid2>
+        <Grid2
           sx={{
             display: { xs: 'none', sm: 'none', md: 'flex' },
           }}
-          md={1}
+          size={1}
           justifyContent="center"
           alignItems="center"
           title={operation.account_dest}
         >
           <Typography noWrap>{dest}</Typography>
-        </Grid>
-        <Grid
-          item
+        </Grid2>
+        <Grid2
           sx={{
             display: { xs: 'none', sm: 'none', md: 'flex' },
           }}
-          md={1}
+          size={1}
           justifyContent="center"
           alignItems="center"
           title={operation.third?.label}
         >
           <Typography noWrap><Trans>{operation.third?.label}</Trans></Typography>
-        </Grid>
-        <Grid
-          item
-          xs={3} sm={2} md={1}
+        </Grid2>
+        <Grid2
+          size={{
+            xs: 3,
+            sm: 2,
+            md: 1
+          }}
           display="flex"
           justifyContent="center"
           alignItems="center"
           title={operation.category?.label}
         >
           <Typography noWrap><Trans>{operation.category?.label}</Trans></Typography>
-        </Grid>
-        <Grid
-          item
+        </Grid2>
+        <Grid2
+          size={{
+            sm: 4,
+            md: 5
+          }}
           sx={{
             display: { xs: 'none', sm: 'flex', md: 'flex' },
           }}
-          sm={4} md={5}
           justifyContent="center"
           alignItems="center"
           title={operation.description}
         >
           <Typography noWrap>{operation.description}</Typography>
-        </Grid>
-        <Grid
-          item
-          xs={3} sm={2} md={1}
+        </Grid2>
+        <Grid2
+          size={{
+            xs: 3,
+            sm: 2,
+            md: 1
+          }}
           display="flex"
           justifyContent="center"
           alignItems="center"
@@ -253,8 +272,8 @@ export const Operations = () => {
                 operation_id: operation.id
               });
             }}><CheckIcon /></IconButton> : ''}
-        </Grid>
-      </Grid>
+        </Grid2>
+      </Grid2>
     )
   }
 
@@ -265,11 +284,11 @@ export const Operations = () => {
       loading: true
     }));
     inversify.getOperationsUsecase.execute({
-      account_id: parseInt(searchParams.get('account_id')),
+      account_id: parseInt(searchParams.get('account_id') ?? '0'),
       page
     })
       .then((response: GetOperationsUsecaseModel) => {
-        if (response.message === CODES.SUCCESS) {
+        if (response.message === CODES.SUCCESS && response.data) {
           setOperations(response.data);
         } else {
           inversify.loggerService.debug(response.error);
@@ -300,7 +319,7 @@ export const Operations = () => {
       loading: true
     }));
     inversify.getAccountUsecase.execute({
-      account_id: parseInt(searchParams.get('account_id'))
+      account_id: parseInt(searchParams.get('account_id') ?? '0')
     })
       .then((response: GetAccountUsecaseModel) => {
         if (response.message === CODES.SUCCESS) {
@@ -342,16 +361,15 @@ export const Operations = () => {
       colorNoReco = 'lightRed';
     }
 
-    contentAccount = <Grid
+    contentAccount = <Grid2
       container
       display="flex"
       justifyContent="center"
       alignItems="center"
       textAlign="center"
     >
-      <Grid
-        xs={12}
-        item
+      <Grid2
+        size={12}
       >
         <h2>
           {account.label}
@@ -370,7 +388,7 @@ export const Operations = () => {
               navigate({
                 pathname: '/operation_new',
                 search: createSearchParams({
-                  account_id: searchParams.get('account_id')
+                  account_id: searchParams.get('account_id') ?? '0'
                 }).toString()
               });
             }}><AddIcon />
@@ -382,22 +400,20 @@ export const Operations = () => {
               navigate({
                 pathname: '/clone',
                 search: createSearchParams({
-                  account_id: searchParams.get('account_id')
+                  account_id: searchParams.get('account_id') ?? '0'
                 }).toString()
               });
             }}><MoveDownIcon />
           </IconButton>
         </h2>
-      </Grid>
-      <Grid
-        xs={12}
-        item
+      </Grid2>
+      <Grid2
+        size={12}
       >
         Balance reconcilé : <span className={colorReco}>{account.balance_reconcilied} €</span>
-      </Grid>
-      <Grid
-        xs={2}
-        item
+      </Grid2>
+      <Grid2
+        size={2}
       >
         {(page !== 0) ? page : ''}<IconButton
           size="small"
@@ -407,16 +423,14 @@ export const Operations = () => {
             setPage(page - 1);
             setOperations(null);
           }}><ArrowBackIosIcon /></IconButton>
-      </Grid>
-      <Grid
-        xs={6}
-        item
+      </Grid2>
+      <Grid2
+        size={6}
       >
         Balance non-reconcilé : <span className={colorNoReco}>{account.balance_not_reconcilied} €</span>
-      </Grid>
-      <Grid
-        xs={2}
-        item
+      </Grid2>
+      <Grid2
+        size={2}
       >
         <IconButton
           size="small"
@@ -425,8 +439,8 @@ export const Operations = () => {
             setPage(page + 1);
             setOperations(null);
           }}><ArrowForwardIosIcon /></IconButton>{page + 2}
-      </Grid>
-    </Grid>;
+      </Grid2>
+    </Grid2>;
   }
 
   let contentOperations = <div></div>;
@@ -435,10 +449,10 @@ export const Operations = () => {
   } if (qryOperations.error) {
     contentOperations = <div><Trans>operations.{qryOperations.error}</Trans></div>
   } else if (operations) {
-    contentOperations = <Grid
+    contentOperations = <Grid2
       container
     >
-      <Grid
+      <Grid2
         container
         sx={{
           color: "#000000",
@@ -448,93 +462,104 @@ export const Operations = () => {
           fontSize: "0.875rem"
         }}
       >
-        <Grid
+        <Grid2
           sx={{
             display: { xs: 'none', sm: 'none', md: 'flex' },
           }}
-          md={1}
-          item
+          size={1}
           justifyContent="center"
           alignItems="center"
         >
           <Trans>operation.id</Trans>
-        </Grid>
-        <Grid
-          item
-          xs={3} sm={2} md={1}
+        </Grid2>
+        <Grid2
+          size={{
+            xs: 3,
+            sm: 2,
+            md: 1
+          }}
           display="flex"
           justifyContent="center"
           alignItems="center"
         >
           <Trans>operation.date</Trans>
-        </Grid>
-        <Grid
-          item
-          xs={3} sm={2} md={1}
+        </Grid2>
+        <Grid2
+          size={{
+            xs: 3,
+            sm: 2,
+            md: 1
+          }}
           display="flex"
           justifyContent="center"
           alignItems="center"
         >
           <Trans>operation.amount</Trans>
-        </Grid>
-        <Grid
-          item
+        </Grid2>
+        <Grid2
           sx={{
             display: { xs: 'none', sm: 'none', md: 'flex' },
           }}
-          md={1}
+          size={1}
           justifyContent="center"
           alignItems="center"
         >
           <Trans>operation.account_dest</Trans>
-        </Grid>
-        <Grid
-          item
+        </Grid2>
+        <Grid2
           sx={{
             display: { xs: 'none', sm: 'none', md: 'flex' },
           }}
-          md={1}
+          size={1}
           justifyContent="center"
           alignItems="center"
         >
           <Trans>operation.third</Trans>
-        </Grid>
-        <Grid
-          item
-          xs={3} sm={2} md={1}
+        </Grid2>
+        <Grid2
+          size={{
+            xs: 3,
+            sm: 2,
+            md: 1
+          }}
           display="flex"
           justifyContent="center"
           alignItems="center"
         >
           <Trans>operation.category</Trans>
-        </Grid>
-        <Grid
-          item
+        </Grid2>
+        <Grid2
           sx={{
             display: { xs: 'none', sm: 'flex', md: 'flex' },
           }}
-          sm={4} md={5}
+          size={{
+            sm: 4,
+            md: 5
+          }}
           justifyContent="center"
           alignItems="center"
         >
           <Trans>operation.description</Trans>
-        </Grid>
-        <Grid
-          item
-          xs={3} sm={2} md={1}
+        </Grid2>
+        <Grid2
+          size={{
+            xs: 3,
+            sm: 2,
+            md: 1
+          }}
           display="flex"
           justifyContent="center"
           alignItems="center"
         >
           <Trans>operations.actions</Trans>
-        </Grid>
-      </Grid>
+        </Grid2>
+      </Grid2>
 
       {operations?.map((operation: any) => (
         <Operation key={operation.id} operation={operation} />
       ))}
 
-    </Grid>;
+    </Grid2>;
   }
 
   return (

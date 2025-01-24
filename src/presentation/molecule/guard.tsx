@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { JSX } from 'react';
 import { Trans } from 'react-i18next';
 import { useLocation, Navigate } from "react-router-dom";
 

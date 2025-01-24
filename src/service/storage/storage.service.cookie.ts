@@ -2,7 +2,7 @@
 import { StateStorage } from 'zustand/middleware';
 
 export class StorageServiceCookie implements StateStorage {
-  getItem(name: string): string {
+  getItem(name: string): string|null {
     const cookies = document.cookie.split('; ');
     for (const cookie of cookies) {
       const [cookieName, cookieValue] = cookie.split('=');

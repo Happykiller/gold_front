@@ -1,7 +1,7 @@
+import dayjs from 'dayjs';
 import * as React from 'react';
-import * as dayjs from 'dayjs';
 import { Send } from '@mui/icons-material';
-import { Button, Grid } from '@mui/material';
+import { Button, Grid2 } from '@mui/material';
 import { Trans, useTranslation } from 'react-i18next';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
@@ -12,19 +12,23 @@ import { CODES } from '@src/common/codes';
 import Bar from '@presentation/molecule/bar';
 import inversify from '@src/common/inversify';
 import { Footer } from '@presentation/molecule/footer';
-import { FlashStore, flashStore} from '@presentation/molecule/flash';
+import { FlashStore, flashStore } from '@presentation/molecule/flash';
 import { AccountsSelect } from '@presentation/molecule/accountsSelect';
 import { CloneOperationsUsecaseModel } from '@usecase/cloneOperations/cloneOperations.usecase.model';
 
 export const Clone = () => {
   const navigate = useNavigate();
-  const [qry, setQry] = React.useState({
-    loading: true,
+  const [qry, setQry] = React.useState<{
+    loading: boolean | null,
+    data: any,
+    error: string | null
+  }>({
+    loading: null,
     data: null,
     error: null
   });
   const { t } = useTranslation();
-  const flash:FlashStore = flashStore();
+  const flash: FlashStore = flashStore();
   const [currentAccount, setCurrentAccount] = React.useState('0');
   const [currentTemplate, setCurrentTemplate] = React.useState('0');
   const [currentDate, setCurrentDate] = React.useState(dayjs());
@@ -42,8 +46,8 @@ export const Clone = () => {
       account_id: parseInt(currentAccount),
       template_account_id: parseInt(currentTemplate)
     })
-      .then((response:CloneOperationsUsecaseModel) => {
-        if(response.message === CODES.SUCCESS) {
+      .then((response: CloneOperationsUsecaseModel) => {
+        if (response.message === CODES.SUCCESS) {
           flash.open(t('clone.succeed'));
           navigate({
             pathname: '/operations',
@@ -59,7 +63,7 @@ export const Clone = () => {
           }));
         }
       })
-      .catch((error:any) => {
+      .catch((error: any) => {
         setQry(qry => ({
           ...qry,
           error: error.message
@@ -74,24 +78,23 @@ export const Clone = () => {
   }
 
   let content = <div></div>;
-  if(qry.loading) {
+  if (qry.loading) {
     content = <div><Trans>common.loading</Trans></div>;
-  } if(qry.error) {
+  } if (qry.error) {
     content = <div><Trans>createVir.{qry.error}</Trans></div>
   } else {
     content = <form
       onSubmit={handleClick}
     >
-      <Grid 
+      <Grid2
         container
         rowSpacing={1}
         columnSpacing={{ xs: 1, sm: 2, md: 3 }}
-        >
+      >
 
         {/* Field account */}
-        <Grid 
-          xs={6}
-          item
+        <Grid2
+          size={6}
           display="flex"
           justifyContent="center"
           alignItems="center"
@@ -99,16 +102,15 @@ export const Clone = () => {
           <AccountsSelect
             value={currentAccount}
             label={<Trans>operation.account</Trans>}
-            onChange={(e:any) => { 
+            onChange={(e: any) => {
               setCurrentAccount(e.target.value);
             }}
           />
-        </Grid>
+        </Grid2>
 
         {/* Field template */}
-        <Grid 
-          xs={6}
-          item
+        <Grid2
+          size={6}
           display="flex"
           justifyContent="center"
           alignItems="center"
@@ -117,16 +119,15 @@ export const Clone = () => {
             value={currentTemplate}
             type={2}
             label={<Trans>clone.template</Trans>}
-            onChange={(e:any) => { 
+            onChange={(e: any) => {
               setCurrentTemplate(e.target.value);
             }}
           />
-        </Grid>
+        </Grid2>
 
         {/* Field date */}
-        <Grid 
-          xs={12}
-          item
+        <Grid2
+          size={12}
           display="flex"
           justifyContent="center"
           alignItems="center"
@@ -136,34 +137,33 @@ export const Clone = () => {
               format="DD/MM/YYYY"
               label={<Trans>operation.date</Trans>}
               value={currentDate}
-              onChange={(newValue) => setCurrentDate(newValue)}
+              onChange={(newValue:any) => setCurrentDate(newValue)}
             />
           </LocalizationProvider>
-        </Grid>
+        </Grid2>
 
         {/* Button submit */}
-        <Grid 
-          xs={12}
-          item
+        <Grid2
+          size={12}
           textAlign='center'
         >
-          <Button 
+          <Button
             type="submit"
             variant="contained"
             size="small"
             disabled={(currentAccount === '0' || currentTemplate === '0')}
             startIcon={<Send />}
           ><Trans>clone.send</Trans></Button>
-        </Grid>
+        </Grid2>
 
-      </Grid>
+      </Grid2>
     </form>
-    ;
+      ;
   }
 
   return (
     <div className="app">
-      <Bar/>
+      <Bar />
       <div className="parent_container">
         <div className="container">
           <div className='title'>
