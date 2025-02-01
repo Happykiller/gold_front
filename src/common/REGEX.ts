@@ -18,5 +18,5 @@ export enum REGEX {
   THING_CB_CRYPTO = '^([0-9]){3}$',
   THING_CB_NAME = '^([a-zA-Z\\s]){3,50}$',
   THING_CB_EXPIRATION_DATE = '^([0-9\/\\-\\s]){4-5}$',
-  PASSKEY_LABEL = '^([a-zA-Z]){3,50}$'
+  PASSKEY_LABEL = '^([a-zA-Z0-9\\-_]){3,50}$'
 }
