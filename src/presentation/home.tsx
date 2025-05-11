@@ -3,11 +3,8 @@ import { Link } from '@mui/material';
 import { createSearchParams, useNavigate } from 'react-router-dom';
 
 import '@presentation/home.scss';
-import '@presentation/common.scss';
 import { CODES } from '@src/common/codes';
 import inversify from '@src/common/inversify';
-import Bar from '@src/presentation/molecule/bar';
-import { Footer } from '@presentation/molecule/footer';
 import { AccountUsecaseModel } from '@usecase/model/account.usecase.model';
 import { GetAccountsUsecaseModel } from '@usecase/getAccounts/getAccounts.usecase.model';
 
@@ -169,7 +166,6 @@ export const Home = () => {
 
   return (
     <div className="app">
-      <Bar/>
       <div className="parent_container">
         <div className="container">
           <div>
@@ -179,7 +175,6 @@ export const Home = () => {
           </div>
         </div>
       </div>
-      <Footer />
     </div>
   )
 };

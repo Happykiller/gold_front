@@ -62,7 +62,7 @@ module.exports = (env, argv) => {
           exclude: /node_modules/, // Exclude node_modules from processing.
         },
         {
-          test: /\.s[ac]ss$/i,
+          test: /\.(s[ac]ss|css)$/i,
           use: [
             isProduction ? MiniCssExtractPlugin.loader : 'style-loader', // Extract CSS in production
             'css-loader',

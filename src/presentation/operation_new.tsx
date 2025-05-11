@@ -10,16 +10,14 @@ import { createSearchParams, useNavigate, useSearchParams } from 'react-router-d
 import { Button, FormControl, Grid2, InputLabel, MenuItem, Select, TextField } from '@mui/material';
 
 import { CODES } from '@src/common/codes';
-import Bar from '@presentation/molecule/bar';
 import inversify from '@src/common/inversify';
-import { Footer } from '@presentation/molecule/footer';
 import { ThirdsSelect } from '@presentation/molecule/thirdsSelect';
-import { FlashStore, flashStore } from '@presentation/molecule/flash';
 import { AccountsSelect } from '@presentation/molecule/accountsSelect';
 import { OperationUsecaseModel } from '@usecase/model/operation.usecase.model';
 import { OpeCategoriesSelect } from '@presentation/molecule/opeCategoriesSelect';
 import { contextStore, ContextStoreModel } from '@presentation/store/contextStore';
 import { CreateOperationUsecaseModel } from '@usecase/createOperation/createOperation.usecase.model';
+import { useFlashStore } from '@happykiller/sunny-ui';
 
 export const OperationNew = () => {
   const navigate = useNavigate();
@@ -33,7 +31,7 @@ export const OperationNew = () => {
     error: null
   });
   const { t } = useTranslation();
-  const flash: FlashStore = flashStore();
+  const flash = useFlashStore();
   const [searchParams] = useSearchParams();
   const context: ContextStoreModel = contextStore();
   const [operation, setOperation] = React.useState<OperationUsecaseModel | any>({
@@ -336,7 +334,6 @@ export const OperationNew = () => {
 
   return (
     <div className="app">
-      <Bar />
       <div className="parent_container">
         <div className="container">
           <div className='title'>
@@ -347,7 +344,6 @@ export const OperationNew = () => {
           </div>
         </div>
       </div>
-      <Footer />
     </div>
   )
 }

@@ -9,12 +9,10 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { createSearchParams, useNavigate } from 'react-router-dom';
 
 import { CODES } from '@src/common/codes';
-import Bar from '@presentation/molecule/bar';
 import inversify from '@src/common/inversify';
-import { Footer } from '@presentation/molecule/footer';
-import { FlashStore, flashStore } from '@presentation/molecule/flash';
 import { AccountsSelect } from '@presentation/molecule/accountsSelect';
 import { CloneOperationsUsecaseModel } from '@usecase/cloneOperations/cloneOperations.usecase.model';
+import { useFlashStore } from '@happykiller/sunny-ui';
 
 export const Clone = () => {
   const navigate = useNavigate();
@@ -28,7 +26,7 @@ export const Clone = () => {
     error: null
   });
   const { t } = useTranslation();
-  const flash: FlashStore = flashStore();
+  const flash = useFlashStore();
   const [currentAccount, setCurrentAccount] = React.useState('0');
   const [currentTemplate, setCurrentTemplate] = React.useState('0');
   const [currentDate, setCurrentDate] = React.useState(dayjs());
@@ -163,7 +161,6 @@ export const Clone = () => {
 
   return (
     <div className="app">
-      <Bar />
       <div className="parent_container">
         <div className="container">
           <div className='title'>
@@ -174,7 +171,6 @@ export const Clone = () => {
           </div>
         </div>
       </div>
-      <Footer />
     </div>
   )
 }

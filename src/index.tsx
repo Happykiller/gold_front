@@ -1,19 +1,23 @@
 // src\index.tsx
-import React, { useState } from 'react';
+/// <reference path="./theme/mui.d.ts" />
+import '@fontsource/roboto';
+import '@fontsource/montserrat';
+import '@fontsource/roboto/400.css';
+import '@fontsource/montserrat/600.css';
+
+import React, { useMemo } from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { ThemeProvider, CssBaseline } from '@mui/material';
 
 import App from '@src/app';
 import initI18n from '@src/i18n';
-import getTheme from '@src/theme';
+import { getTheme } from '@src/theme';
+import { contextStore } from '@presentation/store/contextStore';
 
 const Index: React.FC = () => {
-  // State to determine whether dark mode is enabled
-  const [darkMode] = useState(true);
-
-  // Create the theme based on the current mode (dark or light)
-  const theme = getTheme(darkMode ? 'dark' : 'light');
+  const themeMode = contextStore((s) => s.themeMode);
+  const theme = useMemo(() => getTheme(themeMode), [themeMode]);
 
   return (
     <Router>

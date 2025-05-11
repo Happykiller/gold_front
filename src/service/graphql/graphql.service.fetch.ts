@@ -1,6 +1,6 @@
 import config from '@src/config';
 import { Inversify } from '@src/common/inversify';
-import GraphqlService from '@service/graphql/graphql.service';
+import { GraphqlService } from '@happykiller/sunny-ui';
 
 export class GraphqlServiceFetch implements GraphqlService {
 
@@ -10,7 +10,7 @@ export class GraphqlServiceFetch implements GraphqlService {
 
   async send(datas: any): Promise<any> {
     try {
-      const storage = JSON.parse(await this.inversify.storageService.getItem("gold-storage")??"");
+      const storage = JSON.parse(await this.inversify.storageService.getItem(config.local_storage_name)??"");
       const token = storage?.state.access_token;
 
       const response = await fetch(config.api_url, {

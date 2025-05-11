@@ -9,15 +9,13 @@ import { createSearchParams, useNavigate } from 'react-router-dom';
 import { Button, FormControl, Grid2, InputLabel, MenuItem, Select, TextField, Typography } from '@mui/material';
 
 import { CODES } from '@src/common/codes';
-import Bar from '@presentation/molecule/bar';
 import inversify from '@src/common/inversify';
-import { Footer } from '@presentation/molecule/footer';
 import { ThirdsSelect } from '@presentation/molecule/thirdsSelect';
-import { FlashStore, flashStore } from '@presentation/molecule/flash';
 import { AccountsSelect } from '@presentation/molecule/accountsSelect';
 import { OpeCategoriesSelect } from '@presentation/molecule/opeCategoriesSelect';
 import { GetOperationsUsecaseModel } from '@usecase/getOperations/getOperations.usecase.model';
 import { CreateOperationUsecaseModel } from '@usecase/createOperation/createOperation.usecase.model';
+import { useFlashStore } from '@happykiller/sunny-ui';
 
 export const CreateVir = () => {
   const navigate = useNavigate();
@@ -40,7 +38,7 @@ export const CreateVir = () => {
     error: null
   });
   const { t } = useTranslation();
-  const flash: FlashStore = flashStore();
+  const flash = useFlashStore();
   const [operations, setOperations] = React.useState<any[] | null>(null);
   const [selectedOperations, setSelectedOperations] = React.useState<any[]>([]);
   const [currentDsc, setCurrentDsc] = React.useState('');
@@ -414,7 +412,6 @@ export const CreateVir = () => {
 
   return (
     <div className="app">
-      <Bar />
       <div className="parent_container">
         <div className="container">
           <div className='title'>
@@ -425,7 +422,6 @@ export const CreateVir = () => {
           </div>
         </div>
       </div>
-      <Footer />
     </div>
   )
 }

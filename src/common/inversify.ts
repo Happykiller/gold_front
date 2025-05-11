@@ -1,30 +1,26 @@
 // src\common\inversify.ts
 import { StateStorage } from 'zustand/middleware';
 
-import { AuthUsecase } from '@usecase/auth/auth.usecase';
-import LoggerService from '@service/logger/logger.service';
-import GraphqlService from '@service/graphql/graphql.service';
+import { 
+  AuthPasskeyUsecase, AuthUsecase, CreatePasskeyUsecase, DeletePasskeyUsecase, 
+  GetPasskeyForUserUsecase, GraphqlService, 
+  LoggerService, LoggerServiceReal, SessionInfoUsecase, SystemInfoUsecase, UpdPasswordUsecase 
+} from '@happykiller/sunny-ui';
+import config from '@src/config';
 import { SetRecoUsecase } from '@usecase/setReco/setReco.usecase';
-import { SystemInfoUsecase } from '@usecase/system/systemInfo.usecase';
-import { LoggerServiceReal } from '@service/logger/logger.service.real';
 import { GetThirdsUsecase } from '@usecase/getThirds/getThirds.usecase';
 import { GraphqlServiceFake } from '@service/graphql/graphql.service.fake';
 import { GetAccountUsecase } from '@usecase/getAccount/getAccount.usecase';
 import { GraphqlServiceFetch } from '@service/graphql/graphql.service.fetch';
-import { SessionInfoUsecase } from '@usecase/sessionInfo/systemInfo.usecase';
 import { GetAccountsUsecase } from '@usecase/getAccounts/getAccounts.usecase';
-import { AuthPasskeyUsecase } from '@usecase/authPasskey/authPasskey.usecase';
 import { StorageServiceCookie } from '@service/storage/storage.service.cookie';
 import { GetOperationUsecase } from '@usecase/getOperation/getOperation.usecaset';
-import { DeletePasskeyUsecase } from '@usecase/deletePasskey/deletePasskey.usecase';
-import { CreatePasskeyUsecase } from '@usecase/createPasskey/createPasskey.usecase';
 import { GetOperationsUsecase } from '@usecase/getOperations/getOperations.usecase';
 import { CreateOperationUsecase } from '@usecase/createOperation/createOperation.usecase';
 import { CloneOperationsUsecase } from '@usecase/cloneOperations/cloneOperations.usecase';
 import { UpdateOperationUsecase } from '@usecase/updateOperation/updateOperation.usecase';
 import { DeleteOperationUsecase } from '@usecase/deleteOperation/deleteOperation.usecase';
 import { GetOpeCategoriesUsecase } from '@usecase/getOpeCategories/getOpeCategories.usecase';
-import { GetPasskeyForUserUsecase } from '@usecase/getPasskeyForUser/getPasskeyForUser.usecase';
 
 export class Inversify {
   authUsecase: AuthUsecase;
@@ -38,6 +34,7 @@ export class Inversify {
   getAccountUsecase: GetAccountUsecase;
   authPasskeyUsecase: AuthPasskeyUsecase;
   getAccountsUsecase: GetAccountsUsecase;
+  updPasswordUsecase: UpdPasswordUsecase;
   getOperationUsecase: GetOperationUsecase;
   getOperationsUsecase: GetOperationsUsecase;
   deletePasskeyUsecase: DeletePasskeyUsecase;
@@ -60,6 +57,7 @@ export class Inversify {
     this.getAccountUsecase = new GetAccountUsecase(this);
     this.getAccountsUsecase = new GetAccountsUsecase(this);
     this.authPasskeyUsecase = new AuthPasskeyUsecase(this);
+    this.updPasswordUsecase = new UpdPasswordUsecase(this);
     this.getOperationUsecase = new GetOperationUsecase(this);
     this.getOperationsUsecase = new GetOperationsUsecase(this);
     this.deletePasskeyUsecase = new DeletePasskeyUsecase(this);
@@ -73,7 +71,7 @@ export class Inversify {
 
     // Services
     this.storageService = new StorageServiceCookie();
-    if (process.env.APP_MODE === 'prod' || process.env.APP_MODE === 'dev') {
+    if (config.mode === 'prod' || config.mode === 'dev') {
       this.graphqlService = new GraphqlServiceFetch(this);
     } else {
       this.graphqlService = new GraphqlServiceFake();

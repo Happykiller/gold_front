@@ -20,16 +20,14 @@ import '@presentation/common.scss';
 import '@presentation/operations.scss';
 import { CODES } from '@src/common/codes';
 import inversify from '@src/common/inversify';
-import Bar from '@src/presentation/molecule/bar';
-import { Footer } from '@presentation/molecule/footer';
-import { FlashStore, flashStore } from '@src/presentation/molecule/flash';
+import { useFlashStore } from '@happykiller/sunny-ui';
 import { GetAccountUsecaseModel } from '@usecase/getAccount/getAccount.usecase.model';
 import { GetOperationsUsecaseModel } from '@usecase/getOperations/getOperations.usecase.model';
 
 export const Operations = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const flash: FlashStore = flashStore();
+  const flash = useFlashStore();
   const [searchParams] = useSearchParams();
   const [page, setPage] = React.useState<any>(0);
   const [account, setAccount] = React.useState<any>(null);
@@ -52,6 +50,30 @@ export const Operations = () => {
     data: null,
     error: null
   });
+  const COLUMN_LAYOUT = {
+    id: { xs: 0, sm: 0, md: 1 },
+    date: { xs: 3, sm: 2, md: 1 },
+    amount: { xs: 3, sm: 2, md: 1 },
+    dest: { xs: 0, sm: 0, md: 1 },
+    third: { xs: 0, sm: 0, md: 1 },
+    category: { xs: 3, sm: 2, md: 1 },
+    desc: { xs: 0, sm: 4, md: 5 },
+    actions: { xs: 3, sm: 2, md: 1 },
+  };
+
+  type SizeDefinition = {
+    xs: number;
+    sm: number;
+    md: number;
+  };
+
+  const getDisplayFromSize = (sizes: SizeDefinition): Record<'xs' | 'sm' | 'md', string> => {
+    return {
+      xs: sizes.xs === 0 ? 'none' : 'flex',
+      sm: sizes.sm === 0 ? 'none' : 'flex',
+      md: sizes.md === 0 ? 'none' : 'flex',
+    };
+  };
 
   const reco = async (dto: {
     operation_id: string
@@ -136,10 +158,10 @@ export const Operations = () => {
         }}
       >
         <Grid2
+          size={COLUMN_LAYOUT.id}
           sx={{
-            display: { xs: 'none', sm: 'none', md: 'flex' },
+            display: getDisplayFromSize(COLUMN_LAYOUT.id),
           }}
-          size={1}
           justifyContent="center"
           alignItems="center"
           title={operation.id}
@@ -147,12 +169,10 @@ export const Operations = () => {
           <Typography noWrap>{operation.id}</Typography>
         </Grid2>
         <Grid2
-          size={{
-            xs: 3,
-            sm: 2,
-            md: 1
+          size={COLUMN_LAYOUT.date}
+          sx={{
+            display: getDisplayFromSize(COLUMN_LAYOUT.date),
           }}
-          display="flex"
           justifyContent="center"
           alignItems="center"
           title={dateStr}
@@ -169,12 +189,10 @@ export const Operations = () => {
           >{shortDateStr}</Typography>
         </Grid2>
         <Grid2
-          size={{
-            xs: 3,
-            sm: 2,
-            md: 1
+          size={COLUMN_LAYOUT.amount}
+          sx={{
+            display: getDisplayFromSize(COLUMN_LAYOUT.amount),
           }}
-          display="flex"
           justifyContent="center"
           alignItems="center"
           title={opera + operation.amount + '€'}
@@ -182,10 +200,10 @@ export const Operations = () => {
           <Typography noWrap><span className={color}>{opera + operation.amount} €</span></Typography>
         </Grid2>
         <Grid2
+          size={COLUMN_LAYOUT.dest}
           sx={{
-            display: { xs: 'none', sm: 'none', md: 'flex' },
+            display: getDisplayFromSize(COLUMN_LAYOUT.dest),
           }}
-          size={1}
           justifyContent="center"
           alignItems="center"
           title={operation.account_dest}
@@ -193,10 +211,10 @@ export const Operations = () => {
           <Typography noWrap>{dest}</Typography>
         </Grid2>
         <Grid2
+          size={COLUMN_LAYOUT.third}
           sx={{
-            display: { xs: 'none', sm: 'none', md: 'flex' },
+            display: getDisplayFromSize(COLUMN_LAYOUT.third),
           }}
-          size={1}
           justifyContent="center"
           alignItems="center"
           title={operation.third?.label}
@@ -204,12 +222,10 @@ export const Operations = () => {
           <Typography noWrap><Trans>{operation.third?.label}</Trans></Typography>
         </Grid2>
         <Grid2
-          size={{
-            xs: 3,
-            sm: 2,
-            md: 1
+          size={COLUMN_LAYOUT.category}
+          sx={{
+            display: getDisplayFromSize(COLUMN_LAYOUT.category),
           }}
-          display="flex"
           justifyContent="center"
           alignItems="center"
           title={operation.category?.label}
@@ -217,12 +233,9 @@ export const Operations = () => {
           <Typography noWrap><Trans>{operation.category?.label}</Trans></Typography>
         </Grid2>
         <Grid2
-          size={{
-            sm: 4,
-            md: 5
-          }}
+          size={COLUMN_LAYOUT.desc}
           sx={{
-            display: { xs: 'none', sm: 'flex', md: 'flex' },
+            display: getDisplayFromSize(COLUMN_LAYOUT.desc),
           }}
           justifyContent="center"
           alignItems="center"
@@ -231,10 +244,9 @@ export const Operations = () => {
           <Typography noWrap>{operation.description}</Typography>
         </Grid2>
         <Grid2
-          size={{
-            xs: 3,
-            sm: 2,
-            md: 1
+          size={COLUMN_LAYOUT.actions}
+          sx={{
+            display: getDisplayFromSize(COLUMN_LAYOUT.actions),
           }}
           display="flex"
           justifyContent="center"
@@ -449,9 +461,7 @@ export const Operations = () => {
   } if (qryOperations.error) {
     contentOperations = <div><Trans>operations.{qryOperations.error}</Trans></div>
   } else if (operations) {
-    contentOperations = <Grid2
-      container
-    >
+    contentOperations = <>
       <Grid2
         container
         sx={{
@@ -463,78 +473,69 @@ export const Operations = () => {
         }}
       >
         <Grid2
+          size={COLUMN_LAYOUT.id}
           sx={{
-            display: { xs: 'none', sm: 'none', md: 'flex' },
+            display: getDisplayFromSize(COLUMN_LAYOUT.id),
           }}
-          size={1}
           justifyContent="center"
           alignItems="center"
         >
           <Trans>operation.id</Trans>
         </Grid2>
         <Grid2
-          size={{
-            xs: 3,
-            sm: 2,
-            md: 1
+          size={COLUMN_LAYOUT.date}
+          sx={{
+            display: getDisplayFromSize(COLUMN_LAYOUT.date),
           }}
-          display="flex"
           justifyContent="center"
           alignItems="center"
         >
           <Trans>operation.date</Trans>
         </Grid2>
         <Grid2
-          size={{
-            xs: 3,
-            sm: 2,
-            md: 1
+          size={COLUMN_LAYOUT.amount}
+          sx={{
+            display: getDisplayFromSize(COLUMN_LAYOUT.amount),
           }}
-          display="flex"
           justifyContent="center"
           alignItems="center"
         >
           <Trans>operation.amount</Trans>
         </Grid2>
         <Grid2
+          size={COLUMN_LAYOUT.dest}
           sx={{
-            display: { xs: 'none', sm: 'none', md: 'flex' },
+            display: getDisplayFromSize(COLUMN_LAYOUT.dest),
           }}
-          size={1}
           justifyContent="center"
           alignItems="center"
         >
           <Trans>operation.account_dest</Trans>
         </Grid2>
         <Grid2
+          size={COLUMN_LAYOUT.third}
           sx={{
-            display: { xs: 'none', sm: 'none', md: 'flex' },
+            display: getDisplayFromSize(COLUMN_LAYOUT.third),
           }}
-          size={1}
           justifyContent="center"
           alignItems="center"
         >
           <Trans>operation.third</Trans>
         </Grid2>
         <Grid2
-          size={{
-            xs: 3,
-            sm: 2,
-            md: 1
+          size={COLUMN_LAYOUT.category}
+          sx={{
+            display: getDisplayFromSize(COLUMN_LAYOUT.third),
           }}
-          display="flex"
           justifyContent="center"
           alignItems="center"
         >
           <Trans>operation.category</Trans>
         </Grid2>
         <Grid2
+          size={COLUMN_LAYOUT.desc}
           sx={{
-            display: { xs: 'none', sm: 'flex', md: 'flex' },
-          }}
-          size={{
-            sm: 4,
-            md: 5
+            display: getDisplayFromSize(COLUMN_LAYOUT.desc),
           }}
           justifyContent="center"
           alignItems="center"
@@ -542,12 +543,10 @@ export const Operations = () => {
           <Trans>operation.description</Trans>
         </Grid2>
         <Grid2
-          size={{
-            xs: 3,
-            sm: 2,
-            md: 1
+          size={COLUMN_LAYOUT.actions}
+          sx={{
+            display: getDisplayFromSize(COLUMN_LAYOUT.actions),
           }}
-          display="flex"
           justifyContent="center"
           alignItems="center"
         >
@@ -555,27 +554,19 @@ export const Operations = () => {
         </Grid2>
       </Grid2>
 
-      {operations?.map((operation: any) => (
-        <Operation key={operation.id} operation={operation} />
-      ))}
+      {
+        operations?.map((operation: any) => (
+          <Operation key={operation.id} operation={operation} />
+        ))
+      }
 
-    </Grid2>;
+    </>;
   }
 
   return (
-    <div className="app">
-      <Bar />
-      <div className="parent_container">
-        <div className="container">
-          <div>
-            {contentAccount}
-          </div>
-          <div>
-            {contentOperations}
-          </div>
-        </div>
-      </div>
-      <Footer />
-    </div>
+    <>
+      {contentAccount}
+      {contentOperations}
+    </>
   )
 }

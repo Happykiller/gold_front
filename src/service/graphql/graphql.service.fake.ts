@@ -1,4 +1,6 @@
-import GraphqlService from "@service/graphql/graphql.service";
+// src\service\graphql\graphql.service.fake.ts
+
+import { GraphqlService } from "@happykiller/sunny-ui";
 
 export class GraphqlServiceFake implements GraphqlService {
   send(datas: any): Promise<any> {
