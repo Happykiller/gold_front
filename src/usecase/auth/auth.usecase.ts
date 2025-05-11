@@ -22,7 +22,7 @@ export class AuthUsecase {
                 password: $password
               }
             ) {
-              accessToken
+              access_token
               id
               code
               name_first
@@ -40,7 +40,7 @@ export class AuthUsecase {
 
       const info: any = {
         ... response.data.auth,
-        access_token: response.data.auth.accessToken
+        access_token: response.data.auth.access_token
       };
 
       return {

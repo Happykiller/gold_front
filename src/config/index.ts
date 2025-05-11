@@ -1,3 +1,4 @@
+// src\config\index.ts
 class Config {
   mode:string;
   port:string;

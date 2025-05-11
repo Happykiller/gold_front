@@ -23,7 +23,7 @@ export class AuthPasskeyUsecase {
             auth_passkey (
               dto: $dto
             ) {
-              accessToken
+              access_token
               id
               code
               name_first
@@ -43,7 +43,7 @@ export class AuthPasskeyUsecase {
         message: CODES.SUCCESS,
         data: {
           ... response.data.auth_passkey,
-          access_token: response.data.auth_passkey.accessToken
+          access_token: response.data.auth_passkey.access_token
         }
       }
     } catch (e: any) {

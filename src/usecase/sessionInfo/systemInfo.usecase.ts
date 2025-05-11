@@ -18,7 +18,7 @@ export class SessionInfoUsecase {
           variables: {},
           query: `query getSessionInfo {  
             getSessionInfo {
-              accessToken
+              access_token
               id
               code
               name_first
@@ -36,7 +36,7 @@ export class SessionInfoUsecase {
 
       const info: any = {
         ... response.data.getSessionInfo,
-        access_token: response.data.getSessionInfo.accessToken
+        access_token: response.data.getSessionInfo.access_token
       };
 
       return {
