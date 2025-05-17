@@ -3,12 +3,12 @@ export interface OperationUsecaseModel {
   account_id: number;
   account: {
     id: number;
-    lable: string;
+    label: string;
   }
   account_id_dest: number;
   account_dest: {
     id: number;
-    lable: string;
+    label: string;
   }
   amount: number;
   date: string;
@@ -17,12 +17,12 @@ export interface OperationUsecaseModel {
   third_id: number;
   third: {
     id: number;
-    lable: string;
+    label: string;
   }
   category_id: number;
   category: {
     id: number;
-    lable: string;
+    label: string;
   }
   description: string;
   active: boolean;

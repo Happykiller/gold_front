@@ -9,7 +9,7 @@ import {
 
 export const lightPalette = {
   mode: 'light' as const,
-  primary: { main: '#4169E1', light: '#598AE3' },
+  primary: { main: '#F4B700', light: '#FFD447' },
   secondary: { main: '#8ECAE6', light: '#B2E4F3' },
   background: {
     default: '#FCFCFC',
@@ -19,7 +19,7 @@ export const lightPalette = {
     primary: '#1C1C1C',
   },
   gradient: `
-    radial-gradient(ellipse at 50% 0%, rgba(44, 91, 255, 0.1) 0%, transparent 70%),
+    radial-gradient(ellipse at 50% 0%, rgba(244, 183, 0, 0.08) 0%, transparent 70%),
     linear-gradient(135deg, #FFFFFF 0%, #F4F6FB 100%)`,
 };
 

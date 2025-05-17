@@ -9,7 +9,7 @@ import {
 
 export const darkPalette = {
   mode: 'dark' as const,
-  primary: { main: '#4169E1', light: '#598AE3' },
+  primary: { main: '#F4B700', light: '#FFD447' },
   secondary: { main: '#8ECAE6', light: '#B2E4F3' },
   background: {
     default: '#0F0F2B',
@@ -19,7 +19,7 @@ export const darkPalette = {
     primary: '#F1F1F1',
   },
   gradient: `
-    radial-gradient(ellipse at 50% 0%, rgba(44, 91, 255, 0.25) 0%, transparent 70%),
+    radial-gradient(ellipse at 50% 0%, rgba(244, 183, 0, 0.15) 0%, transparent 70%),
     linear-gradient(135deg, #0F0F2B 0%, #1B1F3B 100%)`,
 };
 
