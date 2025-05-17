@@ -1,10 +1,12 @@
 // src\presentation\operations.tsx
 import * as React from 'react';
 import { useSearchParams, useNavigate, createSearchParams } from 'react-router-dom';
-import { useAccountOperations } from '@presentation/hooks/useAccountOperations';
+
+import inversify from '@src/common/inversify';
+import { CODES } from '@happykiller/sunny-ui';
 import { AccountHeader } from '@presentation/molecule/accountHeader';
 import { OperationsTable } from '@presentation/molecule/operationsTable';
-import inversify from '../common/inversify';
+import { useAccountOperations } from '@presentation/hooks/useAccountOperations';
 
 export const Operations = () => {
   const [searchParams] = useSearchParams();
@@ -20,9 +22,11 @@ export const Operations = () => {
     errorAccount,
     errorOps,
     reload,
+    removeOperation,
+    recoOperation,
+    adjustBalance
   } = useAccountOperations(accountId, page);
 
-  // Example callbacks (adapt to your logic/services)
   const handleEditOperation = (operation: any) => {
     navigate({
       pathname: '/operation_edit',
@@ -34,11 +38,19 @@ export const Operations = () => {
   };
 
   const handleDeleteOperation = (operation: any) => {
-    inversify.deleteOperationUsecase.execute({ operation_id: operation.id }).then(() => reload());
+    inversify.deleteOperationUsecase.execute({ operation_id: operation.id }).then(() => {
+      removeOperation(operation.id);
+      adjustBalance(operation.amount, 'delete', (operation.status_id === 2) ? 'not_reconciled' : 'reconciled');
+    })
   };
 
   const handleRecoOperation = (operation: any) => {
-    inversify.setRecoUsecase.execute({ operation_id: operation.id }).then(() => reload());
+    inversify.setRecoUsecase.execute({ operation_id: operation.id }).then((resp) => {
+      if (resp.message === CODES.SUCCESS && resp.data) {
+        recoOperation(operation.id);
+        adjustBalance(operation.amount, 'reconcile', 'not_reconciled');
+      }
+    });
   };
 
   return (

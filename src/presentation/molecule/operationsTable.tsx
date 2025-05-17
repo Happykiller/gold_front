@@ -1,19 +1,22 @@
 // src\presentation\molecule\operationsTable.tsx
 import * as React from 'react';
-import { Grid, Typography, IconButton, Box, CircularProgress } from '@mui/material';
+import { useMediaQuery } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
+import CheckIcon from '@mui/icons-material/Check';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditNoteIcon from '@mui/icons-material/EditNote';
-import CheckIcon from '@mui/icons-material/Check';
-import { useTheme } from '@mui/material/styles';
+import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
+import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import { Operation } from '@presentation/hooks/useAccountOperations';
+import { Grid, Typography, IconButton, Box, CircularProgress } from '@mui/material';
+
 import {
   getOperationIcon,
   getCategoryIcon,
-  getAmountColor,
   formatOperationDate,
+  getVisualAmountMeta
 } from '@presentation/molecule/operationDisplay';
-import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
-import ArrowRightIcon from '@mui/icons-material/ArrowRight';
+import { Trans } from 'react-i18next';
 
 type Props = {
   operations: Operation[] | null;
@@ -33,20 +36,21 @@ export const OperationsTable: React.FC<Props> = ({
   onRecoOperation,
 }) => {
   const theme = useTheme();
+  const isXs = useMediaQuery(theme.breakpoints.only('xs'));
 
   if (loading) return <Box display="flex" justifyContent="center"><CircularProgress size={32} /></Box>;
   if (error) return <Box color="error.main">{error}</Box>;
   if (!operations) return null;
 
   const columns = [
-    { label: 'ID', key: 'id', xs: 1 },
-    { label: 'Date', key: 'date', xs: 1.25 },
-    { label: 'Montant', key: 'amount', xs: 1.25 },
-    { label: 'Dest.', key: 'dest', xs: 1.25 },
-    { label: 'Cat.', key: 'category', xs: 2 },
-    { label: 'Tiers', key: 'third', xs: 1.25 },
-    { label: 'Desc.', key: 'desc', xs: 2 },
-    { label: '', key: 'actions', xs: 2 },
+    { label: 'ID', key: 'id', xs: 0, sm: 0, md: 1, display: { xs: 'none', md: 'flex' } },
+    { label: 'Date', key: 'date', xs: 3, sm: 2, md: 1.25, display: 'flex' },
+    { label: 'Montant', key: 'amount', xs: 3, sm: 2, md: 1.25, display: 'flex' },
+    { label: 'Dest.', key: 'dest', xs: 0, sm: 2, md: 1.25, display: { xs: 'none', sm: 'flex' } },
+    { label: 'Cat.', key: 'category', xs: 3, sm: 2, md: 2, display: 'flex' },
+    { label: 'Tiers', key: 'third', xs: 0, sm: 2, md: 1.25, display: { xs: 'none', sm: 'flex' } },
+    { label: 'Desc.', key: 'desc', xs: 0, sm: 0, md: 2, display: { xs: 'none', md: 'flex' } },
+    { label: '', key: 'actions', xs: 3, sm: 2, md: 2, display: 'flex' },
   ];
 
   function renderDest(operation: Operation, currentAccountId: number | string) {
@@ -72,28 +76,37 @@ export const OperationsTable: React.FC<Props> = ({
 
   return (
     <Box sx={{
-      background: 'rgba(18,22,42,0.96)',
-      borderRadius: 4,
-      border: `2px solid ${theme.palette.primary.main}`, // Bordure jaune gold
-      boxShadow: `0 0 32px 0 ${theme.palette.primary.main}55`, // Aura gold autour
+      background: {
+        xs: 0,
+        sm: 'rgba(18,22,42,0.96)',
+      },
+      borderRadius: {
+        xs: 0,
+        sm: 4,
+      },
+      border: {
+        xs: 'none',
+        sm: `2px solid ${theme.palette.primary.main}`,
+      },
+      boxShadow: {
+        xs: 'none',
+        sm: `0 0 32px 0 ${theme.palette.primary.main}55`,
+      },
       p: 0,
       width: '100%',
-      maxWidth: 950,
       mx: 'auto'
     }}>
       {/* Table header */}
       <Grid container sx={{
         fontWeight: 600,
-        borderRadius: "8px 8px 0 0",
         fontSize: "0.99rem",
         py: 1,
       }}>
         {columns.map(col => (
-          <Grid item xs={col.xs} key={col.key} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <Grid item xs={col.xs} sm={col.sm} md={col.md} key={col.key} sx={{ display: col.display, alignItems: 'center', justifyContent: 'center' }}>
             <Typography color="#fff" fontSize={15}>{col.label}</Typography>
           </Grid>
         ))}
-        <Grid item xs={0.5}></Grid> {/* pour actions */}
       </Grid>
       {/* Table rows */}
       {operations.map((operation) => (
@@ -105,47 +118,94 @@ export const OperationsTable: React.FC<Props> = ({
             borderBottom: '1px solid #222638',
             background: 'none',
             '&:hover': { backgroundColor: 'rgba(90,100,130,0.12)' },
-            cursor: 'pointer'
+            cursor: isXs ? 'pointer' : 'default'
           }}
           alignItems="center"
-          onClick={() => onEditOperation?.(operation)}
+          onClick={isXs ? () => onEditOperation?.(operation) : undefined}
         >
-          <Grid item xs={1} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <Grid
+            item
+            xs={columns.find(elt => elt.key === 'id')?.xs}
+            sm={columns.find(elt => elt.key === 'id')?.sm}
+            md={columns.find(elt => elt.key === 'id')?.md}
+            sx={{ display: columns.find(elt => elt.key === 'id')?.display, alignItems: 'center', justifyContent: 'center' }}>
             <Typography noWrap color="#e7e7ef">{operation.id}</Typography>
           </Grid>
-          <Grid item xs={1.25} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <Grid
+            item
+            xs={columns.find(elt => elt.key === 'date')?.xs}
+            sm={columns.find(elt => elt.key === 'date')?.sm}
+            md={columns.find(elt => elt.key === 'date')?.md}
+            sx={{ display: columns.find(elt => elt.key === 'date')?.display, alignItems: 'center', justifyContent: 'center' }}>
             <Typography noWrap color="#e7e7ef">{formatOperationDate(operation.date)}</Typography>
           </Grid>
-          <Grid item xs={1.25} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Typography
-              noWrap
-              fontWeight={600}
-              sx={{ color: getAmountColor(operation.amount, theme) }}
-            >
-              {getOperationIcon(operation.amount)}
-              {operation.amount < 0
-                ? operation.amount.toLocaleString('fr-FR', { minimumFractionDigits: 2 }) + ' €'
-                : '+' + operation.amount.toLocaleString('fr-FR', { minimumFractionDigits: 2 }) + ' €'}
-            </Typography>
+          <Grid
+            item
+            xs={columns.find(elt => elt.key === 'amount')?.xs}
+            sm={columns.find(elt => elt.key === 'amount')?.sm}
+            md={columns.find(elt => elt.key === 'amount')?.md}
+            sx={{ display: columns.find(elt => elt.key === 'amount')?.display, alignItems: 'center', justifyContent: 'center' }}>
+            {(() => {
+              const { value, color, sign } = getVisualAmountMeta(operation, operation.account_id_dest ?? 0);
+              return (
+                <Typography
+                  noWrap
+                  fontWeight={600}
+                  sx={{ color }}
+                >
+                  {getOperationIcon(sign === '-' ? -1 : 1)}
+                  {value}
+                </Typography>
+              );
+            })()}
           </Grid>
-          <Grid item xs={1.25} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <Grid
+            item
+            xs={columns.find(elt => elt.key === 'dest')?.xs}
+            sm={columns.find(elt => elt.key === 'dest')?.sm}
+            md={columns.find(elt => elt.key === 'dest')?.md}
+            sx={{ display: columns.find(elt => elt.key === 'dest')?.display, alignItems: 'center', justifyContent: 'center' }}>
             <Typography noWrap color="#e7e7ef">
               {renderDest(operation, operation.account_id_dest ?? 0)}
             </Typography>
           </Grid>
-          <Grid item xs={2} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <Grid
+            item
+            xs={columns.find(elt => elt.key === 'category')?.xs}
+            sm={columns.find(elt => elt.key === 'category')?.sm}
+            md={columns.find(elt => elt.key === 'category')?.md}
+            sx={{ display: columns.find(elt => elt.key === 'category')?.display, alignItems: 'center', justifyContent: 'center' }}>
             {getCategoryIcon(operation.category?.label ?? '')}
-            <Typography noWrap color="#b7d6ff" ml={0.4}>{operation.category?.label || ''}</Typography>
+            <Typography noWrap color="#b7d6ff" ml={0.4} sx={{ display: { xs: 'none', sm: 'inline' } }}><Trans>{operation.category?.label || ''}</Trans></Typography>
           </Grid>
-          <Grid item xs={1.25} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Typography noWrap color="#e7e7ef">{operation.third?.label || ''}</Typography>
+          <Grid
+            item
+            xs={columns.find(elt => elt.key === 'third')?.xs}
+            sm={columns.find(elt => elt.key === 'third')?.sm}
+            md={columns.find(elt => elt.key === 'third')?.md}
+            sx={{ display: columns.find(elt => elt.key === 'third')?.display, alignItems: 'center', justifyContent: 'center' }}>
+            <Typography noWrap color="#e7e7ef"><Trans>{operation.third?.label || ''}</Trans></Typography>
           </Grid>
-          <Grid item xs={2} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
+          <Grid
+            item
+            xs={columns.find(elt => elt.key === 'desc')?.xs}
+            sm={columns.find(elt => elt.key === 'desc')?.sm}
+            md={columns.find(elt => elt.key === 'desc')?.md}
+            sx={{ display: columns.find(elt => elt.key === 'desc')?.display, alignItems: 'center', justifyContent: 'flex-start' }}>
             <Typography noWrap color="#b0b3c6">{operation.description || ''}</Typography>
           </Grid>
-          <Grid item xs={2} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <Grid
+            item
+            xs={columns.find(elt => elt.key === 'actions')?.xs}
+            sm={columns.find(elt => elt.key === 'actions')?.sm}
+            md={columns.find(elt => elt.key === 'actions')?.md}
+            sx={{ display: columns.find(elt => elt.key === 'actions')?.display, alignItems: 'center', justifyContent: 'center' }}>
             <IconButton size="small" onClick={e => { e.stopPropagation(); onDeleteOperation?.(operation); }}><DeleteIcon /></IconButton>
-            <IconButton size="small" onClick={e => { e.stopPropagation(); onEditOperation?.(operation); }}><EditNoteIcon /></IconButton>
+            {!isXs && (
+              <IconButton size="small" onClick={e => { e.stopPropagation(); onEditOperation?.(operation); }}>
+                <EditNoteIcon />
+              </IconButton>
+            )}
             {(operation.status_id === 1) && (
               <IconButton size="small" onClick={e => { e.stopPropagation(); onRecoOperation?.(operation); }}><CheckIcon /></IconButton>
             )}

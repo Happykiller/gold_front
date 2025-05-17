@@ -12,10 +12,10 @@ export interface Operation {
   amount: number;
   date: string;
   account_id_dest?: number;
-  account_dest?: { label: string, id:number };
-  account?: { label: string, id:number };
-  third?: { label: string, id:number };
-  category?: { label: string, id:number };
+  account_dest?: { label: string, id: number };
+  account?: { label: string, id: number };
+  third?: { label: string, id: number };
+  category?: { label: string, id: number };
   description?: string;
 }
 
@@ -33,6 +33,7 @@ export function useAccountOperations(accountId: number, page: number) {
   const [loadingOps, setLoadingOps] = useState(false);
   const [errorAccount, setErrorAccount] = useState<string | null>(null);
   const [errorOps, setErrorOps] = useState<string | null>(null);
+  const [refreshToken, setRefreshToken] = useState(0);
 
   useEffect(() => {
     setLoadingAccount(true);
@@ -44,7 +45,7 @@ export function useAccountOperations(accountId: number, page: number) {
       })
       .catch(e => setErrorAccount(e.message))
       .finally(() => setLoadingAccount(false));
-  }, [accountId]);
+  }, [accountId, refreshToken]);
 
   useEffect(() => {
     setLoadingOps(true);
@@ -56,11 +57,55 @@ export function useAccountOperations(accountId: number, page: number) {
       })
       .catch(e => setErrorOps(e.message))
       .finally(() => setLoadingOps(false));
-  }, [accountId, page]);
+  }, [accountId, page, refreshToken]);
 
   const reload = useCallback(() => {
-    setAccount(null);
-    setOperations(null);
+    setRefreshToken(prev => prev + 1);
+  }, []);
+
+  const removeOperation = useCallback((operationId: number) => {
+    setOperations(ops => ops?.filter(op => op.id !== operationId) ?? null);
+  }, []);
+
+  const recoOperation = useCallback((operationId: number) => {
+    setOperations(ops =>
+      ops?.map(op =>
+        op.id === operationId ? { ...op, status_id: 2 } : op
+      ) ?? null
+    );
+  }, []);
+
+  const adjustBalance = useCallback((
+    delta: number,
+    action: 'reconcile' | 'delete',
+    from: 'reconciled' | 'not_reconciled'
+  ) => {
+    setAccount(acc => {
+      if (!acc) return acc;
+      const next = { ...acc };
+
+      if (action === 'reconcile') {
+        // Move amount from "from" to the other balance
+        if (from === 'reconciled') {
+          next.balance_reconcilied -= delta;
+          next.balance_not_reconcilied += delta;
+        } else {
+          next.balance_reconcilied += delta;
+          next.balance_not_reconcilied -= delta;
+        }
+      }
+
+      if (action === 'delete') {
+        // Remove from current balance only
+        if (from === 'reconciled') {
+          next.balance_reconcilied -= delta;
+        } else {
+          next.balance_not_reconcilied -= delta;
+        }
+      }
+
+      return next;
+    });
   }, []);
 
   return {
@@ -70,6 +115,9 @@ export function useAccountOperations(accountId: number, page: number) {
     loadingOps,
     errorAccount,
     errorOps,
-    reload
+    reload,
+    removeOperation,
+    recoOperation,
+    adjustBalance
   };
 }
