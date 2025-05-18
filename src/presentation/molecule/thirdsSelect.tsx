@@ -1,86 +1,86 @@
+// src\presentation\molecule\thirdsSelect.tsx
 import * as React from 'react';
 import { Trans } from 'react-i18next';
-import { FormControl, InputLabel, MenuItem, Select, Typography } from "@mui/material";
+import {
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  Typography,
+  SelectChangeEvent,
+} from '@mui/material';
 
 import { CODES } from '@src/common/codes';
 import inversify from '@src/common/inversify';
 import { GetThirdsUsecaseModel } from '@usecase/getThirds/getThirds.usecase.model';
 import { OperationThridUsecaseModel } from '@usecase/model/operationThrid.usecase.model';
 
-export const ThirdsSelect = (props: any) => {
+type ThirdsSelectProps = {
+  value: string | number;
+  label: React.ReactNode;
+  onChange: (event: SelectChangeEvent) => void;
+};
+
+export const ThirdsSelect: React.FC<ThirdsSelectProps> = ({
+  value,
+  label,
+  onChange,
+}) => {
   const [thirds, setThirds] = React.useState<OperationThridUsecaseModel[] | null>(null);
-  const [qry, setQry] = React.useState({
-    loading: false,
-    error: null as string | null,
-  });
+  const [loading, setLoading] = React.useState(false);
+  const [error, setError] = React.useState<string | null>(null);
 
-  // Effect to load thirds on mount
   React.useEffect(() => {
-    let isMounted = true; // To prevent state updates on unmounted component
-
+    let isMounted = true;
     const fetchThirds = async () => {
-      try {
-        setQry({ loading: true, error: null });
-        const response: GetThirdsUsecaseModel = await inversify.getThirdsUsecase.execute();
+      setLoading(true);
+      setError(null);
 
+      try {
+        const response: GetThirdsUsecaseModel = await inversify.getThirdsUsecase.execute();
         if (isMounted) {
           if (response.message === CODES.SUCCESS && response.data) {
             setThirds(response.data);
           } else {
             inversify.loggerService.debug(response.error);
-            setQry({ loading: false, error: response.message });
+            setError(response.message);
           }
         }
-      } catch (error: any) {
-        if (isMounted) {
-          setQry({ loading: false, error: error.message });
-        }
+      } catch (err: any) {
+        if (isMounted) setError(err.message);
       } finally {
-        if (isMounted) {
-          setQry((qry) => ({ ...qry, loading: false }));
-        }
+        if (isMounted) setLoading(false);
       }
     };
 
     fetchThirds();
-
     return () => {
-      isMounted = false; // Cleanup to avoid memory leaks
+      isMounted = false;
     };
-  }, []); // Empty dependency array ensures this runs only once after mounting
+  }, []);
 
-  // Render logic
-  if (qry.loading) {
-    return <div><Trans>common.loading</Trans></div>;
+  if (loading) {
+    return <Typography><Trans>common.loading</Trans></Typography>;
   }
 
-  if (qry.error) {
-    return <div><Trans>common.{qry.error}</Trans></div>;
+  if (error) {
+    return <Typography color="error"><Trans>common.{error}</Trans></Typography>;
   }
 
-  if (!thirds) {
-    return <div></div>; // Empty state while waiting for data
-  }
+  if (!thirds) return null;
 
   return (
-    <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
-      <InputLabel>{props.label}</InputLabel>
+    <FormControl variant="standard" fullWidth sx={{ m: 1 }}>
+      <InputLabel>{label}</InputLabel>
       <Select
         variant="standard"
         size="small"
-        value={props.value}
-        onChange={(e) => {
-          e.preventDefault();
-          props.onChange(e);
-        }}
+        value={value.toString()}
+        onChange={onChange}
       >
         <MenuItem value=""><Trans>common.clear</Trans></MenuItem>
         {thirds.map((third) => (
-          <MenuItem
-            key={third.id}
-            value={third.id}
-            sx={{ width: '300px' }}
-          >
+          <MenuItem key={third.id} value={third.id}>
             <Typography noWrap><Trans>{third.label}</Trans></Typography>
           </MenuItem>
         ))}

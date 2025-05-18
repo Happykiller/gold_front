@@ -67,6 +67,7 @@
     "id": "ID",
     "status": "Statut",
     "third": "Tiers",
+    "type": "Type",
     "third-otherCredit": "Créditeur",
     "third-otherDebit": "Débiteur"
   },

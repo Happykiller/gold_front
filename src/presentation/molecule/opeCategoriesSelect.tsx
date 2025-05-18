@@ -1,26 +1,43 @@
+// src\presentation\molecule\opeCategoriesSelect.tsx
 import * as React from 'react';
 import { Trans } from 'react-i18next';
-import { FormControl, InputLabel, MenuItem, Select, Typography } from "@mui/material";
+import {
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  Typography,
+  SelectChangeEvent,
+} from '@mui/material';
 
 import { CODES } from '@src/common/codes';
 import inversify from '@src/common/inversify';
 import { OperationCategoryUsecaseModel } from '@usecase/model/operationCategory.usecase.model';
 import { GetOpeCategoriesUsecaseModel } from '@usecase/getOpeCategories/getOpeCategories.usecase.model';
 
-export const OpeCategoriesSelect = (props: any) => {
-  const [categories, setCategories] = React.useState<OperationCategoryUsecaseModel[] | null>(null);
-  const [qry, setQry] = React.useState({
-    loading: false,
-    error: null as string | null,
-  });
+type OpeCategoriesSelectProps = {
+  value: string | number;
+  label: React.ReactNode;
+  onChange: (event: SelectChangeEvent) => void;
+};
 
-  // Effect to load categories on mount
+export const OpeCategoriesSelect: React.FC<OpeCategoriesSelectProps> = ({
+  value,
+  label,
+  onChange,
+}) => {
+  const [categories, setCategories] = React.useState<OperationCategoryUsecaseModel[] | null>(null);
+  const [loading, setLoading] = React.useState(false);
+  const [error, setError] = React.useState<string | null>(null);
+
   React.useEffect(() => {
-    let isMounted = true; // To prevent state updates if the component unmounts
+    let isMounted = true;
 
     const fetchCategories = async () => {
+      setLoading(true);
+      setError(null);
+
       try {
-        setQry({ loading: true, error: null });
         const response: GetOpeCategoriesUsecaseModel = await inversify.getOpeCategoriesUsecase.execute();
 
         if (isMounted) {
@@ -28,59 +45,42 @@ export const OpeCategoriesSelect = (props: any) => {
             setCategories(response.data);
           } else {
             inversify.loggerService.debug(response.error);
-            setQry({ loading: false, error: response.message });
+            setError(response.message);
           }
         }
-      } catch (error: any) {
-        if (isMounted) {
-          setQry({ loading: false, error: error.message });
-        }
+      } catch (err: any) {
+        if (isMounted) setError(err.message);
       } finally {
-        if (isMounted) {
-          setQry((prevQry) => ({ ...prevQry, loading: false }));
-        }
+        if (isMounted) setLoading(false);
       }
     };
 
     fetchCategories();
+    return () => { isMounted = false; };
+  }, []);
 
-    return () => {
-      isMounted = false; // Cleanup to avoid memory leaks
-    };
-  }, []); // Empty dependency array ensures this runs only once after mounting
-
-  // Render logic
-  if (qry.loading) {
-    return <div><Trans>common.loading</Trans></div>;
+  if (loading) {
+    return <Typography><Trans>common.loading</Trans></Typography>;
   }
 
-  if (qry.error) {
-    return <div><Trans>common.{qry.error}</Trans></div>;
+  if (error) {
+    return <Typography color="error"><Trans>common.{error}</Trans></Typography>;
   }
 
-  if (!categories) {
-    return <div></div>; // Empty state while waiting for data
-  }
+  if (!categories) return null;
 
   return (
-    <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
-      <InputLabel>{props.label}</InputLabel>
+    <FormControl variant="standard" fullWidth sx={{ m: 1 }}>
+      <InputLabel>{label}</InputLabel>
       <Select
         variant="standard"
         size="small"
-        value={props.value}
-        onChange={(e) => {
-          e.preventDefault();
-          props.onChange(e);
-        }}
+        value={value.toString()}
+        onChange={onChange}
       >
         <MenuItem value=""><Trans>common.clear</Trans></MenuItem>
         {categories.map((category) => (
-          <MenuItem
-            key={category.id}
-            value={category.id}
-            sx={{ width: '300px' }}
-          >
+          <MenuItem key={category.id} value={category.id}>
             <Typography noWrap><Trans>{category.label}</Trans></Typography>
           </MenuItem>
         ))}

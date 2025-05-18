@@ -1,18 +1,19 @@
+// src\presentation\clone.tsx
 import dayjs from 'dayjs';
 import * as React from 'react';
 import { Send } from '@mui/icons-material';
-import { Button, Grid2 } from '@mui/material';
 import { Trans, useTranslation } from 'react-i18next';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { createSearchParams, useNavigate } from 'react-router-dom';
+import { Box, Button, Grid2 as Grid, Typography, useTheme } from '@mui/material';
 
 import { CODES } from '@src/common/codes';
 import inversify from '@src/common/inversify';
+import { useFlashStore } from '@happykiller/sunny-ui';
 import { AccountsSelect } from '@presentation/molecule/accountsSelect';
 import { CloneOperationsUsecaseModel } from '@usecase/cloneOperations/cloneOperations.usecase.model';
-import { useFlashStore } from '@happykiller/sunny-ui';
 
 export const Clone = () => {
   const navigate = useNavigate();
@@ -25,8 +26,9 @@ export const Clone = () => {
     data: null,
     error: null
   });
-  const { t } = useTranslation();
+  const theme = useTheme();
   const flash = useFlashStore();
+  const { t } = useTranslation();
   const [currentAccount, setCurrentAccount] = React.useState('0');
   const [currentTemplate, setCurrentTemplate] = React.useState('0');
   const [currentDate, setCurrentDate] = React.useState(dayjs());
@@ -75,102 +77,90 @@ export const Clone = () => {
       });
   }
 
-  let content = <div></div>;
-  if (qry.loading) {
-    content = <div><Trans>common.loading</Trans></div>;
-  } if (qry.error) {
-    content = <div><Trans>createVir.{qry.error}</Trans></div>
-  } else {
-    content = <form
-      onSubmit={handleClick}
-    >
-      <Grid2
-        container
-        rowSpacing={1}
-        columnSpacing={{ xs: 1, sm: 2, md: 3 }}
-      >
-
-        {/* Field account */}
-        <Grid2
-          size={6}
-          display="flex"
-          justifyContent="center"
-          alignItems="center"
-        >
-          <AccountsSelect
-            value={currentAccount}
-            label={<Trans>operation.account</Trans>}
-            onChange={(e: any) => {
-              setCurrentAccount(e.target.value);
-            }}
-          />
-        </Grid2>
-
-        {/* Field template */}
-        <Grid2
-          size={6}
-          display="flex"
-          justifyContent="center"
-          alignItems="center"
-        >
-          <AccountsSelect
-            value={currentTemplate}
-            type={2}
-            label={<Trans>clone.template</Trans>}
-            onChange={(e: any) => {
-              setCurrentTemplate(e.target.value);
-            }}
-          />
-        </Grid2>
-
-        {/* Field date */}
-        <Grid2
-          size={12}
-          display="flex"
-          justifyContent="center"
-          alignItems="center"
-        >
-          <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <DatePicker
-              format="DD/MM/YYYY"
-              label={<Trans>operation.date</Trans>}
-              value={currentDate}
-              onChange={(newValue:any) => setCurrentDate(newValue)}
-            />
-          </LocalizationProvider>
-        </Grid2>
-
-        {/* Button submit */}
-        <Grid2
-          size={12}
-          textAlign='center'
-        >
-          <Button
-            type="submit"
-            variant="contained"
-            size="small"
-            disabled={(currentAccount === '0' || currentTemplate === '0')}
-            startIcon={<Send />}
-          ><Trans>clone.send</Trans></Button>
-        </Grid2>
-
-      </Grid2>
-    </form>
-      ;
-  }
-
   return (
-    <div className="app">
-      <div className="parent_container">
-        <div className="container">
-          <div className='title'>
-            <Trans>clone.title</Trans>
-          </div>
-          <div>
-            {content}
-          </div>
-        </div>
-      </div>
-    </div>
-  )
+    <Box
+      display="flex"
+      justifyContent="center"
+      alignItems="center"
+      sx={{ px: 2 }}
+    >
+      <Box
+        sx={{
+          borderRadius: { xs: 0, sm: '16px' },
+          boxShadow: {
+            xs: 'none',
+            sm: `0 0 32px 0 ${theme.palette.primary.main}55`,
+          },
+          border: {
+            xs: 'none',
+            sm: `2px solid ${theme.palette.primary.main}`,
+          },
+          maxWidth: 400,
+          width: '100%',
+          p: 3,
+        }}
+      >
+        <Typography
+          variant="h6"
+          fontWeight={700}
+          textAlign="center"
+          mb={2}
+          color="text.primary"
+        >
+          <Trans>clone.title</Trans>
+        </Typography>
+
+        {qry.loading ? (
+          <Typography textAlign="center" color="text.secondary">
+            <Trans>common.loading</Trans>
+          </Typography>
+        ) : qry.error ? (
+          <Typography textAlign="center" color="error.main">
+            <Trans>createVir.{qry.error}</Trans>
+          </Typography>
+        ) : (
+          <form onSubmit={handleClick}>
+            <Grid container spacing={2}>
+              <Grid size={6}>
+                <AccountsSelect
+                  value={currentTemplate}
+                  type={2}
+                  label={<Trans>clone.template</Trans>}
+                  onChange={(e: any) => setCurrentTemplate(e.target.value)}
+                />
+              </Grid>
+              <Grid size={6}>
+                <AccountsSelect
+                  value={currentAccount}
+                  label={<Trans>operation.account</Trans>}
+                  onChange={(e: any) => setCurrentAccount(e.target.value)}
+                />
+              </Grid>
+              <Grid size={12} textAlign="center">
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <DatePicker
+                    format="DD/MM/YYYY"
+                    label={<Trans>operation.date</Trans>}
+                    value={currentDate}
+                    onChange={(newValue: any) => setCurrentDate(newValue)}
+                  />
+                </LocalizationProvider>
+              </Grid>
+              <Grid size={12} textAlign="center">
+                <Button
+                  type="submit"
+                  variant="contained"
+                  disabled={currentAccount === '0' || currentTemplate === '0'}
+                  startIcon={<Send />}
+                >
+                  <Trans>clone.send</Trans>
+                </Button>
+              </Grid>
+            </Grid>
+          </form>
+        )}
+      </Box>
+    </Box>
+  );
+
 }

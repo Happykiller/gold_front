@@ -1,92 +1,86 @@
+// src\presentation\molecule\accountsSelect.tsx
 import * as React from 'react';
 import { Trans } from 'react-i18next';
-import { FormControl, InputLabel, MenuItem, Select, Typography } from "@mui/material";
+import {
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  Typography,
+  SelectChangeEvent,
+} from '@mui/material';
 
 import { CODES } from '@src/common/codes';
 import inversify from '@src/common/inversify';
 import { AccountUsecaseModel } from '@usecase/model/account.usecase.model';
 import { GetAccountsUsecaseModel } from '@usecase/getAccounts/getAccounts.usecase.model';
 
-export const AccountsSelect = (props:any) => {
-  const [accounts, setAccounts] = React.useState<AccountUsecaseModel[]|null>(null);
-  const [qry, setQry] = React.useState<{
-      loading: boolean | null,
-      data: any,
-      error: string | null
-    }>({
-      loading: null,
-      data: null,
-      error: null
-    });
+type AccountsSelectProps = {
+  value: string | number;
+  label: React.ReactNode;
+  onChange: (event: SelectChangeEvent) => void;
+  type?: number; // 0 (all), 1 (default), 2 (template), etc.
+};
 
-  let content = <div></div>;
+export const AccountsSelect: React.FC<AccountsSelectProps> = ({
+  value,
+  label,
+  onChange,
+  type = 0,
+}) => {
+  const [accounts, setAccounts] = React.useState<AccountUsecaseModel[] | null>(null);
+  const [loading, setLoading] = React.useState(false);
+  const [error, setError] = React.useState<string | null>(null);
 
-  if(qry.loading) {
-    content = <div><Trans>common.loading</Trans></div>;
-  } else if(qry.error) {
-    content = <div><Trans>common.{qry.error}</Trans></div>
-  } else if (accounts === null) {
-    setQry(qry => ({
-      ...qry,
-      loading: true
-    }));
-    inversify.getAccountsUsecase.execute()
-      .then((response:GetAccountsUsecaseModel) => {
-        if(response.message === CODES.SUCCESS && response.data) {
+  React.useEffect(() => {
+    if (accounts !== null) return;
+
+    setLoading(true);
+    inversify.getAccountsUsecase
+      .execute()
+      .then((response: GetAccountsUsecaseModel) => {
+        if (response.message === CODES.SUCCESS && response.data) {
           setAccounts(response.data);
         } else {
           inversify.loggerService.debug(response.error);
-          setQry(qry => ({
-            ...qry,
-            error: response.message
-          }));
+          setError(response.message);
         }
       })
-      .catch((error:any) => {
-        setQry(qry => ({
-          ...qry,
-          error: error.message
-        }));
+      .catch((err: any) => {
+        setError(err.message);
       })
       .finally(() => {
-        setQry(qry => ({
-          ...qry,
-          loading: false
-        }));
+        setLoading(false);
       });
-  } else {
-    content = (
-      <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
-        <InputLabel>{props.label}</InputLabel>
-        <Select
-          variant="standard"
-          size="small"
-          displayEmpty
-          value={props.value}
-          onChange={(e) => { 
-            e.preventDefault();
-            props.onChange(e);
-          }}
-        >
-          <MenuItem value={0}><Trans>common.clear</Trans></MenuItem>
-          {
-            accounts.map((account) => {
-              const type = props.type??1;
-              if (type === 0 || account.type_id === type) {
-                return <MenuItem 
-                  key={account.id} 
-                  value={account.id}
-                  sx={{
-                    width: '300px'
-                  }}
-                ><Typography noWrap>{account.label}</Typography></MenuItem>;
-              }
-            })
-          }
-        </Select>
-      </FormControl>
-    )
+  }, [accounts]);
+
+  if (loading) {
+    return <Typography><Trans>common.loading</Trans></Typography>;
   }
 
-  return content;
-}
+  if (error) {
+    return <Typography color="error"><Trans>common.{error}</Trans></Typography>;
+  }
+
+  return (
+    <FormControl variant="standard" fullWidth sx={{ m: 1 }}>
+      <InputLabel>{label}</InputLabel>
+      <Select
+        variant="standard"
+        size="small"
+        displayEmpty
+        value={value.toString()}
+        onChange={onChange}
+      >
+        <MenuItem value={0}><Trans>common.clear</Trans></MenuItem>
+        {accounts?.map((account) =>
+          (type === 0 || account.type_id === type) && (
+            <MenuItem key={account.id} value={account.id}>
+              <Typography noWrap>{account.label}</Typography>
+            </MenuItem>
+          )
+        )}
+      </Select>
+    </FormControl>
+  );
+};

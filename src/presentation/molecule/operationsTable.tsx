@@ -78,7 +78,7 @@ export const OperationsTable: React.FC<Props> = ({
     <Box sx={{
       background: {
         xs: 0,
-        sm: 'rgba(18,22,42,0.96)',
+        sm: theme.palette.background.default,
       },
       borderRadius: {
         xs: 0,
