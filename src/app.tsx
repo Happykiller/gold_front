@@ -22,7 +22,6 @@ const App: React.FC = () => {
     <div>
       {/* Define the application's routing structure */}
       <Routes>
-
         <Route path="*" element={<LayoutPublicExt><NotFound /></LayoutPublicExt>} />
         
         {/* Route for the cgu page */}

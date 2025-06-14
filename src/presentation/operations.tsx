@@ -70,6 +70,7 @@ export const Operations = () => {
         }
       />
       <OperationsTable
+        current_account_id={accountId}
         operations={operations}
         loading={loadingOps}
         error={errorOps}

@@ -8,7 +8,7 @@ import EditNoteIcon from '@mui/icons-material/EditNote';
 import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import { Operation } from '@presentation/hooks/useAccountOperations';
-import { Grid, Typography, IconButton, Box, CircularProgress } from '@mui/material';
+import { Grid2 as Grid, Typography, IconButton, Box, CircularProgress } from '@mui/material';
 
 import {
   getOperationIcon,
@@ -19,6 +19,7 @@ import {
 import { Trans } from 'react-i18next';
 
 type Props = {
+  current_account_id: number;
   operations: Operation[] | null;
   loading: boolean;
   error: string | null;
@@ -28,6 +29,7 @@ type Props = {
 };
 
 export const OperationsTable: React.FC<Props> = ({
+  current_account_id,
   operations,
   loading,
   error,
@@ -103,7 +105,7 @@ export const OperationsTable: React.FC<Props> = ({
         py: 1,
       }}>
         {columns.map(col => (
-          <Grid item xs={col.xs} sm={col.sm} md={col.md} key={col.key} sx={{ display: col.display, alignItems: 'center', justifyContent: 'center' }}>
+          <Grid size={{ xs: col.xs, sm: col.sm, md: col.md }} key={col.key} sx={{ display: col.display, alignItems: 'center', justifyContent: 'center' }}>
             <Typography color="#fff" fontSize={15}>{col.label}</Typography>
           </Grid>
         ))}
@@ -124,29 +126,32 @@ export const OperationsTable: React.FC<Props> = ({
           onClick={isXs ? () => onEditOperation?.(operation) : undefined}
         >
           <Grid
-            item
-            xs={columns.find(elt => elt.key === 'id')?.xs}
-            sm={columns.find(elt => elt.key === 'id')?.sm}
-            md={columns.find(elt => elt.key === 'id')?.md}
+            size={{
+              xs: columns.find(elt => elt.key === 'id')?.xs,
+              sm: columns.find(elt => elt.key === 'id')?.sm,
+              md: columns.find(elt => elt.key === 'id')?.md
+            }}
             sx={{ display: columns.find(elt => elt.key === 'id')?.display, alignItems: 'center', justifyContent: 'center' }}>
             <Typography noWrap color="#e7e7ef">{operation.id}</Typography>
           </Grid>
           <Grid
-            item
-            xs={columns.find(elt => elt.key === 'date')?.xs}
-            sm={columns.find(elt => elt.key === 'date')?.sm}
-            md={columns.find(elt => elt.key === 'date')?.md}
+            size={{
+              xs: columns.find(elt => elt.key === 'date')?.xs,
+              sm: columns.find(elt => elt.key === 'date')?.sm,
+              md: columns.find(elt => elt.key === 'date')?.md
+            }}
             sx={{ display: columns.find(elt => elt.key === 'date')?.display, alignItems: 'center', justifyContent: 'center' }}>
             <Typography noWrap color="#e7e7ef">{formatOperationDate(operation.date)}</Typography>
           </Grid>
           <Grid
-            item
-            xs={columns.find(elt => elt.key === 'amount')?.xs}
-            sm={columns.find(elt => elt.key === 'amount')?.sm}
-            md={columns.find(elt => elt.key === 'amount')?.md}
+            size={{
+              xs: columns.find(elt => elt.key === 'amount')?.xs,
+              sm: columns.find(elt => elt.key === 'amount')?.sm,
+              md: columns.find(elt => elt.key === 'amount')?.md
+            }}
             sx={{ display: columns.find(elt => elt.key === 'amount')?.display, alignItems: 'center', justifyContent: 'center' }}>
             {(() => {
-              const { value, color, sign } = getVisualAmountMeta(operation, operation.account_id_dest ?? 0);
+              const { value, color, sign } = getVisualAmountMeta(operation, current_account_id);
               return (
                 <Typography
                   noWrap
@@ -160,45 +165,50 @@ export const OperationsTable: React.FC<Props> = ({
             })()}
           </Grid>
           <Grid
-            item
-            xs={columns.find(elt => elt.key === 'dest')?.xs}
-            sm={columns.find(elt => elt.key === 'dest')?.sm}
-            md={columns.find(elt => elt.key === 'dest')?.md}
+            size={{
+              xs: columns.find(elt => elt.key === 'dest')?.xs,
+              sm: columns.find(elt => elt.key === 'dest')?.sm,
+              md: columns.find(elt => elt.key === 'dest')?.md
+            }}
             sx={{ display: columns.find(elt => elt.key === 'dest')?.display, alignItems: 'center', justifyContent: 'center' }}>
             <Typography noWrap color="#e7e7ef">
-              {renderDest(operation, operation.account_id_dest ?? 0)}
+              {renderDest(operation, current_account_id)}
             </Typography>
           </Grid>
           <Grid
-            item
-            xs={columns.find(elt => elt.key === 'category')?.xs}
-            sm={columns.find(elt => elt.key === 'category')?.sm}
-            md={columns.find(elt => elt.key === 'category')?.md}
+            size={{
+              xs: columns.find(elt => elt.key === 'category')?.xs,
+              sm: columns.find(elt => elt.key === 'category')?.sm,
+              md: columns.find(elt => elt.key === 'category')?.md
+            }}
             sx={{ display: columns.find(elt => elt.key === 'category')?.display, alignItems: 'center', justifyContent: 'center' }}>
             {getCategoryIcon(operation.category?.label ?? '')}
             <Typography noWrap color="#b7d6ff" ml={0.4} sx={{ display: { xs: 'none', sm: 'inline' } }}><Trans>{operation.category?.label || ''}</Trans></Typography>
           </Grid>
           <Grid
-            item
-            xs={columns.find(elt => elt.key === 'third')?.xs}
-            sm={columns.find(elt => elt.key === 'third')?.sm}
-            md={columns.find(elt => elt.key === 'third')?.md}
+            size={{
+              xs: columns.find(elt => elt.key === 'third')?.xs,
+              sm: columns.find(elt => elt.key === 'third')?.sm,
+              md: columns.find(elt => elt.key === 'third')?.md
+            }}
             sx={{ display: columns.find(elt => elt.key === 'third')?.display, alignItems: 'center', justifyContent: 'center' }}>
             <Typography noWrap color="#e7e7ef"><Trans>{operation.third?.label || ''}</Trans></Typography>
           </Grid>
           <Grid
-            item
-            xs={columns.find(elt => elt.key === 'desc')?.xs}
-            sm={columns.find(elt => elt.key === 'desc')?.sm}
-            md={columns.find(elt => elt.key === 'desc')?.md}
+            size={{
+              xs: columns.find(elt => elt.key === 'desc')?.xs,
+              sm: columns.find(elt => elt.key === 'desc')?.sm,
+              md: columns.find(elt => elt.key === 'desc')?.md
+            }}
             sx={{ display: columns.find(elt => elt.key === 'desc')?.display, alignItems: 'center', justifyContent: 'flex-start' }}>
             <Typography noWrap color="#b0b3c6">{operation.description || ''}</Typography>
           </Grid>
           <Grid
-            item
-            xs={columns.find(elt => elt.key === 'actions')?.xs}
-            sm={columns.find(elt => elt.key === 'actions')?.sm}
-            md={columns.find(elt => elt.key === 'actions')?.md}
+            size={{
+              xs: columns.find(elt => elt.key === 'actions')?.xs,
+              sm: columns.find(elt => elt.key === 'actions')?.sm,
+              md: columns.find(elt => elt.key === 'actions')?.md
+            }}
             sx={{ display: columns.find(elt => elt.key === 'actions')?.display, alignItems: 'center', justifyContent: 'center' }}>
             <IconButton size="small" onClick={e => { e.stopPropagation(); onDeleteOperation?.(operation); }}><DeleteIcon /></IconButton>
             {!isXs && (
