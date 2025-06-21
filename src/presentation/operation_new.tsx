@@ -4,7 +4,7 @@ import dayjs, { Dayjs } from 'dayjs';
 import { Trans, useTranslation } from 'react-i18next';
 import SaveAltIcon from '@mui/icons-material/SaveAlt';
 import {
-  Box, Button, FormControl, Grid2 as Grid, InputLabel, MenuItem,
+  Box, Button, FormControl, Grid, InputLabel, MenuItem,
   Select, Typography, useTheme
 } from '@mui/material';
 import InfoIcon from '@mui/icons-material/Info';

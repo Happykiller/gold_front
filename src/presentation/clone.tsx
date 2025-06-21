@@ -7,7 +7,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { createSearchParams, useNavigate } from 'react-router-dom';
-import { Box, Button, Grid2 as Grid, Typography, useTheme } from '@mui/material';
+import { Box, Button, Grid, Typography, useTheme } from '@mui/material';
 
 import { CODES } from '@src/common/codes';
 import inversify from '@src/common/inversify';

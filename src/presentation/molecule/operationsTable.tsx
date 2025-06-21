@@ -1,5 +1,6 @@
 // src\presentation\molecule\operationsTable.tsx
 import * as React from 'react';
+import { Trans } from 'react-i18next';
 import { useMediaQuery } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import CheckIcon from '@mui/icons-material/Check';
@@ -8,7 +9,7 @@ import EditNoteIcon from '@mui/icons-material/EditNote';
 import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import { Operation } from '@presentation/hooks/useAccountOperations';
-import { Grid2 as Grid, Typography, IconButton, Box, CircularProgress } from '@mui/material';
+import { Grid, Typography, IconButton, Box, CircularProgress } from '@mui/material';
 
 import {
   getOperationIcon,
@@ -16,7 +17,7 @@ import {
   formatOperationDate,
   getVisualAmountMeta
 } from '@presentation/molecule/operationDisplay';
-import { Trans } from 'react-i18next';
+import { useCalculatorStore } from '@stores/useCalculatorStore';
 
 type Props = {
   current_account_id: number;
@@ -38,7 +39,12 @@ export const OperationsTable: React.FC<Props> = ({
   onRecoOperation,
 }) => {
   const theme = useTheme();
+  const { add, open } = useCalculatorStore();
   const isXs = useMediaQuery(theme.breakpoints.only('xs'));
+
+  const handleClickOperation = (operation: Operation) => {
+    add(operation);
+  };
 
   if (loading) return <Box display="flex" justifyContent="center"><CircularProgress size={32} /></Box>;
   if (error) return <Box color="error.main">{error}</Box>;
@@ -120,10 +126,17 @@ export const OperationsTable: React.FC<Props> = ({
             borderBottom: '1px solid #222638',
             background: 'none',
             '&:hover': { backgroundColor: 'rgba(90,100,130,0.12)' },
-            cursor: isXs ? 'pointer' : 'default'
+            cursor: isXs ? 'pointer' : (open ? 'copy' : 'default')
           }}
           alignItems="center"
-          onClick={isXs ? () => onEditOperation?.(operation) : undefined}
+          onClick={() => {
+            if (isXs) {
+              onEditOperation?.(operation);
+            } else if (open) {
+              handleClickOperation(operation);
+            }
+          }}
+
         >
           <Grid
             size={{

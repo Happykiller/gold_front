@@ -8,7 +8,7 @@ import { createSearchParams, useNavigate } from 'react-router-dom';
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import {
   Box, Button, Typography, FormControl, InputLabel,
-  MenuItem, Select, useTheme, Grid2 as Grid
+  MenuItem, Select, useTheme, Grid
 } from '@mui/material';
 import EuroIcon from '@mui/icons-material/Euro';
 import DescriptionIcon from '@mui/icons-material/Description';

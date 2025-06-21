@@ -172,3 +172,17 @@ export function getVisualAmountMeta(operation: Operation, currentAccountId: numb
 export function formatOperationDate(date: string) {
   return dayjs(parseInt(date)).format('DD/MM/YYYY');
 }
+
+export function getSignedAmount(operation: Operation, currentAccountId: number): number {
+  if (operation.type_id === 1) return operation.amount; // Crédit
+  if (operation.type_id === 2) return -operation.amount; // Débit
+
+  if (operation.type_id === 3) {
+    // Virement
+    return (operation.account_id_dest === currentAccountId)
+      ? operation.amount  // Reçu
+      : -operation.amount; // Envoyé
+  }
+
+  return operation.amount; // fallback
+}

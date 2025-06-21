@@ -6,6 +6,7 @@ import inversify from '@src/common/inversify';
 import { CODES } from '@happykiller/sunny-ui';
 import { AccountHeader } from '@presentation/molecule/accountHeader';
 import { OperationsTable } from '@presentation/molecule/operationsTable';
+import { FloatingCalculator } from '@presentation/molecule/FloatingCalculator';
 import { useAccountOperations } from '@presentation/hooks/useAccountOperations';
 
 export const Operations = () => {
@@ -78,6 +79,7 @@ export const Operations = () => {
         onDeleteOperation={handleDeleteOperation}
         onRecoOperation={handleRecoOperation}
       />
+      <FloatingCalculator />
     </>
   );
 };

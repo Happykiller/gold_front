@@ -1,8 +1,12 @@
 # docker-compose.prod.yml
 services:
-  gold_front:  # Define the service name
-    container_name: gold_front  # Name of the container
+  gold_front:
+    container_name: gold_front
     image: gold_front
-    ports:
-      - "8083:80"  # Map port 80 in the container to port 8086 on the host
-    restart: always  # Automatically restart the container if it stops
+    restart: always
+    networks:
+      - interservices
+
+networks:
+  interservices:
+    external: true

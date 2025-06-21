@@ -8,7 +8,7 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { createSearchParams, useNavigate, useSearchParams } from 'react-router-dom';
 import {
-  Box, Button, FormControl, Grid2 as Grid, InputLabel, MenuItem,
+  Box, Button, FormControl, Grid, InputLabel, MenuItem,
   Select, TextField, Typography, useTheme
 } from '@mui/material';
 
