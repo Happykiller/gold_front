@@ -7,9 +7,25 @@
     "accounts": "Accounts",
     "clone": "Clone",
     "createVir": "Transfer",
+    "graphic": "Charts",
+    "ventilation": "Ventilation",
     "logout": "Logout",
     "profile": "Profile",
     "settings": "Settings"
+  },
+  "graphic": {
+    "title": "Cashflow",
+    "accounts": "Accounts",
+    "startDate": "Start Date",
+    "endDate": "End Date",
+    "generate": "Generate",
+    "reconciled": "Reconciled Balance",
+    "total": "Total Balance",
+    "dateRangeError": "Start date must be before end date.",
+    "filterMode": "Display Mode",
+    "filterReconciled": "Reconciled operations",
+    "filterAll": "All operations",
+    "sumSeries": "Total Sum"
   },
   "clone": {
     "send": "Clone",
@@ -29,6 +45,18 @@
     "send": "Send",
     "succeed": "Transfer created: ",
     "title": "Transfer"
+  },
+  "ventilation": {
+    "title": "Ventilation",
+    "add_dest": "Add destination",
+    "dest_account": "Destination account",
+    "amount": "Amount / Percentage",
+    "is_percentage": "Percentage?",
+    "send": "Ventilate",
+    "succeed": "Ventilation successful",
+    "error_amount_exceeded": "Total exceeds the amount to ventilate",
+    "total_allocated": "Total allocated",
+    "total_amount": "Total to ventilate"
   },
   "editOperation": {
     "send": "Update",

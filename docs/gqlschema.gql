@@ -1,0 +1,359 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type AuthModelResolver {
+  """Session token"""
+  access_token: String!
+
+  """Id of the user"""
+  id: String!
+
+  """Code of the user"""
+  code: String!
+  name_first: String!
+  name_last: String!
+  description: String!
+  mail: String!
+  role: String!
+}
+
+type PasskeyResolverModel {
+  id: String!
+  label: String!
+  user_id: String!
+  hostname: String!
+  user_code: String!
+  challenge: String!
+  credential_id: String!
+}
+
+type SystemInfoResolverModel {
+  version: String!
+}
+
+type SendMailSystemResolverModel {
+  success: Boolean!
+  message: String!
+}
+
+type PingResponse {
+  message: String!
+}
+
+type UserModelResolver {
+  id: String
+  code: String
+  name_first: String
+  name_last: String
+  description: String
+  mail: String
+  role: String
+}
+
+type AccountModelResolver {
+  id: Int!
+
+  """1, regular by default"""
+  type_id: Int!
+  parent_account_id: Int
+  label: String!
+  description: String
+  balance_reconcilied: Float
+  balance_not_reconcilied: Float
+  creator_id: Int!
+  creation_date: String!
+  modificator_id: Int
+  modification_date: String
+}
+
+type AccountTypeModelResolver {
+  id: Int!
+  label: String!
+  description: String
+  creator_id: Int!
+  creation_date: String!
+  modificator_id: Int
+  modification_date: String
+}
+
+type OperationModelResolver {
+  id: Int!
+  account_id: Int!
+  account_id_dest: Int
+  amount: Float!
+  date: String!
+  status_id: Int!
+  type_id: Int!
+  third_id: Int
+  category_id: Int
+  description: String!
+  active: Boolean!
+  creator_id: Int!
+  creation_date: String!
+  modificator_id: Int
+  modification_date: String
+  account: AccountModelResolver!
+  account_dest: AccountModelResolver
+  status: OperationStatutModelResolver!
+  type: OperationTypeModelResolver!
+  third: OperationThirdModelResolver!
+  category: OperationCategoryModelResolver!
+}
+
+type OperationLinkModelResolver {
+  id: Int!
+  operation_id: Int!
+  operation_ref_id: Int!
+  active: Boolean!
+  creator_id: Int!
+  creation_date: String!
+  modificator_id: Int
+  modification_date: String
+}
+
+type OperationTypeModelResolver {
+  id: Int!
+  label: String!
+  active: Boolean!
+  creator_id: Int!
+  creation_date: String!
+  modificator_id: Int
+  modification_date: String
+}
+
+type OperationThirdModelResolver {
+  id: Int!
+  label: String!
+  active: Boolean!
+  creator_id: Int!
+  creation_date: String!
+  modificator_id: Int
+  modification_date: String
+}
+
+type OperationStatutModelResolver {
+  id: Int!
+  label: String!
+  active: Boolean!
+  creator_id: Int!
+  creation_date: String!
+  modificator_id: Int
+  modification_date: String
+}
+
+type OperationCategoryModelResolver {
+  id: Int!
+  label: String!
+  description: String!
+  active: Boolean!
+  creator_id: Int!
+  creation_date: String!
+  modificator_id: Int
+  modification_date: String
+}
+
+type CashflowModelResolver {
+  account_id: Int!
+  date: String!
+  reconciled_balance: Float!
+  total_balance: Float!
+}
+
+type Query {
+  ping: PingResponse!
+  auth(dto: AuthAuthResolverDto!): AuthModelResolver!
+  auth_passkey(dto: PasskeyAuthResolverDto!): AuthModelResolver!
+  getSessionInfo: AuthModelResolver!
+  passkeys_for_user: [PasskeyResolverModel!]!
+  systemInfo: SystemInfoResolverModel!
+  test_mail: SendMailSystemResolverModel!
+  users: [UserModelResolver!]!
+  user(dto: GetUserResolverDto!): UserModelResolver!
+  accounts: [AccountModelResolver!]!
+  account(dto: GetAccountInputResolver!): AccountModelResolver!
+  accountTypes: [AccountTypeModelResolver!]!
+  operations(dto: GetOperationsInputResolver!): [OperationModelResolver!]!
+  cashflow(dto: CashflowInputResolver!): [CashflowModelResolver!]!
+  operation(dto: GetOperationInputResolver!): OperationModelResolver!
+  operationTypes: [OperationTypeModelResolver!]!
+  operationCategories: [OperationCategoryModelResolver!]!
+  operationStatus: [OperationStatutModelResolver!]!
+  operationThirds: [OperationThirdModelResolver!]!
+  operationLinks(dto: GetOperationInputResolver!): [OperationLinkModelResolver!]!
+}
+
+input AuthAuthResolverDto {
+  """User code for the session"""
+  login: String!
+
+  """Password for the session"""
+  password: String!
+}
+
+input PasskeyAuthResolverDto {
+  user_code: String!
+  authentication: PasskeyAuthAuthenticationResolverDto!
+}
+
+input PasskeyAuthAuthenticationResolverDto {
+  id: String!
+  rawId: String!
+  type: String!
+  authenticatorAttachment: String
+  response: PasskeyAuthResponseResolverDto!
+}
+
+input PasskeyAuthResponseResolverDto {
+  authenticatorData: String!
+  clientDataJSON: String!
+  signature: String!
+  userHandle: String
+}
+
+input GetUserResolverDto {
+  id: String
+  code: String
+}
+
+input GetAccountInputResolver {
+  account_id: Int!
+}
+
+input GetOperationsInputResolver {
+  account_id: Int!
+  limit: Int = 100
+  offset: Int = 0
+}
+
+input CashflowInputResolver {
+  account_ids: [Int!]!
+  start_date: String!
+  end_date: String!
+}
+
+input GetOperationInputResolver {
+  operation_id: Int!
+}
+
+type Mutation {
+  update_password(dto: UpdPasswordAuthResolverDto!): AuthModelResolver!
+  create_passkey(dto: CreatePasskeyResolverDto!): PasskeyResolverModel!
+  delete_passkey(dto: DeletePasskeyResolverDto!): Boolean!
+  create_user(dto: CreateUserResolverDto!): UserModelResolver!
+  createAccount(dto: CreateAccountInputResolver!): AccountModelResolver!
+  updateAccount(dto: UpdateAccountInputResolver!): AccountModelResolver!
+  deleteAccount(dto: GetAccountInputResolver!): Boolean!
+  createOperation(dto: CreateOperationInputResolver!): OperationModelResolver!
+  updateOperation(dto: UpdateOperationInputResolver!): OperationModelResolver!
+  deleteOperation(dto: GetOperationInputResolver!): Boolean!
+  createOperationLink(dto: CreateOperationLinkInputResolver!): OperationLinkModelResolver!
+  deleteOperationLink(dto: GetOperationLinkInputResolver!): Boolean!
+  cloneOperations(dto: CloneOperationInputResolver!): [OperationModelResolver!]!
+}
+
+input UpdPasswordAuthResolverDto {
+  old_value: String!
+  new_value: String!
+  conf_value: String!
+}
+
+input CreatePasskeyResolverDto {
+  label: String!
+  hostname: String!
+  challenge: String!
+  registration: RegisterPasskeyResolverDto!
+}
+
+input RegisterPasskeyResolverDto {
+  type: String!
+  id: String!
+  rawId: String!
+  authenticatorAttachment: String!
+  response: RegisterResponsePasskeyResolverDto!
+  user: RegisterUserPasskeyResolverDto!
+}
+
+input RegisterResponsePasskeyResolverDto {
+  attestationObject: String!
+  authenticatorData: String!
+  clientDataJSON: String!
+  publicKey: String!
+  publicKeyAlgorithm: Float!
+  transports: [String!]!
+}
+
+input RegisterUserPasskeyResolverDto {
+  name: String!
+  id: String!
+}
+
+input DeletePasskeyResolverDto {
+  passkey_id: String!
+}
+
+input CreateUserResolverDto {
+  """Code of the user"""
+  code: String!
+  name_first: String!
+  name_last: String!
+  description: String!
+  mail: String!
+  password: String!
+}
+
+input CreateAccountInputResolver {
+  """1, regular by default"""
+  type_id: Int!
+  parent_account_id: Int
+  label: String!
+  description: String
+}
+
+input UpdateAccountInputResolver {
+  account_id: Int!
+  type_id: Int
+  parent_account_id: Int
+  label: String
+  description: String
+}
+
+input CreateOperationInputResolver {
+  account_id: Int!
+  account_id_dest: Int
+  amount: Float!
+  date: String!
+  status_id: Int!
+  type_id: Int!
+  third_id: Int
+  category_id: Int
+  description: String
+}
+
+input UpdateOperationInputResolver {
+  account_id: Int
+  account_id_dest: Int
+  amount: Float
+  date: String
+  status_id: Int
+  type_id: Int
+  third_id: Int
+  category_id: Int
+  description: String
+  operation_id: Int!
+}
+
+input CreateOperationLinkInputResolver {
+  operation_id: Int!
+  operation_ref_id: Int!
+}
+
+input GetOperationLinkInputResolver {
+  operation_link_id: Int!
+}
+
+input CloneOperationInputResolver {
+  account_id: Int!
+  template_account_id: Int!
+  date: String!
+}

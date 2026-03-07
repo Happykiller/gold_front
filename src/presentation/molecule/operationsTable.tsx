@@ -9,7 +9,7 @@ import EditNoteIcon from '@mui/icons-material/EditNote';
 import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import { Operation } from '@presentation/hooks/useAccountOperations';
-import { Grid, Typography, IconButton, Box, CircularProgress } from '@mui/material';
+import { Grid, Typography, IconButton, Box, CircularProgress, Tooltip } from '@mui/material';
 
 import {
   getOperationIcon,
@@ -214,7 +214,9 @@ export const OperationsTable: React.FC<Props> = ({
               md: columns.find(elt => elt.key === 'desc')?.md
             }}
             sx={{ display: columns.find(elt => elt.key === 'desc')?.display, alignItems: 'center', justifyContent: 'flex-start' }}>
-            <Typography noWrap color="#b0b3c6">{operation.description || ''}</Typography>
+            <Tooltip title={operation.description || ''} placement="top">
+              <Typography noWrap color="#b0b3c6">{operation.description || ''}</Typography>
+            </Tooltip>
           </Grid>
           <Grid
             size={{

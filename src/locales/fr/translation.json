@@ -7,9 +7,25 @@
     "accounts": "Comptes",
     "clone": "Cloner",
     "createVir": "Virement",
+    "graphic": "Graphique",
+    "ventilation": "Ventilation",
     "logout": "Déconnexion",
     "profile": "Profil",
     "settings": "Réglages"
+  },
+  "graphic": {
+    "title": "Trésorerie",
+    "accounts": "Comptes",
+    "startDate": "Date de début",
+    "endDate": "Date de fin",
+    "generate": "Générer",
+    "reconciled": "Solde réconcilié",
+    "total": "Solde total",
+    "dateRangeError": "La date de début doit être antérieure à la date de fin.",
+    "filterMode": "Affichage",
+    "filterReconciled": "Opérations réconciliées",
+    "filterAll": "Toutes opérations",
+    "sumSeries": "Total Cumulé"
   },
   "clone": {
     "send": "Cloner",
@@ -29,6 +45,18 @@
     "send": "Envoyer",
     "succeed": "Virement créé : ",
     "title": "Virement"
+  },
+  "ventilation": {
+    "title": "Ventilation",
+    "add_dest": "Ajouter une destination",
+    "dest_account": "Compte de destination",
+    "amount": "Montant / Pourcentage",
+    "is_percentage": "Pourcentage ?",
+    "send": "Ventiler",
+    "succeed": "Ventilation réussie",
+    "error_amount_exceeded": "Le total dépasse le montant à ventiler",
+    "total_allocated": "Total alloué",
+    "total_amount": "Total à ventiler"
   },
   "editOperation": {
     "send": "Mettre à jour",

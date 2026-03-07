@@ -1,10 +1,10 @@
 // src\common\inversify.ts
 import { StateStorage } from 'zustand/middleware';
 
-import { 
-  AuthPasskeyUsecase, AuthUsecase, CreatePasskeyUsecase, DeletePasskeyUsecase, 
-  GetPasskeyForUserUsecase, GraphqlService, 
-  LoggerService, LoggerServiceReal, SessionInfoUsecase, SystemInfoUsecase, UpdPasswordUsecase 
+import {
+  AuthPasskeyUsecase, AuthUsecase, CreatePasskeyUsecase, DeletePasskeyUsecase,
+  GetPasskeyForUserUsecase, GraphqlService,
+  LoggerService, LoggerServiceReal, SessionInfoUsecase, SystemInfoUsecase, UpdPasswordUsecase
 } from '@happykiller/sunny-ui';
 import config from '@src/config';
 import { SetRecoUsecase } from '@usecase/setReco/setReco.usecase';
@@ -21,6 +21,7 @@ import { CloneOperationsUsecase } from '@usecase/cloneOperations/cloneOperations
 import { UpdateOperationUsecase } from '@usecase/updateOperation/updateOperation.usecase';
 import { DeleteOperationUsecase } from '@usecase/deleteOperation/deleteOperation.usecase';
 import { GetOpeCategoriesUsecase } from '@usecase/getOpeCategories/getOpeCategories.usecase';
+import { GetCashflowUsecase } from '@usecase/getCashflow/getCashflow.usecase';
 
 export class Inversify {
   authUsecase: AuthUsecase;
@@ -45,6 +46,7 @@ export class Inversify {
   deleteOperationUsecase: DeleteOperationUsecase;
   getOpeCategoriesUsecase: GetOpeCategoriesUsecase;
   getPasskeyForUserUsecase: GetPasskeyForUserUsecase;
+  getCashflowUsecase: GetCashflowUsecase;
 
   constructor() {
     // Usecases
@@ -68,6 +70,7 @@ export class Inversify {
     this.deleteOperationUsecase = new DeleteOperationUsecase(this);
     this.getOpeCategoriesUsecase = new GetOpeCategoriesUsecase(this);
     this.getPasskeyForUserUsecase = new GetPasskeyForUserUsecase(this);
+    this.getCashflowUsecase = new GetCashflowUsecase(this);
 
     // Services
     this.storageService = new StorageServiceCookie();

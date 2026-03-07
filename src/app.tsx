@@ -8,6 +8,8 @@ import inversify from './common/inversify';
 import { Clone } from '@presentation/clone';
 import { CreateVir } from '@presentation/createVir';
 import { Operations } from '@presentation/operations';
+import { Ventilation } from '@presentation/ventilation';
+import { Graphic } from '@presentation/graphic';
 import { OperationNew } from '@presentation/operation_new';
 import { EditOperation } from '@presentation/operation_edit';
 import { contextStore } from './presentation/store/contextStore';
@@ -23,7 +25,7 @@ const App: React.FC = () => {
       {/* Define the application's routing structure */}
       <Routes>
         <Route path="*" element={<LayoutPublicExt><NotFound /></LayoutPublicExt>} />
-        
+
         {/* Route for the cgu page */}
         <Route path="/cgu" element={<LayoutPublicExt><CGU /></LayoutPublicExt>} />
 
@@ -88,6 +90,12 @@ const App: React.FC = () => {
         {/* Route for the info page */}
         <Route path="/createVir" element={<LayoutProtectedExt><CreateVir /></LayoutProtectedExt>} />
 
+        {/* Route for ventilation page */}
+        <Route path="/ventilation" element={<LayoutProtectedExt><Ventilation /></LayoutProtectedExt>} />
+
+        {/* Route for the graphic page */}
+        <Route path="/graphic" element={<LayoutProtectedExt><Graphic /></LayoutProtectedExt>} />
+
         {/* Route for the training page */}
         <Route path="/clone" element={<LayoutProtectedExt><Clone /></LayoutProtectedExt>} />
 
@@ -97,7 +105,7 @@ const App: React.FC = () => {
         {/* Route for the preview page */}
         <Route path="/operation_new" element={<LayoutProtectedExt><OperationNew /></LayoutProtectedExt>} />
       </Routes>
-      
+
       {/* Render the Footer component */}
       <FlashMessage icons={{ close: <CloseIcon fontSize="small" /> }} />
     </div>

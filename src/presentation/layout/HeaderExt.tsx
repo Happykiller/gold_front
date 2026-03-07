@@ -8,7 +8,7 @@ import { contextStore } from '../store/contextStore';
 export function HeaderExt() {
   return <Header
     contextStore={contextStore()}
-    routes={['accounts', 'createVir', 'clone']}
+    routes={['accounts', 'createVir', 'ventilation', 'graphic', 'clone']}
     settings={['profile', 'logout']}
     brandName='Vergo'
     icons={{ menu: <MenuIcon /> }}
