@@ -10,7 +10,8 @@ export class GraphqlServiceFetch implements GraphqlService {
 
   async send(datas: any): Promise<any> {
     try {
-      const storage = JSON.parse(await this.inversify.storageService.getItem(config.local_storage_name)??"");
+      const storedSession = await this.inversify.storageService.getItem(config.local_storage_name);
+      const storage = storedSession ? JSON.parse(storedSession) : null;
       const token = storage?.state.access_token;
 
       const response = await fetch(config.api_url, {
