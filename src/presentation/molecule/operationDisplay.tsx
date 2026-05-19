@@ -26,6 +26,8 @@ import EmojiTransportationIcon from '@mui/icons-material/EmojiTransportation';
 
 import { Operation } from '@presentation/hooks/useAccountOperations';
 
+const DEFAULT_VAT_RATE = 20;
+
 export function getCategoryIcon(categoryLabel: string) {
   const label = categoryLabel?.trim().toLowerCase();
 
@@ -167,6 +169,33 @@ export function getVisualAmountMeta(operation: Operation, currentAccountId: numb
   }
 
   return { sign: '', color: '#ccc', value: baseAmount }; // Fallback
+}
+
+export function getOperationVatRate(operation: Operation) {
+  return typeof operation.vat_rate === 'number' && Number.isFinite(operation.vat_rate)
+    ? operation.vat_rate
+    : DEFAULT_VAT_RATE;
+}
+
+export function formatEuroAmount(amount: number) {
+  return `${amount.toLocaleString('fr-FR', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })} €`;
+}
+
+export function getOperationVatBreakdown(operation: Operation) {
+  const vatRate = getOperationVatRate(operation);
+  const ttc = operation.amount;
+  const ht = ttc / (1 + vatRate / 100);
+  const vatAmount = ttc - ht;
+
+  return {
+    vatRate,
+    ttc,
+    ht,
+    vatAmount,
+  };
 }
 
 export function formatOperationDate(date: string) {

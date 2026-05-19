@@ -95,9 +95,13 @@
     "id": "ID",
     "status": "Statut",
     "third": "Tiers",
+    "vat_amount": "Montant TVA",
+    "vat_rate": "Taux de TVA (%)",
     "type": "Type",
     "third-otherCredit": "Créditeur",
-    "third-otherDebit": "Débiteur"
+    "third-otherDebit": "Débiteur",
+    "ttc_amount": "Montant TTC",
+    "ht_amount": "Montant HT"
   },
   "operation_create": {
     "send": "Créer",

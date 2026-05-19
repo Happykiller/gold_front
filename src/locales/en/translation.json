@@ -95,8 +95,12 @@
     "id": "ID",
     "status": "Status",
     "third": "Third party",
+    "vat_amount": "VAT amount",
+    "vat_rate": "VAT rate (%)",
     "third-otherCredit": "Creditor",
-    "third-otherDebit": "Debtor"
+    "third-otherDebit": "Debtor",
+    "ttc_amount": "Amount incl. VAT",
+    "ht_amount": "Amount excl. VAT"
   },
   "operation_create": {
     "send": "Create",

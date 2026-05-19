@@ -36,6 +36,9 @@ export const EditOperation = () => {
   }>({ loading: null, data: null, error: null });
   const [operation, setOperation] = React.useState<OperationUsecaseModel | null>(null);
   const [opDate, setOpDate] = React.useState<Dayjs>(dayjs());
+  const [vatRateValue, setVatRateValue] = React.useState('20');
+
+  const vatRateIsValid = /^(100(\.0+)?|[0-9]{1,2}(\.[0-9]{1,2})?)$/.test(vatRateValue);
 
   const handleClick = async (event: React.SyntheticEvent) => {
     event.preventDefault();
@@ -43,6 +46,7 @@ export const EditOperation = () => {
 
     const dto = {
       ...operation,
+      vat_rate: parseFloat(vatRateValue.replace(',', '.')),
       date: opDate.format('YYYY-MM-DD'),
     };
 
@@ -74,6 +78,7 @@ export const EditOperation = () => {
         if (response.message === CODES.SUCCESS && response.data) {
           setOpDate(dayjs(parseInt(response.data.date)));
           setOperation(response.data);
+          setVatRateValue(String(response.data.vat_rate ?? 20));
         } else {
           setQry({ ...qry, error: response.message });
         }
@@ -121,7 +126,7 @@ export const EditOperation = () => {
         {operation && (
           <form onSubmit={handleClick}>
             <Grid container spacing={2}>
-              <Grid size={6}>
+              <Grid size={4}>
                 <TextField
                   label={<Trans>operation.amount</Trans>}
                   variant="standard"
@@ -133,7 +138,34 @@ export const EditOperation = () => {
                   }
                 />
               </Grid>
-              <Grid size={6}>
+              <Grid size={4}>
+                <TextField
+                  label={<Trans>operation.vat_rate</Trans>}
+                  variant="standard"
+                  fullWidth
+                  type="number"
+                  value={vatRateValue}
+                  onChange={e => {
+                    const nextValue = e.target.value.replace(',', '.');
+                    setVatRateValue(nextValue);
+                    setOperation({
+                      ...operation,
+                      vat_rate: nextValue === '' ? undefined : parseFloat(nextValue),
+                    });
+                  }}
+                  error={!vatRateIsValid}
+                  helperText={!vatRateIsValid ? 'Valeur entre 0 et 100' : ' '}
+                  slotProps={{
+                    htmlInput: {
+                      min: 0,
+                      max: 100,
+                      step: 0.1,
+                      inputMode: 'decimal',
+                    },
+                  }}
+                />
+              </Grid>
+              <Grid size={4}>
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                   <DatePicker
                     format="DD/MM/YYYY"
@@ -229,6 +261,8 @@ export const EditOperation = () => {
                   disabled={
                     operation.amount <= 0 ||
                     !operation.description ||
+                    !vatRateIsValid ||
+                    vatRateValue === '' ||
                     operation.account_id === operation.account_id_dest
                   }
                 >

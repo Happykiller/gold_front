@@ -11,6 +11,7 @@ export interface OperationUsecaseModel {
     label: string;
   }
   amount: number;
+  vat_rate?: number;
   date: string;
   status_id: number;
   type_id: number;

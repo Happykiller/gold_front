@@ -20,6 +20,7 @@ export class CreateOperationUsecase {
             $account_id: Int!
             $account_id_dest: Int
             $amount: Float!
+            $vat_rate: Float
             $date: String!
             $status_id: Int!
             $type_id: Int!
@@ -32,6 +33,7 @@ export class CreateOperationUsecase {
                 account_id: $account_id
                 account_id_dest: $account_id_dest
                 amount: $amount
+                vat_rate: $vat_rate
                 date: $date
                 status_id: $status_id
                 type_id: $type_id
@@ -44,6 +46,7 @@ export class CreateOperationUsecase {
               account_id
               account_id_dest
               amount
+              vat_rate
               date
               status_id
               type_id

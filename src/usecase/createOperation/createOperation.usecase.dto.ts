@@ -1,5 +1,6 @@
 export interface CreateOperationUsecaseDto {
   amount: number
+  vat_rate?: number
   date: string
   description: string
   account_id: number

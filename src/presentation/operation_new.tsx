@@ -5,7 +5,7 @@ import { Trans, useTranslation } from 'react-i18next';
 import SaveAltIcon from '@mui/icons-material/SaveAlt';
 import {
   Box, Button, FormControl, Grid, InputLabel, MenuItem,
-  Select, Typography, useTheme
+  Select, TextField, Typography, useTheme
 } from '@mui/material';
 import InfoIcon from '@mui/icons-material/Info';
 import EuroIcon from '@mui/icons-material/Euro';
@@ -39,10 +39,12 @@ export const OperationNew = () => {
   const [opDate, setOpDate] = React.useState<Dayjs>(dayjs());
   const [desc, setDesc] = React.useState({ value: '', valid: false });
   const [amount, setAmount] = React.useState({ value: '', valid: false });
+  const [vatRate, setVatRate] = React.useState({ value: '20', valid: true });
 
   const [operation, setOperation] = React.useState<CreateOperationUsecaseDto>({
     account_id: parseInt(searchParams.get('account_id') ?? '0'),
     amount: 0,
+    vat_rate: 20,
     date: dayjs().format('YYYY-MM-DD'),
     status_id: 1,
     type_id: 2,
@@ -58,6 +60,7 @@ export const OperationNew = () => {
     const dto = {
       ...operation,
       amount: parseFloat(amount.value),
+      vat_rate: parseFloat(vatRate.value.replace(',', '.')),
       description: desc.value,
       date: opDate.format('YYYY-MM-DD')
     };
@@ -118,7 +121,7 @@ export const OperationNew = () => {
         ) : (
           <form onSubmit={handleClick}>
             <Grid container spacing={2}>
-              <Grid size={6}>
+              <Grid size={4}>
                 <Input
                   label={<Trans>operation.amount</Trans>}
                   tooltip="Montant de l’opération (nombre positif)"
@@ -134,7 +137,35 @@ export const OperationNew = () => {
                   }}
                 />
               </Grid>
-              <Grid size={6}>
+              <Grid size={4}>
+                <TextField
+                  label={<Trans>operation.vat_rate</Trans>}
+                  variant="standard"
+                  fullWidth
+                  type="number"
+                  value={vatRate.value}
+                  onChange={(e) => {
+                    const nextValue = e.target.value.replace(',', '.');
+                    const valid = /^(100(\.0+)?|[0-9]{1,2}(\.[0-9]{1,2})?)$/.test(nextValue);
+                    setVatRate({ value: nextValue, valid });
+                    setOperation({
+                      ...operation,
+                      vat_rate: nextValue === '' ? undefined : parseFloat(nextValue),
+                    });
+                  }}
+                  error={!vatRate.valid}
+                  helperText={!vatRate.valid ? 'Valeur entre 0 et 100' : ' '}
+                  slotProps={{
+                    htmlInput: {
+                      min: 0,
+                      max: 100,
+                      step: 0.1,
+                      inputMode: 'decimal',
+                    },
+                  }}
+                />
+              </Grid>
+              <Grid size={4}>
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                   <DatePicker
                     format="DD/MM/YYYY"
@@ -233,7 +264,7 @@ export const OperationNew = () => {
                   variant="contained"
                   startIcon={<SaveAltIcon fontSize="small" />}
                   disabled={
-                    !amount.valid || !desc.valid || operation.account_id === operation.account_id_dest
+                    !amount.valid || !desc.valid || !vatRate.valid || vatRate.value === '' || operation.account_id === operation.account_id_dest
                   }
                 >
                   <Trans>operation_create.send</Trans>

@@ -10,6 +10,7 @@ export interface Operation {
   type_id: number;
   status_id: number;
   amount: number;
+  vat_rate?: number;
   date: string;
   account_id_dest?: number;
   account_dest?: { label: string, id: number };

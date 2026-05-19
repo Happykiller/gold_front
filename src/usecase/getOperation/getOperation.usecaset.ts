@@ -33,6 +33,7 @@ export class GetOperationUsecase {
                 label
               }
               amount
+              vat_rate
               date
               status_id
               type_id

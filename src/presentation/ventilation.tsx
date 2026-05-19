@@ -63,6 +63,7 @@ export const Ventilation = () => {
 
                 const response: CreateOperationUsecaseModel = await inversify.createOperationUsecase.execute({
                     amount: dest.actualAmount,
+                    vat_rate: 20,
                     description: description.value,
                     date: currentDate!.format('YYYY-MM-DD'),
                     account_id: parseInt(originAccount),

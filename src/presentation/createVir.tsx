@@ -59,6 +59,7 @@ export const CreateVir = () => {
 
     inversify.createOperationUsecase.execute({
       amount: parseFloat(amount.value.replace(',', '.')),
+      vat_rate: 20,
       description: desc.value,
       date: currentDate.format('YYYY-MM-DD'),
       account_id: parseInt(currentAccount),

@@ -25,6 +25,7 @@ export class UpdateOperationUsecase {
               $account_id: Int!, 
               $account_id_dest: Int, 
               $amount: Float!, 
+              $vat_rate: Float,
               $status_id: Int!, 
               $type_id: Int!, 
               $third_id: Int!, 
@@ -38,6 +39,7 @@ export class UpdateOperationUsecase {
                 account_id: $account_id
                 account_id_dest: $account_id_dest
                 amount: $amount
+                vat_rate: $vat_rate
                 status_id: $status_id
                 type_id: $type_id
                 third_id: $third_id
@@ -58,6 +60,7 @@ export class UpdateOperationUsecase {
                   label
               }
               amount
+              vat_rate
               date
               status_id
               type_id

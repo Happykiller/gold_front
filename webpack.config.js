@@ -7,7 +7,6 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const FaviconsWebpackPlugin = require('favicons-webpack-plugin');
 
 // Load environment variables from .env and .env.local files
 dotenv.config({ path: '.env' });
@@ -81,28 +80,6 @@ module.exports = (env, argv) => {
 
     plugins: [
 
-      new FaviconsWebpackPlugin({
-        logo: './src/public/logo.png', // Chemin vers votre logo de base
-        mode: 'webapp', // Génère des icônes pour PWA
-        devMode: 'webapp', // Utilisation en développement
-        favicons: {
-          appName: 'Gold',
-          appDescription: 'Banking and Budget Management',
-          developerName: 'Fabrice Rosito',
-          developerURL: null, // Peut être défini si vous souhaitez une URL
-          background: '#ffffff',
-          theme_color: '#3367D6',
-          icons: {
-            android: true, // Génère les icônes pour Android
-            appleIcon: true, // Génère les icônes Apple
-            appleStartup: false, // Pas nécessaire pour cette utilisation
-            favicons: true,
-            windows: false, // Peut être désactivé pour des besoins réduits
-            yandex: false // Pas nécessaire
-          }
-        }
-      }),
-
       new CleanWebpackPlugin(),  // Nettoie le dossier dist avant chaque build
 
       // Plugin to generate an HTML file from a template, and include the bundled assets.
@@ -117,7 +94,17 @@ module.exports = (env, argv) => {
 
       new CopyWebpackPlugin({
         patterns: [
-          { from: 'src/public', to: '' }, // Copie les favicons et le manifest dans le dossier de build
+          {
+            from: 'src/public',
+            to: '',
+            globOptions: {
+              ignore: [
+                '**/logo.png',
+                '**/logo_dark.png',
+                '**/logo_light.png',
+              ],
+            },
+          },
         ],
       }),
 
@@ -148,6 +135,13 @@ module.exports = (env, argv) => {
       },
       runtimeChunk: 'single',
     },
+
+    performance: isProduction ? {
+      hints: 'warning',
+      maxAssetSize: 1500000,
+      maxEntrypointSize: 1500000,
+      assetFilter: (assetFilename) => assetFilename !== 'favicon.ico',
+    } : false,
 
     devServer: {
       // Serve static files from the 'public' directory.

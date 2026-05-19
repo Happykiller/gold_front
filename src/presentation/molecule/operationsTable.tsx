@@ -6,6 +6,7 @@ import { useTheme } from '@mui/material/styles';
 import CheckIcon from '@mui/icons-material/Check';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditNoteIcon from '@mui/icons-material/EditNote';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import { Operation } from '@presentation/hooks/useAccountOperations';
@@ -14,7 +15,9 @@ import { Grid, Typography, IconButton, Box, CircularProgress, Tooltip } from '@m
 import {
   getOperationIcon,
   getCategoryIcon,
+  formatEuroAmount,
   formatOperationDate,
+  getOperationVatBreakdown,
   getVisualAmountMeta
 } from '@presentation/molecule/operationDisplay';
 import { useCalculatorStore } from '@stores/useCalculatorStore';
@@ -165,15 +168,49 @@ export const OperationsTable: React.FC<Props> = ({
             sx={{ display: columns.find(elt => elt.key === 'amount')?.display, alignItems: 'center', justifyContent: 'center' }}>
             {(() => {
               const { value, color, sign } = getVisualAmountMeta(operation, current_account_id);
+              const { vatRate, ttc, ht, vatAmount } = getOperationVatBreakdown(operation);
+
+              const tooltipContent = (
+                <Box sx={{ py: 0.5 }}>
+                  <Typography variant="body2">TVA: {vatRate} %</Typography>
+                  <Typography variant="body2"><Trans>operation.ttc_amount</Trans>: {formatEuroAmount(ttc)}</Typography>
+                  <Typography variant="body2"><Trans>operation.ht_amount</Trans>: {formatEuroAmount(ht)}</Typography>
+                  <Typography variant="body2"><Trans>operation.vat_amount</Trans>: {formatEuroAmount(vatAmount)}</Typography>
+                </Box>
+              );
+
               return (
-                <Typography
-                  noWrap
-                  fontWeight={600}
-                  sx={{ color }}
-                >
-                  {getOperationIcon(sign === '-' ? -1 : 1)}
-                  {value}
-                </Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, minWidth: 0 }}>
+                  <Typography
+                    noWrap
+                    fontWeight={600}
+                    sx={{ color }}
+                  >
+                    {getOperationIcon(sign === '-' ? -1 : 1)}
+                    {value}
+                  </Typography>
+                  <Tooltip
+                    title={tooltipContent}
+                    placement="top"
+                    arrow
+                    enterTouchDelay={0}
+                    leaveTouchDelay={3000}
+                  >
+                    <Box
+                      component="span"
+                      onClick={(e) => e.stopPropagation()}
+                      sx={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        color: '#8f98ad',
+                        cursor: 'help',
+                        lineHeight: 0,
+                      }}
+                    >
+                      <InfoOutlinedIcon sx={{ fontSize: 15 }} />
+                    </Box>
+                  </Tooltip>
+                </Box>
               );
             })()}
           </Grid>
