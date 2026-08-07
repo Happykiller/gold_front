@@ -26,6 +26,13 @@ import { useFlashStore, Input } from '@happykiller/sunny-ui';
 import { AccountsSelect } from '@presentation/molecule/accountsSelect';
 import { OpeCategoriesSelect } from '@presentation/molecule/opeCategoriesSelect';
 import { CreateOperationUsecaseModel } from '@usecase/createOperation/createOperation.usecase.model';
+import {
+  destinationAmount,
+  isExceeded,
+  isFullyAllocated,
+  parseAmount,
+  totalAllocated,
+} from '@presentation/ventilation.calc';
 
 export const Ventilation = () => {
   const theme = useTheme();
@@ -64,24 +71,16 @@ export const Ventilation = () => {
   ]);
   const [nextId, setNextId] = React.useState(2);
 
-  const parsedTotalAmount = parseFloat(amount.value.replace(',', '.')) || 0;
+  const parsedTotalAmount = parseAmount(amount.value);
 
-  // Calculate actual amounts for each destination
-  const calculatedDestinations = destinations.map((dest) => {
-    const val = parseFloat(dest.amountStr.value.replace(',', '.')) || 0;
-    const actualAmount = dest.isPercentage
-      ? (parsedTotalAmount * val) / 100
-      : val;
-    return { ...dest, actualAmount };
-  });
+  // Montant réel de chaque ligne, pour l'affichage comme pour la création.
+  const calculatedDestinations = destinations.map((dest) => ({
+    ...dest,
+    actualAmount: destinationAmount(dest, parsedTotalAmount),
+  }));
 
-  const totalAllocated =
-    Math.round(
-      calculatedDestinations.reduce((acc, curr) => acc + curr.actualAmount, 0) *
-        100,
-    ) / 100;
-  const isExceeded =
-    totalAllocated > parsedTotalAmount && parsedTotalAmount > 0;
+  const allocated = totalAllocated(destinations, parsedTotalAmount);
+  const exceeded = isExceeded(destinations, parsedTotalAmount);
   const isValid =
     currentDate !== null &&
     description.valid &&
@@ -90,8 +89,7 @@ export const Ventilation = () => {
     originAccount !== '' &&
     destinations.length > 0 &&
     destinations.every((d) => d.accountId !== '' && d.amountStr.valid) &&
-    totalAllocated === parsedTotalAmount &&
-    parsedTotalAmount > 0;
+    isFullyAllocated(destinations, parsedTotalAmount);
 
   const handleCreateOperation = async (e: React.SyntheticEvent) => {
     e.preventDefault();
@@ -359,18 +357,17 @@ export const Ventilation = () => {
                 <Typography
                   variant="h6"
                   color={
-                    isExceeded
+                    exceeded
                       ? 'error.main'
-                      : totalAllocated === parsedTotalAmount &&
-                          parsedTotalAmount > 0
+                      : isFullyAllocated(destinations, parsedTotalAmount)
                         ? 'success.main'
                         : 'warning.main'
                   }
                 >
-                  <Trans>ventilation.total_allocated</Trans> : {totalAllocated}{' '}
-                  € / {parsedTotalAmount} €
+                  <Trans>ventilation.total_allocated</Trans> : {allocated} € /{' '}
+                  {parsedTotalAmount} €
                 </Typography>
-                {isExceeded && (
+                {exceeded && (
                   <Typography variant="subtitle2" color="error.main">
                     <Trans>ventilation.error_amount_exceeded</Trans>
                   </Typography>

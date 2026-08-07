@@ -23,6 +23,8 @@ jobs:
 
       - run: npm run lint
 
-      # Seule barrière automatique côté front tant que les tests n'existent
-      # pas : la compilation TypeScript en mode strict.
+      - run: npm test
+
+      # `build` enchaîne `tsc --noEmit` puis `vite build` : esbuild ne vérifie
+      # pas les types, c'est tsc qui tient ce rôle.
       - run: npm run build
