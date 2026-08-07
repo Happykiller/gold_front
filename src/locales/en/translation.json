@@ -113,6 +113,7 @@
   "operations": {
     "actions": "Actions",
     "deleteSucced": "Deletion successful",
+    "end_of_list": "End of list",
     "recoSucced": "Reconciliation successful",
     "title": "Operations"
   },

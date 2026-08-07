@@ -621,6 +621,7 @@ export type OperationQuery = {
 
 export type OperationsQueryVariables = Exact<{
   account_id: number;
+  limit: number;
   offset: number;
 }>;
 

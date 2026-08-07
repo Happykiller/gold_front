@@ -4,8 +4,6 @@ import AddIcon from '@mui/icons-material/Add';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import { useTheme, useMediaQuery } from '@mui/material';
 import CalculateIcon from '@mui/icons-material/Calculate';
-import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
-import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import {
   Box,
   Grid,
@@ -21,8 +19,6 @@ type Props = {
   account: Account | null;
   loading: boolean;
   error: string | null;
-  page: number;
-  setPage: (p: number) => void;
   onRefresh: () => void;
   onAddOperation?: () => void;
   onCloneAccount?: () => void;
@@ -32,8 +28,6 @@ export const AccountHeader: React.FC<Props> = ({
   account,
   loading,
   error,
-  page,
-  setPage,
   onRefresh,
   onAddOperation,
 }) => {
@@ -134,29 +128,6 @@ export const AccountHeader: React.FC<Props> = ({
           </Typography>
         </Grid>
       </Grid>
-      {/* Pagination */}
-      <Box
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          mt: 1,
-        }}
-      >
-        <IconButton
-          size="small"
-          disabled={page === 0}
-          onClick={() => setPage(page - 1)}
-        >
-          <ArrowBackIosIcon />
-        </IconButton>
-        <Typography color="grey.200" sx={{ mx: 2, fontWeight: 500 }}>
-          Page {page + 1}
-        </Typography>
-        <IconButton size="small" onClick={() => setPage(page + 1)}>
-          <ArrowForwardIosIcon />
-        </IconButton>
-      </Box>
     </Box>
   );
 };

@@ -12,18 +12,21 @@ export class GetOperationsUsecase {
     dto: GetOperationsUsecaseDto,
   ): Promise<GetOperationsUsecaseModel> {
     try {
-      const finalDto: any = {
-        account_id: dto.account_id,
-        offset: dto.page * 25,
-      };
       const response: GraphqlResponse<OperationsQuery> =
         await this.inversify.graphqlService.send({
           operationName: 'operations',
-          variables: finalDto,
+          variables: {
+            account_id: dto.account_id,
+            limit: dto.limit,
+            offset: dto.offset,
+          },
+          // `limit` était un littéral dans la requête : la taille du lot était
+          // donc figée ici autant que dans le calcul de l'offset. En variable,
+          // elle redevient une décision de l'appelant.
           query: /* GraphQL */ `
-            query operations($account_id: Int!, $offset: Int!) {
+            query operations($account_id: Int!, $limit: Int!, $offset: Int!) {
               operations(
-                dto: { account_id: $account_id, limit: 25, offset: $offset }
+                dto: { account_id: $account_id, limit: $limit, offset: $offset }
               ) {
                 id
                 account_id

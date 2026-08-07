@@ -27,6 +27,7 @@ import { ThirdsSelect } from '@presentation/molecule/thirdsSelect';
 import { AccountsSelect } from '@presentation/molecule/accountsSelect';
 import { OpeCategoriesSelect } from '@presentation/molecule/opeCategoriesSelect';
 import { GetOperationsUsecaseModel } from '@usecase/getOperations/getOperations.usecase.model';
+import { OPERATIONS_PAGE_SIZE } from '@presentation/hooks/useAccountOperations';
 import { CreateOperationUsecaseModel } from '@usecase/createOperation/createOperation.usecase.model';
 
 export const CreateVir = () => {
@@ -108,7 +109,8 @@ export const CreateVir = () => {
       inversify.getOperationsUsecase
         .execute({
           account_id: parseInt(currentAccountDest),
-          page: 0,
+          limit: OPERATIONS_PAGE_SIZE,
+          offset: 0,
         })
         .then((response: GetOperationsUsecaseModel) => {
           if (response.message === CODES.SUCCESS && response.data) {

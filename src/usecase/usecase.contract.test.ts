@@ -78,7 +78,7 @@ const cases: Case[] = [
     build: (i) => new GetOperationsUsecase(i),
     operationName: 'operations',
     dataKey: 'operations',
-    dto: { account_id: 1 },
+    dto: { account_id: 1, limit: 50, offset: 0 },
   },
   {
     name: 'GetOperationUsecase',

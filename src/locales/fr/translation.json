@@ -114,6 +114,7 @@
   "operations": {
     "actions": "Actions",
     "deleteSucced": "Suppression réussie",
+    "end_of_list": "Fin de la liste",
     "recoSucced": "Réconciliation réussie",
     "title": "Opérations"
   },
