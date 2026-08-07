@@ -1,0 +1,10 @@
+# Révisions purement mécaniques, à ignorer dans `git blame` pour ne pas masquer
+# l'auteur réel de chaque ligne.
+#
+# Activer une fois par clone :
+#   git config blame.ignoreRevsFile .git-blame-ignore-revs
+#
+# GitHub applique ce fichier automatiquement dans sa vue blame.
+
+# style: apply prettier across the codebase (2026-08-07)
+67776702dba47d65f087a6471b811c070069d176
