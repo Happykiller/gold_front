@@ -2,6 +2,6 @@ import { AccountUsecaseModel } from '../model/account.usecase.model';
 
 export interface GetAccountsUsecaseModel {
   message: string;
-  data?: AccountUsecaseModel[],
+  data?: AccountUsecaseModel[];
   error?: string;
 }

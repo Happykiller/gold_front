@@ -1,5 +1,5 @@
 export interface DeleteOperationUsecaseModel {
   message: string;
-  data?: boolean,
+  data?: boolean;
   error?: string;
 }

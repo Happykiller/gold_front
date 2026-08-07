@@ -45,5 +45,5 @@ export const lightTheme = responsiveFontSizes(
         },
       },
     },
-  })
+  }),
 );

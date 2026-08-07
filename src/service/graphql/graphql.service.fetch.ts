@@ -3,14 +3,13 @@ import { Inversify } from '@src/common/inversify';
 import { GraphqlService } from '@happykiller/sunny-ui';
 
 export class GraphqlServiceFetch implements GraphqlService {
-
-  constructor(
-    private inversify:Inversify
-  ){}
+  constructor(private inversify: Inversify) {}
 
   async send(datas: any): Promise<any> {
     try {
-      const storedSession = await this.inversify.storageService.getItem(config.local_storage_name);
+      const storedSession = await this.inversify.storageService.getItem(
+        config.local_storage_name,
+      );
       const storage = storedSession ? JSON.parse(storedSession) : null;
       const token = storage?.state.access_token;
 
@@ -20,16 +19,16 @@ export class GraphqlServiceFetch implements GraphqlService {
         cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token??'token'}`
+          Authorization: `Bearer ${token ?? 'token'}`,
         },
-        body: JSON.stringify(datas)
+        body: JSON.stringify(datas),
       });
 
       const responseJson = response.json();
 
       return responseJson;
-    } catch(e:any) {
+    } catch (e: any) {
       this.inversify.loggerService.error(e.message);
     }
   }
-} 
+}

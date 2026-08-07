@@ -1,3 +1,8 @@
+// Plusieurs membres partagent volontairement la même expression : des champs
+// distincts peuvent avoir la même contrainte de saisie (THING_DESCRIPTION et
+// CHEST_DESCRIPTION, THING_PASSWORD et THING_LOGIN). Aligner leurs valeurs
+// serait un changement fonctionnel, pas un nettoyage.
+/* eslint-disable @typescript-eslint/no-duplicate-enum-values */
 export enum REGEX {
   LOGIN = '^([a-zA-Z\\.\\-_]){3,50}$',
   PASSWORD = '^([a-zA-Z0-9@$€!%*?&\\.\\-_:;,]){3,50}$',
@@ -17,6 +22,6 @@ export enum REGEX {
   THING_CB_CODE = '^([0-9]){4}$',
   THING_CB_CRYPTO = '^([0-9]){3}$',
   THING_CB_NAME = '^([a-zA-Z\\s]){3,50}$',
-  THING_CB_EXPIRATION_DATE = '^([0-9\/\\-\\s]){4-5}$',
-  PASSKEY_LABEL = '^([a-zA-Z0-9\\-_]){3,50}$'
+  THING_CB_EXPIRATION_DATE = '^([0-9/\\-\\s]){4-5}$',
+  PASSKEY_LABEL = '^([a-zA-Z0-9\\-_]){3,50}$',
 }

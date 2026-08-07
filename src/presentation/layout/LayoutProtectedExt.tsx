@@ -5,7 +5,11 @@ import { FooterExt } from '@components/layout/FooterExt';
 import inversify from '@src/common/inversify';
 import { contextStore } from '../store/contextStore';
 
-export function LayoutProtectedExt({ children }: { children: React.ReactNode }) {
+export function LayoutProtectedExt({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <LayoutProtected
       header={<HeaderExt />}

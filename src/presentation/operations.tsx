@@ -1,6 +1,10 @@
 // src\presentation\operations.tsx
 import * as React from 'react';
-import { useSearchParams, useNavigate, createSearchParams } from 'react-router-dom';
+import {
+  useSearchParams,
+  useNavigate,
+  createSearchParams,
+} from 'react-router-dom';
 
 import inversify from '@src/common/inversify';
 import { CODES } from '@happykiller/sunny-ui';
@@ -25,7 +29,7 @@ export const Operations = () => {
     reload,
     removeOperation,
     recoOperation,
-    adjustBalance
+    adjustBalance,
   } = useAccountOperations(accountId, page);
 
   const handleEditOperation = (operation: any) => {
@@ -34,24 +38,32 @@ export const Operations = () => {
       search: createSearchParams({
         account_id: accountId.toString(),
         operation_id: operation.id.toString(),
-      }).toString()
+      }).toString(),
     });
   };
 
   const handleDeleteOperation = (operation: any) => {
-    inversify.deleteOperationUsecase.execute({ operation_id: operation.id }).then(() => {
-      removeOperation(operation.id);
-      adjustBalance(operation.amount, 'delete', (operation.status_id === 2) ? 'not_reconciled' : 'reconciled');
-    })
+    inversify.deleteOperationUsecase
+      .execute({ operation_id: operation.id })
+      .then(() => {
+        removeOperation(operation.id);
+        adjustBalance(
+          operation.amount,
+          'delete',
+          operation.status_id === 2 ? 'not_reconciled' : 'reconciled',
+        );
+      });
   };
 
   const handleRecoOperation = (operation: any) => {
-    inversify.setRecoUsecase.execute({ operation_id: operation.id }).then((resp) => {
-      if (resp.message === CODES.SUCCESS && resp.data) {
-        recoOperation(operation.id);
-        adjustBalance(operation.amount, 'reconcile', 'not_reconciled');
-      }
-    });
+    inversify.setRecoUsecase
+      .execute({ operation_id: operation.id })
+      .then((resp) => {
+        if (resp.message === CODES.SUCCESS && resp.data) {
+          recoOperation(operation.id);
+          adjustBalance(operation.amount, 'reconcile', 'not_reconciled');
+        }
+      });
   };
 
   return (
@@ -64,10 +76,20 @@ export const Operations = () => {
         setPage={setPage}
         onRefresh={reload}
         onAddOperation={() =>
-          navigate({ pathname: '/operation_new', search: createSearchParams({ account_id: accountId.toString() }).toString() })
+          navigate({
+            pathname: '/operation_new',
+            search: createSearchParams({
+              account_id: accountId.toString(),
+            }).toString(),
+          })
         }
         onCloneAccount={() =>
-          navigate({ pathname: '/clone', search: createSearchParams({ account_id: accountId.toString() }).toString() })
+          navigate({
+            pathname: '/clone',
+            search: createSearchParams({
+              account_id: accountId.toString(),
+            }).toString(),
+          })
         }
       />
       <OperationsTable

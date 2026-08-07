@@ -3,20 +3,16 @@ import { Inversify } from '@src/common/inversify';
 import { SessionInfoUsecaseModel } from '@usecase/sessionInfo/model/sessionInfo.usecase.model';
 
 export class SessionInfoUsecase {
+  SessionInfo: any;
 
-  SessionInfo:any;
+  constructor(private inversify: Inversify) {}
 
-  constructor(
-    private inversify:Inversify
-  ){}
-
-  async execute(): Promise<SessionInfoUsecaseModel>  {
+  async execute(): Promise<SessionInfoUsecaseModel> {
     try {
-      const response:any = await this.inversify.graphqlService.send(
-        {
-          operationName: 'getSessionInfo',
-          variables: {},
-          query: `query getSessionInfo {  
+      const response: any = await this.inversify.graphqlService.send({
+        operationName: 'getSessionInfo',
+        variables: {},
+        query: `query getSessionInfo {  
             getSessionInfo {
               access_token
               id
@@ -26,28 +22,27 @@ export class SessionInfoUsecase {
               description
               mail
             }
-          }`
-        }
-      );
+          }`,
+      });
 
-      if(response.errors) {
+      if (response.errors) {
         throw new Error(response.errors[0].message);
       }
 
       const info: any = {
-        ... response.data.getSessionInfo,
-        access_token: response.data.getSessionInfo.access_token
+        ...response.data.getSessionInfo,
+        access_token: response.data.getSessionInfo.access_token,
       };
 
       return {
         message: CODES.SUCCESS,
-        data: info
-      }
+        data: info,
+      };
     } catch (e: any) {
       return {
         message: CODES.FAIL,
-        error: e.message
-      }
+        error: e.message,
+      };
     }
   }
 }

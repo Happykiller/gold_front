@@ -4,23 +4,21 @@ import { OperationUsecaseModel } from '@usecase/model/operation.usecase.model';
 import { UpdateOperationUsecaseModel } from '@usecase/updateOperation/updateOperation.usecase.mode';
 
 export class UpdateOperationUsecase {
+  constructor(private inversify: Inversify) {}
 
-  constructor(
-    private inversify:Inversify
-  ){}
-
-  async execute(dto: OperationUsecaseModel): Promise<UpdateOperationUsecaseModel>  {
+  async execute(
+    dto: OperationUsecaseModel,
+  ): Promise<UpdateOperationUsecaseModel> {
     try {
-      const finalDto:any = {
+      const finalDto: any = {
         operation_id: dto.id,
-        ... dto
+        ...dto,
       };
 
-      const response:any = await this.inversify.graphqlService.send(
-        {
-          operationName: 'updateOperation',
-          variables: finalDto,
-          query: `mutation updateOperation(
+      const response: any = await this.inversify.graphqlService.send({
+        operationName: 'updateOperation',
+        variables: finalDto,
+        query: `mutation updateOperation(
               $operation_id: Int!, 
               $account_id: Int!, 
               $account_id_dest: Int, 
@@ -80,23 +78,22 @@ export class UpdateOperationUsecase {
               modificator_id
               modification_date
             }
-          }`
-        }
-      );
+          }`,
+      });
 
-      if(response.errors) {
+      if (response.errors) {
         throw new Error(response.errors[0].message);
       }
 
       return {
         message: CODES.SUCCESS,
-        data: response.data.updateOperation
-      }
+        data: response.data.updateOperation,
+      };
     } catch (e: any) {
       return {
         message: CODES.FAIL,
-        error: e.message
-      }
+        error: e.message,
+      };
     }
   }
 }

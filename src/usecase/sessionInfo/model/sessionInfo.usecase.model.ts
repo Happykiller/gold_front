@@ -8,6 +8,6 @@ export interface SessionInfoUsecaseModel {
     name_last: string;
     description: string;
     mail: string;
-  },
+  };
   error?: string;
 }

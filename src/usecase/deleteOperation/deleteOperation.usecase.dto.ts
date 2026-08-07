@@ -1,3 +1,3 @@
 export interface DeleteOperationUsecaseDto {
-  operation_id: number
+  operation_id: number;
 }

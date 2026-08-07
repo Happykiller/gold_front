@@ -4,18 +4,16 @@ import { DeleteOperationUsecaseDto } from '@usecase/deleteOperation/deleteOperat
 import { DeleteOperationUsecaseModel } from '@usecase/deleteOperation/deleteOperation.usecase.model';
 
 export class DeleteOperationUsecase {
+  constructor(private inversify: Inversify) {}
 
-  constructor(
-    private inversify:Inversify
-  ){}
-
-  async execute(dto: DeleteOperationUsecaseDto): Promise<DeleteOperationUsecaseModel>  {
+  async execute(
+    dto: DeleteOperationUsecaseDto,
+  ): Promise<DeleteOperationUsecaseModel> {
     try {
-      const response:any = await this.inversify.graphqlService.send( 
-        {
-          operationName: 'deleteOperation',
-          variables: dto,
-          query: `mutation deleteOperation(
+      const response: any = await this.inversify.graphqlService.send({
+        operationName: 'deleteOperation',
+        variables: dto,
+        query: `mutation deleteOperation(
             $operation_id: Int!
           ) {
             deleteOperation (
@@ -23,23 +21,22 @@ export class DeleteOperationUsecase {
                 operation_id: $operation_id
               }
             )
-          }`
-        }
-      );
+          }`,
+      });
 
-      if(response.errors) {
+      if (response.errors) {
         throw new Error(response.errors[0].message);
       }
 
       return {
         message: CODES.SUCCESS,
-        data: true
-      }
+        data: true,
+      };
     } catch (e: any) {
       return {
         message: CODES.DELETE_OPERATION_FAIL,
-        error: e.message
-      }
+        error: e.message,
+      };
     }
   }
 }

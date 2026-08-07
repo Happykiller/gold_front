@@ -2,6 +2,6 @@ import { OperationCategoryUsecaseModel } from '@usecase/model/operationCategory.
 
 export interface GetOpeCategoriesUsecaseModel {
   message: string;
-  data?: OperationCategoryUsecaseModel[],
+  data?: OperationCategoryUsecaseModel[];
   error?: string;
 }

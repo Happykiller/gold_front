@@ -4,22 +4,20 @@ import { GetOperationsUsecaseDto } from '@usecase/getOperations/getOperations.us
 import { GetOperationsUsecaseModel } from '@usecase/getOperations/getOperations.usecase.model';
 
 export class GetOperationsUsecase {
+  constructor(private inversify: Inversify) {}
 
-  constructor(
-    private inversify:Inversify
-  ){}
-
-  async execute(dto: GetOperationsUsecaseDto): Promise<GetOperationsUsecaseModel>  {
+  async execute(
+    dto: GetOperationsUsecaseDto,
+  ): Promise<GetOperationsUsecaseModel> {
     try {
-      const finalDto:any = {
+      const finalDto: any = {
         account_id: dto.account_id,
-        offset: dto.page * 25
-      }
-      const response:any = await this.inversify.graphqlService.send(
-        {
-          operationName: 'operations',
-          variables: finalDto,
-          query: `query operations($account_id: Int!, $offset: Int!) {
+        offset: dto.page * 25,
+      };
+      const response: any = await this.inversify.graphqlService.send({
+        operationName: 'operations',
+        variables: finalDto,
+        query: `query operations($account_id: Int!, $offset: Int!) {
             operations (
               dto: {
                 account_id: $account_id
@@ -59,23 +57,22 @@ export class GetOperationsUsecase {
               modificator_id
               modification_date
             }
-          }`
-        }
-      );
+          }`,
+      });
 
-      if(response.errors) {
+      if (response.errors) {
         throw new Error(response.errors[0].message);
       }
 
       return {
         message: CODES.SUCCESS,
-        data: response.data.operations
-      }
+        data: response.data.operations,
+      };
     } catch (e: any) {
       return {
         message: CODES.FAIL,
-        error: e.message
-      }
+        error: e.message,
+      };
     }
   }
 }

@@ -2,9 +2,17 @@
 import { StateStorage } from 'zustand/middleware';
 
 import {
-  AuthPasskeyUsecase, AuthUsecase, CreatePasskeyUsecase, DeletePasskeyUsecase,
-  GetPasskeyForUserUsecase, GraphqlService,
-  LoggerService, LoggerServiceReal, SessionInfoUsecase, SystemInfoUsecase, UpdPasswordUsecase
+  AuthPasskeyUsecase,
+  AuthUsecase,
+  CreatePasskeyUsecase,
+  DeletePasskeyUsecase,
+  GetPasskeyForUserUsecase,
+  GraphqlService,
+  LoggerService,
+  LoggerServiceReal,
+  SessionInfoUsecase,
+  SystemInfoUsecase,
+  UpdPasswordUsecase,
 } from '@happykiller/sunny-ui';
 import config from '@src/config';
 import { SetRecoUsecase } from '@usecase/setReco/setReco.usecase';
@@ -79,7 +87,6 @@ export class Inversify {
     } else {
       this.graphqlService = new GraphqlServiceFake();
     }
-
   }
 }
 

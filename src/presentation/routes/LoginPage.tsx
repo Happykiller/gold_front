@@ -1,5 +1,13 @@
 import React from 'react';
-import { Done, Info as InfoIcon, Key, Lock, Person, Visibility, VisibilityOff } from '@mui/icons-material';
+import {
+  Done,
+  Info as InfoIcon,
+  Key,
+  Lock,
+  Person,
+  Visibility,
+  VisibilityOff,
+} from '@mui/icons-material';
 
 import inversify from '@src/common/inversify';
 import { contextStore } from '@presentation/store/contextStore';
@@ -14,7 +22,7 @@ export const LoginPage: React.FC = () => (
       done: <Done />,
       key: <Key />,
       person: <Person fontSize="small" />,
-      lock: <Lock fontSize="small" />
+      lock: <Lock fontSize="small" />,
     }}
     services={{
       authUsecase: inversify.authUsecase,

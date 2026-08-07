@@ -35,13 +35,14 @@ export const sharedTypography = {
     fontWeight: 600,
     fontSize: pxToRem(14),
     letterSpacing: '0.05em',
-    textTransform: 'uppercase' as 'uppercase',
+    textTransform: 'uppercase' as const,
   },
 };
 
-export const createSharedComponents = (
-  buttonPalette: { main: string; light: string }
-): Components => ({
+export const createSharedComponents = (buttonPalette: {
+  main: string;
+  light: string;
+}): Components => ({
   MuiButton: {
     styleOverrides: {
       root: {
@@ -72,7 +73,7 @@ export const createSharedComponents = (
   },
   MuiLink: {
     styleOverrides: {
-      root: (props: any) => {
+      root: (_props: any) => {
         return {
           color: buttonPalette.main,
           textDecoration: 'none',

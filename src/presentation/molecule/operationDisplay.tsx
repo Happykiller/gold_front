@@ -32,87 +32,87 @@ export function getCategoryIcon(categoryLabel: string) {
   const label = categoryLabel?.trim().toLowerCase();
 
   const map: Record<string, { icon: JSX.Element; color: string }> = {
-    'alimentation': {
+    alimentation: {
       icon: <LocalDiningIcon />,
       color: '#ff9800',
     },
-    'santé': {
+    santé: {
       icon: <HealthAndSafetyIcon />,
       color: '#ef5350',
     },
-    'cadeau': {
+    cadeau: {
       icon: <CardGiftcardIcon />,
       color: '#f06292',
     },
-    'prêt': {
+    prêt: {
       icon: <PaymentsIcon />,
       color: '#9575cd',
     },
-    'mobilité': {
+    mobilité: {
       icon: <EmojiTransportationIcon />,
       color: '#4fc3f7',
     },
-    'vacances': {
+    vacances: {
       icon: <BeachAccessIcon />,
       color: '#4db6ac',
     },
-    'illidan': {
+    illidan: {
       icon: <ChildCareIcon />,
       color: '#ba68c8',
     },
-    'enfant': {
+    enfant: {
       icon: <ChildCareIcon />,
       color: '#ba68c8',
     },
-    'fabrice': {
+    fabrice: {
       icon: <FavoriteIcon />,
       color: '#ff4081',
     },
-    'frais': {
+    frais: {
       icon: <PaymentsIcon />,
       color: '#8d6e63',
     },
-    'sortie': {
+    sortie: {
       icon: <CelebrationIcon />,
       color: '#ffb74d',
     },
-    'revenue': {
+    revenue: {
       icon: <TrendingUpIcon />,
       color: '#66bb6a',
     },
-    'régulation': {
+    régulation: {
       icon: <BalanceIcon />,
       color: '#90a4ae',
     },
-    'jeux': {
+    jeux: {
       icon: <SportsEsportsIcon />,
       color: '#7986cb',
     },
-    'impôts': {
+    impôts: {
       icon: <GavelIcon />,
       color: '#ff7043',
     },
-    'fai': {
+    fai: {
       icon: <WifiIcon />,
       color: '#26a69a',
     },
-    'immobilier': {
+    immobilier: {
       icon: <HouseIcon />,
       color: '#4db6ac',
     },
-    'salaire': {
+    salaire: {
       icon: <WorkIcon />,
       color: '#00c853',
     },
-    'assurance': {
+    assurance: {
       icon: <ShieldIcon />,
       color: '#607d8b',
     },
-    'charges': {
+    charges: {
       icon: <CreditCardIcon />,
       color: '#b388ff',
     },
-    'geek': {
+    geek: {
       icon: <MouseIcon />,
       color: '#67b7ff',
     },
@@ -144,13 +144,38 @@ export function getCategoryIcon(categoryLabel: string) {
 }
 
 export function getOperationIcon(amount: number) {
-  if (amount < 0) return <TrendingDownIcon sx={{ color: '#ff5f5f', fontSize: 18, verticalAlign: 'middle', mr: 0.5 }} />;
-  if (amount > 0) return <TrendingUpIcon sx={{ color: '#23e47a', fontSize: 18, verticalAlign: 'middle', mr: 0.5 }} />;
+  if (amount < 0)
+    return (
+      <TrendingDownIcon
+        sx={{
+          color: '#ff5f5f',
+          fontSize: 18,
+          verticalAlign: 'middle',
+          mr: 0.5,
+        }}
+      />
+    );
+  if (amount > 0)
+    return (
+      <TrendingUpIcon
+        sx={{
+          color: '#23e47a',
+          fontSize: 18,
+          verticalAlign: 'middle',
+          mr: 0.5,
+        }}
+      />
+    );
   return null;
 }
 
-export function getVisualAmountMeta(operation: Operation, currentAccountId: number) {
-  const baseAmount = operation.amount.toLocaleString('fr-FR', { minimumFractionDigits: 2 }) + ' €';
+export function getVisualAmountMeta(
+  operation: Operation,
+  currentAccountId: number,
+) {
+  const baseAmount =
+    operation.amount.toLocaleString('fr-FR', { minimumFractionDigits: 2 }) +
+    ' €';
 
   if (operation.type_id === 1) {
     return { sign: '+', color: '#23e47a', value: `+${baseAmount}` }; // Crédit
@@ -172,7 +197,8 @@ export function getVisualAmountMeta(operation: Operation, currentAccountId: numb
 }
 
 export function getOperationVatRate(operation: Operation) {
-  return typeof operation.vat_rate === 'number' && Number.isFinite(operation.vat_rate)
+  return typeof operation.vat_rate === 'number' &&
+    Number.isFinite(operation.vat_rate)
     ? operation.vat_rate
     : DEFAULT_VAT_RATE;
 }
@@ -202,14 +228,17 @@ export function formatOperationDate(date: string) {
   return dayjs(parseInt(date)).format('DD/MM/YYYY');
 }
 
-export function getSignedAmount(operation: Operation, currentAccountId: number): number {
+export function getSignedAmount(
+  operation: Operation,
+  currentAccountId: number,
+): number {
   if (operation.type_id === 1) return operation.amount; // Crédit
   if (operation.type_id === 2) return -operation.amount; // Débit
 
   if (operation.type_id === 3) {
     // Virement
-    return (operation.account_id_dest === currentAccountId)
-      ? operation.amount  // Reçu
+    return operation.account_id_dest === currentAccountId
+      ? operation.amount // Reçu
       : -operation.amount; // Envoyé
   }
 

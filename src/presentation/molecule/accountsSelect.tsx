@@ -28,7 +28,9 @@ export const AccountsSelect: React.FC<AccountsSelectProps> = ({
   onChange,
   type = 0,
 }) => {
-  const [accounts, setAccounts] = React.useState<AccountUsecaseModel[] | null>(null);
+  const [accounts, setAccounts] = React.useState<AccountUsecaseModel[] | null>(
+    null,
+  );
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
 
@@ -55,11 +57,19 @@ export const AccountsSelect: React.FC<AccountsSelectProps> = ({
   }, [accounts]);
 
   if (loading) {
-    return <Typography><Trans>common.loading</Trans></Typography>;
+    return (
+      <Typography>
+        <Trans>common.loading</Trans>
+      </Typography>
+    );
   }
 
   if (error) {
-    return <Typography color="error"><Trans>common.{error}</Trans></Typography>;
+    return (
+      <Typography color="error">
+        <Trans>common.{error}</Trans>
+      </Typography>
+    );
   }
 
   return (
@@ -72,13 +82,16 @@ export const AccountsSelect: React.FC<AccountsSelectProps> = ({
         value={value.toString()}
         onChange={onChange}
       >
-        <MenuItem value={0}><Trans>common.clear</Trans></MenuItem>
-        {accounts?.map((account) =>
-          (type === 0 || account.type_id === type) && (
-            <MenuItem key={account.id} value={account.id}>
-              <Typography noWrap>{account.label}</Typography>
-            </MenuItem>
-          )
+        <MenuItem value={0}>
+          <Trans>common.clear</Trans>
+        </MenuItem>
+        {accounts?.map(
+          (account) =>
+            (type === 0 || account.type_id === type) && (
+              <MenuItem key={account.id} value={account.id}>
+                <Typography noWrap>{account.label}</Typography>
+              </MenuItem>
+            ),
         )}
       </Select>
     </FormControl>

@@ -9,7 +9,10 @@ import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 
 import { useCalculatorStore } from '@stores/useCalculatorStore';
 import { Operation } from '@components/hooks/useAccountOperations';
-import { getSignedAmount, getVisualAmountMeta } from '@components/molecule/operationDisplay';
+import {
+  getSignedAmount,
+  getVisualAmountMeta,
+} from '@components/molecule/operationDisplay';
 
 export const FloatingCalculator: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -18,7 +21,7 @@ export const FloatingCalculator: React.FC = () => {
   const accountId = parseInt(searchParams.get('account_id') ?? '0');
   const total = operations.reduce(
     (acc, op) => acc + getSignedAmount(op, accountId),
-    0
+    0,
   );
 
   const [position, setPosition] = useState({ x: 100, y: 100 });
@@ -115,7 +118,12 @@ export const FloatingCalculator: React.FC = () => {
                 </Typography>
               );
             })}
-            <Box mt={2} display="flex" justifyContent="space-between" alignItems="center">
+            <Box
+              mt={2}
+              display="flex"
+              justifyContent="space-between"
+              alignItems="center"
+            >
               <Typography fontWeight={700}>Total</Typography>
               <Typography fontWeight={700}>
                 {total.toLocaleString('fr-FR', { minimumFractionDigits: 2 })} €
@@ -130,7 +138,6 @@ export const FloatingCalculator: React.FC = () => {
           </IconButton>
         </Box>
       </Box>
-
     </Paper>
   );
 };

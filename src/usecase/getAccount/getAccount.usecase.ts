@@ -4,18 +4,14 @@ import { GetAccountUsecaseDto } from '@usecase/getAccount/getAccount.usecase.dto
 import { GetAccountUsecaseModel } from '@usecase/getAccount/getAccount.usecase.model';
 
 export class GetAccountUsecase {
+  constructor(private inversify: Inversify) {}
 
-  constructor(
-    private inversify:Inversify
-  ){}
-
-  async execute(dto: GetAccountUsecaseDto): Promise<GetAccountUsecaseModel>  {
+  async execute(dto: GetAccountUsecaseDto): Promise<GetAccountUsecaseModel> {
     try {
-      const response:any = await this.inversify.graphqlService.send(
-        {
-          operationName: 'account',
-          variables: dto,
-          query: `query account($account_id: Int!) {
+      const response: any = await this.inversify.graphqlService.send({
+        operationName: 'account',
+        variables: dto,
+        query: `query account($account_id: Int!) {
             account (
               dto: {
                 account_id: $account_id
@@ -33,23 +29,22 @@ export class GetAccountUsecase {
               modificator_id
               modification_date
             }
-          }`
-        }
-      );
+          }`,
+      });
 
-      if(response.errors) {
+      if (response.errors) {
         throw new Error(response.errors[0].message);
       }
 
       return {
         message: CODES.SUCCESS,
-        data: response.data.account
-      }
+        data: response.data.account,
+      };
     } catch (e: any) {
       return {
         message: CODES.FAIL,
-        error: e.message
-      }
+        error: e.message,
+      };
     }
   }
 }

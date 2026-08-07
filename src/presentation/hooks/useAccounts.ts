@@ -3,7 +3,10 @@ import * as React from 'react';
 import { GetAccountsUsecaseModel } from '@usecase/getAccounts/getAccounts.usecase.model';
 import inversify from '@src/common/inversify';
 import { CODES } from '@src/common/codes';
-import { formatAccounts, FormattedAccount } from '@src/presentation/molecule/accounts';
+import {
+  formatAccounts,
+  FormattedAccount,
+} from '@src/presentation/molecule/accounts';
 
 export function useAccounts() {
   const [data, setData] = React.useState<FormattedAccount[] | null>(null);
@@ -13,7 +16,8 @@ export function useAccounts() {
   React.useEffect(() => {
     let cancelled = false;
     setLoading(true);
-    inversify.getAccountsUsecase.execute()
+    inversify.getAccountsUsecase
+      .execute()
       .then((response: GetAccountsUsecaseModel) => {
         if (!cancelled) {
           if (response.message === CODES.SUCCESS && response.data) {
@@ -25,7 +29,9 @@ export function useAccounts() {
       })
       .catch((err: any) => !cancelled && setError(err.message))
       .finally(() => !cancelled && setLoading(false));
-    return () => { cancelled = true };
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   return { data, loading, error };

@@ -5,18 +5,16 @@ import { CreateOperationUsecaseDto } from '@usecase/createOperation/createOperat
 import { CreateOperationUsecaseModel } from '@usecase/createOperation/createOperation.usecase.model';
 
 export class CreateOperationUsecase {
+  constructor(private inversify: Inversify) {}
 
-  constructor(
-    private inversify:Inversify
-  ){}
-
-  async execute(dto: CreateOperationUsecaseDto): Promise<CreateOperationUsecaseModel>  {
+  async execute(
+    dto: CreateOperationUsecaseDto,
+  ): Promise<CreateOperationUsecaseModel> {
     try {
-      const response:any = await this.inversify.graphqlService.send( 
-        {
-          operationName: 'createOperation',
-          variables: dto,
-          query: `mutation createOperation(
+      const response: any = await this.inversify.graphqlService.send({
+        operationName: 'createOperation',
+        variables: dto,
+        query: `mutation createOperation(
             $account_id: Int!
             $account_id_dest: Int
             $amount: Float!
@@ -58,23 +56,22 @@ export class CreateOperationUsecase {
               modificator_id
               modification_date
             }
-          }`
-        }
-      );
+          }`,
+      });
 
-      if(response.errors) {
+      if (response.errors) {
         throw new Error(response.errors[0].message);
       }
 
       return {
         message: CODES.SUCCESS,
-        data: response.data.createOperation
-      }
+        data: response.data.createOperation,
+      };
     } catch (e: any) {
       return {
         message: CODES.CREATE_OPERATION_FAIL,
-        error: e.message
-      }
+        error: e.message,
+      };
     }
   }
 }

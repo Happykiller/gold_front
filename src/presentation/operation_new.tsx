@@ -4,15 +4,27 @@ import dayjs, { Dayjs } from 'dayjs';
 import { Trans, useTranslation } from 'react-i18next';
 import SaveAltIcon from '@mui/icons-material/SaveAlt';
 import {
-  Box, Button, FormControl, Grid, InputLabel, MenuItem,
-  Select, TextField, Typography, useTheme
+  Box,
+  Button,
+  FormControl,
+  Grid,
+  InputLabel,
+  MenuItem,
+  Select,
+  TextField,
+  Typography,
+  useTheme,
 } from '@mui/material';
 import InfoIcon from '@mui/icons-material/Info';
 import EuroIcon from '@mui/icons-material/Euro';
 import DescriptionIcon from '@mui/icons-material/Description';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
-import { createSearchParams, useNavigate, useSearchParams } from 'react-router-dom';
+import {
+  createSearchParams,
+  useNavigate,
+  useSearchParams,
+} from 'react-router-dom';
 
 import { CODES } from '@src/common/codes';
 import inversify from '@src/common/inversify';
@@ -31,9 +43,9 @@ export const OperationNew = () => {
   const [searchParams] = useSearchParams();
 
   const [qry, setQry] = React.useState<{
-    loading: boolean | null,
-    data: any,
-    error: string | null
+    loading: boolean | null;
+    data: any;
+    error: string | null;
   }>({ loading: null, data: null, error: null });
 
   const [opDate, setOpDate] = React.useState<Dayjs>(dayjs());
@@ -50,7 +62,7 @@ export const OperationNew = () => {
     type_id: 2,
     third_id: 2,
     category_id: 1,
-    description: ''
+    description: '',
   });
 
   const handleClick = async (event: React.SyntheticEvent) => {
@@ -62,10 +74,11 @@ export const OperationNew = () => {
       amount: parseFloat(amount.value),
       vat_rate: parseFloat(vatRate.value.replace(',', '.')),
       description: desc.value,
-      date: opDate.format('YYYY-MM-DD')
+      date: opDate.format('YYYY-MM-DD'),
     };
 
-    inversify.createOperationUsecase.execute(dto)
+    inversify.createOperationUsecase
+      .execute(dto)
       .then((response: CreateOperationUsecaseModel) => {
         if (response.message === CODES.SUCCESS) {
           flash.open(t('operation_new.succeed'));
@@ -97,7 +110,10 @@ export const OperationNew = () => {
       <Box
         sx={{
           borderRadius: { xs: 0, sm: '16px' },
-          boxShadow: { xs: 'none', sm: `0 0 32px 0 ${theme.palette.primary.main}55` },
+          boxShadow: {
+            xs: 'none',
+            sm: `0 0 32px 0 ${theme.palette.primary.main}55`,
+          },
           border: { xs: 'none', sm: `2px solid ${theme.palette.primary.main}` },
           maxWidth: 600,
           width: '100%',
@@ -113,7 +129,9 @@ export const OperationNew = () => {
         </Typography>
 
         {qry.loading ? (
-          <Typography textAlign="center"><Trans>common.loading</Trans></Typography>
+          <Typography textAlign="center">
+            <Trans>common.loading</Trans>
+          </Typography>
         ) : qry.error ? (
           <Typography textAlign="center" color="error.main">
             <Trans>operation_create.{qry.error}</Trans>
@@ -146,11 +164,15 @@ export const OperationNew = () => {
                   value={vatRate.value}
                   onChange={(e) => {
                     const nextValue = e.target.value.replace(',', '.');
-                    const valid = /^(100(\.0+)?|[0-9]{1,2}(\.[0-9]{1,2})?)$/.test(nextValue);
+                    const valid =
+                      /^(100(\.0+)?|[0-9]{1,2}(\.[0-9]{1,2})?)$/.test(
+                        nextValue,
+                      );
                     setVatRate({ value: nextValue, valid });
                     setOperation({
                       ...operation,
-                      vat_rate: nextValue === '' ? undefined : parseFloat(nextValue),
+                      vat_rate:
+                        nextValue === '' ? undefined : parseFloat(nextValue),
                     });
                   }}
                   error={!vatRate.valid}
@@ -192,11 +214,16 @@ export const OperationNew = () => {
               </Grid>
               <Grid size={6}>
                 <FormControl variant="standard" fullWidth>
-                  <InputLabel><Trans>operation.type</Trans></InputLabel>
+                  <InputLabel>
+                    <Trans>operation.type</Trans>
+                  </InputLabel>
                   <Select
                     value={operation.type_id}
                     onChange={(e) =>
-                      setOperation({ ...operation, type_id: e.target.value as number })
+                      setOperation({
+                        ...operation,
+                        type_id: e.target.value as number,
+                      })
                     }
                   >
                     <MenuItem value={1}>Crédit</MenuItem>
@@ -221,18 +248,26 @@ export const OperationNew = () => {
                     value={operation.account_id_dest ?? ''}
                     label={<Trans>operation.account_dest</Trans>}
                     onChange={(e: any) =>
-                      setOperation({ ...operation, account_id_dest: e.target.value })
+                      setOperation({
+                        ...operation,
+                        account_id_dest: e.target.value,
+                      })
                     }
                   />
                 </Grid>
               )}
               <Grid size={6}>
                 <FormControl variant="standard" fullWidth>
-                  <InputLabel><Trans>operation.status</Trans></InputLabel>
+                  <InputLabel>
+                    <Trans>operation.status</Trans>
+                  </InputLabel>
                   <Select
                     value={operation.status_id}
                     onChange={(e) =>
-                      setOperation({ ...operation, status_id: e.target.value as number })
+                      setOperation({
+                        ...operation,
+                        status_id: e.target.value as number,
+                      })
                     }
                   >
                     <MenuItem value={1}>A suivre</MenuItem>
@@ -264,7 +299,11 @@ export const OperationNew = () => {
                   variant="contained"
                   startIcon={<SaveAltIcon fontSize="small" />}
                   disabled={
-                    !amount.valid || !desc.valid || !vatRate.valid || vatRate.value === '' || operation.account_id === operation.account_id_dest
+                    !amount.valid ||
+                    !desc.valid ||
+                    !vatRate.valid ||
+                    vatRate.value === '' ||
+                    operation.account_id === operation.account_id_dest
                   }
                 >
                   <Trans>operation_create.send</Trans>

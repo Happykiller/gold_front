@@ -9,7 +9,11 @@ export const Home: React.FC = () => {
   const { data: accounts, loading, error } = useAccounts();
 
   if (loading) {
-    return <Box display="flex" justifyContent="center"><CircularProgress /></Box>;
+    return (
+      <Box display="flex" justifyContent="center">
+        <CircularProgress />
+      </Box>
+    );
   }
 
   if (error) {
@@ -20,7 +24,6 @@ export const Home: React.FC = () => {
     return <Alert severity="info">No accounts found.</Alert>;
   }
 
-
   return (
     <Box
       sx={{
@@ -29,11 +32,13 @@ export const Home: React.FC = () => {
         width: '100%',
       }}
     >
-      <Box sx={{ width: '100%', maxWidth: 540 }}> {/* Ajuste maxWidth à ton besoin */}
+      <Box sx={{ width: '100%', maxWidth: 540 }}>
+        {' '}
+        {/* Ajuste maxWidth à ton besoin */}
         <AccountTree accounts={accounts} />
       </Box>
     </Box>
   );
 
-  return ;
+  return;
 };

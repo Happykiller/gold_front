@@ -1,7 +1,6 @@
 const path = require('path');
 const dotenv = require('dotenv');
 const webpack = require('webpack');
-const Dotenv = require('dotenv-webpack');
 const { version } = require('./package.json');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
@@ -65,7 +64,7 @@ module.exports = (env, argv) => {
           use: [
             isProduction ? MiniCssExtractPlugin.loader : 'style-loader', // Extract CSS in production
             'css-loader',
-            'sass-loader'
+            'sass-loader',
           ],
         },
         {
@@ -79,8 +78,7 @@ module.exports = (env, argv) => {
     },
 
     plugins: [
-
-      new CleanWebpackPlugin(),  // Nettoie le dossier dist avant chaque build
+      new CleanWebpackPlugin(), // Nettoie le dossier dist avant chaque build
 
       // Plugin to generate an HTML file from a template, and include the bundled assets.
       new HtmlWebpackPlugin({
@@ -98,11 +96,7 @@ module.exports = (env, argv) => {
             from: 'src/public',
             to: '',
             globOptions: {
-              ignore: [
-                '**/logo.png',
-                '**/logo_dark.png',
-                '**/logo_light.png',
-              ],
+              ignore: ['**/logo.png', '**/logo_dark.png', '**/logo_light.png'],
             },
           },
         ],
@@ -117,9 +111,10 @@ module.exports = (env, argv) => {
         'process.env.VERSION': JSON.stringify(version),
       }),
 
-      isProduction && new MiniCssExtractPlugin({
-        filename: 'styles.[contenthash].css' // Output CSS file
-      }), // Only add plugin in production
+      isProduction &&
+        new MiniCssExtractPlugin({
+          filename: 'styles.[contenthash].css', // Output CSS file
+        }), // Only add plugin in production
     ],
 
     optimization: {
@@ -136,12 +131,14 @@ module.exports = (env, argv) => {
       runtimeChunk: 'single',
     },
 
-    performance: isProduction ? {
-      hints: 'warning',
-      maxAssetSize: 1500000,
-      maxEntrypointSize: 1500000,
-      assetFilter: (assetFilename) => assetFilename !== 'favicon.ico',
-    } : false,
+    performance: isProduction
+      ? {
+          hints: 'warning',
+          maxAssetSize: 1500000,
+          maxEntrypointSize: 1500000,
+          assetFilter: (assetFilename) => assetFilename !== 'favicon.ico',
+        }
+      : false,
 
     devServer: {
       // Serve static files from the 'public' directory.
@@ -153,10 +150,10 @@ module.exports = (env, argv) => {
       compress: true,
 
       // Port number for the development server.
-      port: process.env.APP_PORT??9000,
+      port: process.env.APP_PORT ?? 9000,
 
       // Redirect 404s to index.html to handle client-side routing
-      historyApiFallback: true, 
+      historyApiFallback: true,
     },
   };
 };

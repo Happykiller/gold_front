@@ -5,20 +5,18 @@ import { GetAccountsUsecaseDto } from '@usecase/getAccounts/getAccounts.usecase.
 import { GetAccountsUsecaseModel } from '@usecase/getAccounts/getAccounts.usecase.model';
 
 export class GetAccountsUsecase {
+  constructor(private inversify: Inversify) {}
 
-  constructor(
-    private inversify:Inversify
-  ){}
+  accounts: AccountUsecaseModel[] = [];
 
-  accounts:AccountUsecaseModel[] = [];
-
-  async execute(dto?: GetAccountsUsecaseDto): Promise<GetAccountsUsecaseModel>  {
+  async execute(
+    _dto?: GetAccountsUsecaseDto,
+  ): Promise<GetAccountsUsecaseModel> {
     try {
-      const response:any = await this.inversify.graphqlService.send(
-        {
-          operationName: 'accounts',
-          variables: {},
-          query: `query accounts {  
+      const response: any = await this.inversify.graphqlService.send({
+        operationName: 'accounts',
+        variables: {},
+        query: `query accounts {  
             accounts {
               id
               type_id
@@ -32,25 +30,27 @@ export class GetAccountsUsecase {
               modificator_id
               modification_date
             }
-          }`
-        }
-      );
+          }`,
+      });
 
-      if(response.errors) {
+      if (response.errors) {
         throw new Error(response.errors[0].message);
       }
 
-      this.accounts = response.data.accounts.sort((elt1:AccountUsecaseModel, elt2:AccountUsecaseModel) => elt1.label.localeCompare(elt2.label));
+      this.accounts = response.data.accounts.sort(
+        (elt1: AccountUsecaseModel, elt2: AccountUsecaseModel) =>
+          elt1.label.localeCompare(elt2.label),
+      );
 
       return {
         message: CODES.SUCCESS,
-        data: this.accounts
-      }
+        data: this.accounts,
+      };
     } catch (e: any) {
       return {
         message: CODES.FAIL,
-        error: e.message
-      }
+        error: e.message,
+      };
     }
   }
 }

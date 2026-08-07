@@ -1,3 +1,3 @@
 export interface GetOperationUsecaseDto {
-  operation_id: number
+  operation_id: number;
 }

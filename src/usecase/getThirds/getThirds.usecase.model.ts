@@ -1,7 +1,7 @@
-import { OperationThridUsecaseModel } from "@usecase/model/operationThrid.usecase.model";
+import { OperationThridUsecaseModel } from '@usecase/model/operationThrid.usecase.model';
 
 export interface GetThirdsUsecaseModel {
   message: string;
-  data?: OperationThridUsecaseModel[],
+  data?: OperationThridUsecaseModel[];
   error?: string;
 }

@@ -5,7 +5,7 @@ import { initReactI18next } from 'react-i18next';
 import detector from 'i18next-browser-languagedetector';
 
 import { translation } from '@happykiller/sunny-ui';
-import appEN from '@src/locales/en/translation.json'
+import appEN from '@src/locales/en/translation.json';
 import appFR from '@src/locales/fr/translation.json';
 
 // the translations
@@ -17,7 +17,7 @@ const resources = {
   },
   fr: {
     translation: merge({}, translation.fr, appFR),
-  }
+  },
 };
 
 const initI18n = async () => {
@@ -31,7 +31,7 @@ const initI18n = async () => {
       debug: process.env.NODE_ENV === 'development',
       interpolation: {
         escapeValue: false,
-      }
+      },
     });
 };
 

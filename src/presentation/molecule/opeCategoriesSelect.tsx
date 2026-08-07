@@ -26,7 +26,9 @@ export const OpeCategoriesSelect: React.FC<OpeCategoriesSelectProps> = ({
   label,
   onChange,
 }) => {
-  const [categories, setCategories] = React.useState<OperationCategoryUsecaseModel[] | null>(null);
+  const [categories, setCategories] = React.useState<
+    OperationCategoryUsecaseModel[] | null
+  >(null);
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
 
@@ -38,7 +40,8 @@ export const OpeCategoriesSelect: React.FC<OpeCategoriesSelectProps> = ({
       setError(null);
 
       try {
-        const response: GetOpeCategoriesUsecaseModel = await inversify.getOpeCategoriesUsecase.execute();
+        const response: GetOpeCategoriesUsecaseModel =
+          await inversify.getOpeCategoriesUsecase.execute();
 
         if (isMounted) {
           if (response.message === CODES.SUCCESS && response.data) {
@@ -56,15 +59,25 @@ export const OpeCategoriesSelect: React.FC<OpeCategoriesSelectProps> = ({
     };
 
     fetchCategories();
-    return () => { isMounted = false; };
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   if (loading) {
-    return <Typography><Trans>common.loading</Trans></Typography>;
+    return (
+      <Typography>
+        <Trans>common.loading</Trans>
+      </Typography>
+    );
   }
 
   if (error) {
-    return <Typography color="error"><Trans>common.{error}</Trans></Typography>;
+    return (
+      <Typography color="error">
+        <Trans>common.{error}</Trans>
+      </Typography>
+    );
   }
 
   if (!categories) return null;
@@ -78,10 +91,14 @@ export const OpeCategoriesSelect: React.FC<OpeCategoriesSelectProps> = ({
         value={value.toString()}
         onChange={onChange}
       >
-        <MenuItem value=""><Trans>common.clear</Trans></MenuItem>
+        <MenuItem value="">
+          <Trans>common.clear</Trans>
+        </MenuItem>
         {categories.map((category) => (
           <MenuItem key={category.id} value={category.id}>
-            <Typography noWrap><Trans>{category.label}</Trans></Typography>
+            <Typography noWrap>
+              <Trans>{category.label}</Trans>
+            </Typography>
           </MenuItem>
         ))}
       </Select>

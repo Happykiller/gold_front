@@ -2,6 +2,6 @@ import { OperationTypeUsecaseModel } from '@usecase/model/operationType.usecase.
 
 export interface GetOpeTypesUsecaseModel {
   message: string;
-  data?: OperationTypeUsecaseModel[],
+  data?: OperationTypeUsecaseModel[];
   error?: string;
 }

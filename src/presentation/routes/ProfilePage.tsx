@@ -1,5 +1,13 @@
 import React from 'react';
-import { Add, Delete, Done, HelpOutline, Visibility, VisibilityOff, VpnKey } from '@mui/icons-material';
+import {
+  Add,
+  Delete,
+  Done,
+  HelpOutline,
+  Visibility,
+  VisibilityOff,
+  VpnKey,
+} from '@mui/icons-material';
 
 import inversify from '@src/common/inversify';
 import { contextStore } from '@presentation/store/contextStore';

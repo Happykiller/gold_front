@@ -1,5 +1,4 @@
 // src\index.tsx
-/// <reference path="./theme/mui.d.ts" />
 import '@fontsource/roboto';
 import '@fontsource/montserrat';
 import '@fontsource/roboto/400.css';
@@ -34,7 +33,9 @@ const Index: React.FC = () => {
 // Initialize i18n and then render the app
 initI18n().then(() => {
   // Create a root for rendering with ReactDOM.createRoot
-  const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
+  const root = ReactDOM.createRoot(
+    document.getElementById('root') as HTMLElement,
+  );
   // Render the Index component into the root element
   root.render(<Index />);
 });

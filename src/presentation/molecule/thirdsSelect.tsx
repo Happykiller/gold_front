@@ -26,7 +26,9 @@ export const ThirdsSelect: React.FC<ThirdsSelectProps> = ({
   label,
   onChange,
 }) => {
-  const [thirds, setThirds] = React.useState<OperationThridUsecaseModel[] | null>(null);
+  const [thirds, setThirds] = React.useState<
+    OperationThridUsecaseModel[] | null
+  >(null);
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
 
@@ -37,7 +39,8 @@ export const ThirdsSelect: React.FC<ThirdsSelectProps> = ({
       setError(null);
 
       try {
-        const response: GetThirdsUsecaseModel = await inversify.getThirdsUsecase.execute();
+        const response: GetThirdsUsecaseModel =
+          await inversify.getThirdsUsecase.execute();
         if (isMounted) {
           if (response.message === CODES.SUCCESS && response.data) {
             setThirds(response.data);
@@ -60,11 +63,19 @@ export const ThirdsSelect: React.FC<ThirdsSelectProps> = ({
   }, []);
 
   if (loading) {
-    return <Typography><Trans>common.loading</Trans></Typography>;
+    return (
+      <Typography>
+        <Trans>common.loading</Trans>
+      </Typography>
+    );
   }
 
   if (error) {
-    return <Typography color="error"><Trans>common.{error}</Trans></Typography>;
+    return (
+      <Typography color="error">
+        <Trans>common.{error}</Trans>
+      </Typography>
+    );
   }
 
   if (!thirds) return null;
@@ -78,10 +89,14 @@ export const ThirdsSelect: React.FC<ThirdsSelectProps> = ({
         value={value.toString()}
         onChange={onChange}
       >
-        <MenuItem value=""><Trans>common.clear</Trans></MenuItem>
+        <MenuItem value="">
+          <Trans>common.clear</Trans>
+        </MenuItem>
         {thirds.map((third) => (
           <MenuItem key={third.id} value={third.id}>
-            <Typography noWrap><Trans>{third.label}</Trans></Typography>
+            <Typography noWrap>
+              <Trans>{third.label}</Trans>
+            </Typography>
           </MenuItem>
         ))}
       </Select>

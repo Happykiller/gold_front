@@ -2,7 +2,7 @@
 import { StateStorage } from 'zustand/middleware';
 
 export class StorageServiceCookie implements StateStorage {
-  getItem(name: string): string|null {
+  getItem(name: string): string | null {
     const cookies = document.cookie.split('; ');
     for (const cookie of cookies) {
       const [cookieName, cookieValue] = cookie.split('=');
@@ -13,7 +13,11 @@ export class StorageServiceCookie implements StateStorage {
     return null;
   }
 
-  setItem(name: string, value: any, options:{ expires?:number, path?:string } = {}): void {
+  setItem(
+    name: string,
+    value: any,
+    options: { expires?: number; path?: string } = {},
+  ): void {
     const { expires = 1, path = '/' } = options;
     let cookieString = `${encodeURIComponent(name)}=${encodeURIComponent(value)}; path=${path}`;
     if (expires) {
@@ -26,4 +30,4 @@ export class StorageServiceCookie implements StateStorage {
   removeItem(name: string, path = '/'): void {
     document.cookie = `${encodeURIComponent(name)}=; path=${path}; expires=Thu, 01 Jan 1970 00:00:00 GMT`;
   }
-};
+}

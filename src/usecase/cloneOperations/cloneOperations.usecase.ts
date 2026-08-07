@@ -4,18 +4,16 @@ import { CloneOperationsUsecaseDto } from '@usecase/cloneOperations/cloneOperati
 import { CloneOperationsUsecaseModel } from '@usecase/cloneOperations/cloneOperations.usecase.model';
 
 export class CloneOperationsUsecase {
+  constructor(private inversify: Inversify) {}
 
-  constructor(
-    private inversify:Inversify
-  ){}
-
-  async execute(dto: CloneOperationsUsecaseDto): Promise<CloneOperationsUsecaseModel>  {
+  async execute(
+    dto: CloneOperationsUsecaseDto,
+  ): Promise<CloneOperationsUsecaseModel> {
     try {
-      const response:any = await this.inversify.graphqlService.send( 
-        {
-          operationName: 'cloneOperations',
-          variables: dto,
-          query: `mutation cloneOperations(
+      const response: any = await this.inversify.graphqlService.send({
+        operationName: 'cloneOperations',
+        variables: dto,
+        query: `mutation cloneOperations(
             $account_id: Int!
             $template_account_id: Int!
             $date: String!
@@ -42,23 +40,22 @@ export class CloneOperationsUsecase {
               modificator_id
               modification_date
             }
-          }`
-        }
-      );
+          }`,
+      });
 
-      if(response.errors) {
+      if (response.errors) {
         throw new Error(response.errors[0].message);
       }
 
       return {
         message: CODES.SUCCESS,
-        data: response.data.cloneOperations
-      }
+        data: response.data.cloneOperations,
+      };
     } catch (e: any) {
       return {
         message: CODES.CLONE_OPERATION_FAIL,
-        error: e.message
-      }
+        error: e.message,
+      };
     }
   }
 }

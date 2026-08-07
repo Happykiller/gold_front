@@ -18,13 +18,13 @@ import { CloneOperationsUsecaseModel } from '@usecase/cloneOperations/cloneOpera
 export const Clone = () => {
   const navigate = useNavigate();
   const [qry, setQry] = React.useState<{
-    loading: boolean | null,
-    data: any,
-    error: string | null
+    loading: boolean | null;
+    data: any;
+    error: string | null;
   }>({
     loading: null,
     data: null,
-    error: null
+    error: null,
   });
   const theme = useTheme();
   const flash = useFlashStore();
@@ -36,46 +36,47 @@ export const Clone = () => {
   const handleClick = async (event: React.SyntheticEvent) => {
     event.preventDefault();
 
-    setQry(qry => ({
+    setQry((qry) => ({
       ...qry,
-      loading: true
+      loading: true,
     }));
 
-    inversify.cloneOperationsUsecase.execute({
-      date: currentDate.format('YYYY-MM-DD'),
-      account_id: parseInt(currentAccount),
-      template_account_id: parseInt(currentTemplate)
-    })
+    inversify.cloneOperationsUsecase
+      .execute({
+        date: currentDate.format('YYYY-MM-DD'),
+        account_id: parseInt(currentAccount),
+        template_account_id: parseInt(currentTemplate),
+      })
       .then((response: CloneOperationsUsecaseModel) => {
         if (response.message === CODES.SUCCESS) {
           flash.open(t('clone.succeed'));
           navigate({
             pathname: '/operations',
             search: createSearchParams({
-              account_id: currentAccount
-            }).toString()
+              account_id: currentAccount,
+            }).toString(),
           });
         } else {
           inversify.loggerService.debug(response.error);
-          setQry(qry => ({
+          setQry((qry) => ({
             ...qry,
-            error: response.message
+            error: response.message,
           }));
         }
       })
       .catch((error: any) => {
-        setQry(qry => ({
+        setQry((qry) => ({
           ...qry,
-          error: error.message
+          error: error.message,
         }));
       })
       .finally(() => {
-        setQry(qry => ({
+        setQry((qry) => ({
           ...qry,
-          loading: false
+          loading: false,
         }));
       });
-  }
+  };
 
   return (
     <Box
@@ -162,5 +163,4 @@ export const Clone = () => {
       </Box>
     </Box>
   );
-
-}
+};

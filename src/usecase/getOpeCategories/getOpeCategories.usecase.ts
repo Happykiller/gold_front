@@ -4,45 +4,45 @@ import { OperationCategoryUsecaseModel } from '@usecase/model/operationCategory.
 import { GetOpeCategoriesUsecaseModel } from '@usecase/getOpeCategories/getOpeCategories.usecase.model';
 
 export class GetOpeCategoriesUsecase {
+  constructor(private inversify: Inversify) {}
 
-  constructor(
-    private inversify:Inversify
-  ){}
+  categories: OperationCategoryUsecaseModel[] = [];
 
-  categories:OperationCategoryUsecaseModel[] = [];
-
-  async execute(): Promise<GetOpeCategoriesUsecaseModel>  {
+  async execute(): Promise<GetOpeCategoriesUsecaseModel> {
     try {
       if (this.categories.length === 0) {
-        const response:any = await this.inversify.graphqlService.send(
-          {
-            operationName: 'operationCategories',
-            variables: {},
-            query: `query operationCategories {  
+        const response: any = await this.inversify.graphqlService.send({
+          operationName: 'operationCategories',
+          variables: {},
+          query: `query operationCategories {  
               operationCategories {
                 id
                 label
               }
-            }`
-          }
-        );
+            }`,
+        });
 
-        if(response.errors) {
+        if (response.errors) {
           throw new Error(response.errors[0].message);
         }
 
-        this.categories = response.data.operationCategories.sort((elt1:OperationCategoryUsecaseModel, elt2:OperationCategoryUsecaseModel) => elt1.label.localeCompare(elt2.label));
+        this.categories = response.data.operationCategories.sort(
+          (
+            elt1: OperationCategoryUsecaseModel,
+            elt2: OperationCategoryUsecaseModel,
+          ) => elt1.label.localeCompare(elt2.label),
+        );
       }
 
       return {
         message: CODES.SUCCESS,
-        data: this.categories
-      }
+        data: this.categories,
+      };
     } catch (e: any) {
       return {
         message: CODES.FAIL,
-        error: e.message
-      }
+        error: e.message,
+      };
     }
   }
 }

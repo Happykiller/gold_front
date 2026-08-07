@@ -6,21 +6,17 @@ import { SetRecoUsecaseDto } from '@usecase/setReco/setReco.usecase.dto';
 import { SetRecoUsecaseModel } from '@usecase/setReco/setReco.usecase.model';
 
 export class SetRecoUsecase {
+  constructor(private inversify: Inversify) {}
 
-  constructor(
-    private inversify:Inversify
-  ){}
-
-  async execute(dto: SetRecoUsecaseDto): Promise<SetRecoUsecaseModel>  {
+  async execute(dto: SetRecoUsecaseDto): Promise<SetRecoUsecaseModel> {
     try {
-      const response:any = await this.inversify.graphqlService.send(
-        {
-          operationName: 'updateOperation',
-          variables: {
-            ...dto,
-            date: dayjs().format('YYYY-MM-DD')
-          },
-          query: `mutation updateOperation($operation_id: Int!, $date: String!) {
+      const response: any = await this.inversify.graphqlService.send({
+        operationName: 'updateOperation',
+        variables: {
+          ...dto,
+          date: dayjs().format('YYYY-MM-DD'),
+        },
+        query: `mutation updateOperation($operation_id: Int!, $date: String!) {
             updateOperation (
               dto: {
                 operation_id: $operation_id
@@ -30,23 +26,22 @@ export class SetRecoUsecase {
             ) {
               id
             }
-          }`
-        }
-      );
+          }`,
+      });
 
-      if(response.errors) {
+      if (response.errors) {
         throw new Error(response.errors[0].message);
       }
 
       return {
         message: CODES.SUCCESS,
-        data: response.data.updateOperation
-      }
+        data: response.data.updateOperation,
+      };
     } catch (e: any) {
       return {
         message: CODES.FAIL,
-        error: e.message
-      }
+        error: e.message,
+      };
     }
   }
 }

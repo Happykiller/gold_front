@@ -7,8 +7,15 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { createSearchParams, useNavigate } from 'react-router-dom';
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import {
-  Box, Button, Typography, FormControl, InputLabel,
-  MenuItem, Select, useTheme, Grid
+  Box,
+  Button,
+  Typography,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  useTheme,
+  Grid,
 } from '@mui/material';
 import EuroIcon from '@mui/icons-material/Euro';
 import DescriptionIcon from '@mui/icons-material/Description';
@@ -29,14 +36,14 @@ export const CreateVir = () => {
   const flash = useFlashStore();
 
   const [qry, setQry] = React.useState<{
-    loading: boolean | null,
-    data: any,
-    error: string | null
+    loading: boolean | null;
+    data: any;
+    error: string | null;
   }>({ loading: null, data: null, error: null });
   const [qryOps, setQryLOps] = React.useState<{
-    loading: boolean | null,
-    data: any,
-    error: string | null
+    loading: boolean | null;
+    data: any;
+    error: string | null;
   }>({ loading: null, data: null, error: null });
 
   const [operations, setOperations] = React.useState<any[] | null>(null);
@@ -51,58 +58,71 @@ export const CreateVir = () => {
   const [amount, setAmount] = React.useState({ value: '0.00', valid: false });
   const [desc, setDesc] = React.useState({ value: '', valid: false });
 
-  const sum = Math.round(selectedOperations.reduce((n, { amount }) => n + amount, 0) * 100) / 100;
+  const sum =
+    Math.round(
+      selectedOperations.reduce((n, { amount }) => n + amount, 0) * 100,
+    ) / 100;
 
   const handleClick = async (event: React.SyntheticEvent) => {
     event.preventDefault();
     setQry({ ...qry, loading: true });
 
-    inversify.createOperationUsecase.execute({
-      amount: parseFloat(amount.value.replace(',', '.')),
-      vat_rate: 20,
-      description: desc.value,
-      date: currentDate.format('YYYY-MM-DD'),
-      account_id: parseInt(currentAccount),
-      status_id: parseInt(currentStatus),
-      type_id: 3,
-      third_id: parseInt(currentThird),
-      category_id: parseInt(currentCategory),
-      account_id_dest: parseInt(currentAccountDest),
-      linkedOps: selectedOperations.map((ope) => ope.id)
-    }).then((response: CreateOperationUsecaseModel) => {
-      if (response.message === CODES.SUCCESS && response.data) {
-        flash.open(t('createVir.succeed') + response.data.id);
-        navigate({
-          pathname: '/operations',
-          search: createSearchParams({ account_id: currentAccountDest }).toString()
-        });
-      } else {
-        setQry({ ...qry, error: response.message });
-      }
-    }).catch(error => {
-      setQry({ ...qry, error: error.message });
-    }).finally(() => {
-      setQry({ ...qry, loading: false });
-    });
+    inversify.createOperationUsecase
+      .execute({
+        amount: parseFloat(amount.value.replace(',', '.')),
+        vat_rate: 20,
+        description: desc.value,
+        date: currentDate.format('YYYY-MM-DD'),
+        account_id: parseInt(currentAccount),
+        status_id: parseInt(currentStatus),
+        type_id: 3,
+        third_id: parseInt(currentThird),
+        category_id: parseInt(currentCategory),
+        account_id_dest: parseInt(currentAccountDest),
+        linkedOps: selectedOperations.map((ope) => ope.id),
+      })
+      .then((response: CreateOperationUsecaseModel) => {
+        if (response.message === CODES.SUCCESS && response.data) {
+          flash.open(t('createVir.succeed') + response.data.id);
+          navigate({
+            pathname: '/operations',
+            search: createSearchParams({
+              account_id: currentAccountDest,
+            }).toString(),
+          });
+        } else {
+          setQry({ ...qry, error: response.message });
+        }
+      })
+      .catch((error) => {
+        setQry({ ...qry, error: error.message });
+      })
+      .finally(() => {
+        setQry({ ...qry, loading: false });
+      });
   };
 
   React.useEffect(() => {
     if (operations === null) {
       setQryLOps({ ...qryOps, loading: true });
-      inversify.getOperationsUsecase.execute({
-        account_id: parseInt(currentAccountDest),
-        page: 0
-      }).then((response: GetOperationsUsecaseModel) => {
-        if (response.message === CODES.SUCCESS && response.data) {
-          setOperations(response.data);
-        } else {
-          setQryLOps({ ...qryOps, error: response.message });
-        }
-      }).catch(error => {
-        setQryLOps({ ...qryOps, error: error.message });
-      }).finally(() => {
-        setQryLOps({ ...qryOps, loading: false });
-      });
+      inversify.getOperationsUsecase
+        .execute({
+          account_id: parseInt(currentAccountDest),
+          page: 0,
+        })
+        .then((response: GetOperationsUsecaseModel) => {
+          if (response.message === CODES.SUCCESS && response.data) {
+            setOperations(response.data);
+          } else {
+            setQryLOps({ ...qryOps, error: response.message });
+          }
+        })
+        .catch((error) => {
+          setQryLOps({ ...qryOps, error: error.message });
+        })
+        .finally(() => {
+          setQryLOps({ ...qryOps, loading: false });
+        });
     }
   }, [currentAccountDest]);
 
@@ -110,43 +130,54 @@ export const CreateVir = () => {
     <Grid size={12} container spacing={1} justifyContent="center">
       {selectedOperations.map((operation) => (
         <Grid key={operation.id}>
-          <Button variant="contained" size="small" startIcon={<Delete />} sx={{ borderRadius: 2 }}>
-            <Typography noWrap>{operation.amount}€ {operation.description}</Typography>
+          <Button
+            variant="contained"
+            size="small"
+            startIcon={<Delete />}
+            sx={{ borderRadius: 2 }}
+          >
+            <Typography noWrap>
+              {operation.amount}€ {operation.description}
+            </Typography>
           </Button>
         </Grid>
       ))}
     </Grid>
   );
 
-  const listOperations =
-    qryOps.loading ? (
-      <Trans>common.loading</Trans>
-    ) : qryOps.error ? (
-      <Trans>createVir.{qryOps.error}</Trans>
-    ) : (
-      <FormControl variant="standard" fullWidth>
-        <InputLabel><Trans>createVir.operations</Trans></InputLabel>
-        <Select
-          variant="standard"
-          size="small"
-          value={opeSelected}
-          onChange={(e) => {
-            const val = e.target.value;
-            setOpeSelected(val);
-            setSelectedOperations(prev => [...prev, val]);
-          }}
-        >
-          <MenuItem value="">Aucune</MenuItem>
-          {operations?.map(operation => (
+  const listOperations = qryOps.loading ? (
+    <Trans>common.loading</Trans>
+  ) : qryOps.error ? (
+    <Trans>createVir.{qryOps.error}</Trans>
+  ) : (
+    <FormControl variant="standard" fullWidth>
+      <InputLabel>
+        <Trans>createVir.operations</Trans>
+      </InputLabel>
+      <Select
+        variant="standard"
+        size="small"
+        value={opeSelected}
+        onChange={(e) => {
+          const val = e.target.value;
+          setOpeSelected(val);
+          setSelectedOperations((prev) => [...prev, val]);
+        }}
+      >
+        <MenuItem value="">Aucune</MenuItem>
+        {operations?.map(
+          (operation) =>
             operation.type_id === 2 && (
               <MenuItem key={operation.id} value={operation}>
-                <Typography noWrap>{operation.amount}€ {operation.description}</Typography>
+                <Typography noWrap>
+                  {operation.amount}€ {operation.description}
+                </Typography>
               </MenuItem>
-            )
-          ))}
-        </Select>
-      </FormControl>
-    );
+            ),
+        )}
+      </Select>
+    </FormControl>
+  );
 
   return (
     <Box
@@ -155,13 +186,16 @@ export const CreateVir = () => {
       alignItems="center"
       minHeight="100vh"
       sx={{
-        px: 2
+        px: 2,
       }}
     >
       <Box
         sx={{
           borderRadius: { xs: 0, sm: '16px' },
-          boxShadow: { xs: 'none', sm: `0 0 32px 0 ${theme.palette.primary.main}55` },
+          boxShadow: {
+            xs: 'none',
+            sm: `0 0 32px 0 ${theme.palette.primary.main}55`,
+          },
           border: { xs: 'none', sm: `2px solid ${theme.palette.primary.main}` },
           maxWidth: 600,
           background: {
@@ -171,7 +205,13 @@ export const CreateVir = () => {
           p: 3,
         }}
       >
-        <Typography variant="h6" fontWeight={700} textAlign="center" mb={2} color="text.primary">
+        <Typography
+          variant="h6"
+          fontWeight={700}
+          textAlign="center"
+          mb={2}
+          color="text.primary"
+        >
           <Trans>createVir.title</Trans>
         </Typography>
 
@@ -200,7 +240,6 @@ export const CreateVir = () => {
                     help: <Info fontSize="small" />,
                   }}
                 />
-
               </Grid>
               <Grid size={6}>
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -247,14 +286,16 @@ export const CreateVir = () => {
               </Grid>
               <Grid size={6}>
                 <FormControl variant="standard" fullWidth>
-                  <InputLabel><Trans>operation.status</Trans></InputLabel>
+                  <InputLabel>
+                    <Trans>operation.status</Trans>
+                  </InputLabel>
                   <Select
                     value={currentStatus}
                     variant="standard"
-                    onChange={e => setCurrentStatus(e.target.value)}
+                    onChange={(e) => setCurrentStatus(e.target.value)}
                   >
-                    <MenuItem value='1'>A suivre</MenuItem>
-                    <MenuItem value='2'>Réconcilier</MenuItem>
+                    <MenuItem value="1">A suivre</MenuItem>
+                    <MenuItem value="2">Réconcilier</MenuItem>
                   </Select>
                 </FormControl>
               </Grid>
@@ -272,13 +313,13 @@ export const CreateVir = () => {
                   onChange={(e: any) => setCurrentCategory(e.target.value)}
                 />
               </Grid>
-              <Grid size={6}>
-                {listOperations}
-              </Grid>
+              <Grid size={6}>{listOperations}</Grid>
               {renderLinkedOperations}
               {sum > 0 && (
                 <Grid size={12} textAlign="center">
-                  <Typography variant="subtitle2" color="primary">{sum} €</Typography>
+                  <Typography variant="subtitle2" color="primary">
+                    {sum} €
+                  </Typography>
                 </Grid>
               )}
               <Grid size={12} textAlign="center">
