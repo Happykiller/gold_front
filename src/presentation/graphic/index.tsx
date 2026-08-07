@@ -18,7 +18,12 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs, { Dayjs } from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import Highcharts from 'highcharts';
-import HighchartsReact from 'highcharts-react-official';
+// Import nommé volontaire : `highcharts-react-official` est un bundle UMD
+// ancien, et Vite en pré-bundle l'objet module entier comme export par défaut
+// (`export default require_highcharts_react_min()`). Un import par défaut
+// récupère donc `{ HighchartsReact, default }` au lieu du composant, ce que
+// React refuse de rendre — « Element type is invalid… got: object ».
+import { HighchartsReact } from 'highcharts-react-official';
 import inversify from '@src/common/inversify';
 import { GetAccountsUsecaseModel } from '@usecase/getAccounts/getAccounts.usecase.model';
 
