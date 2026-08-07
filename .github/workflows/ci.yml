@@ -11,12 +11,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # Node 20 : la version qui tourne réellement en production (image
-      # node:20-alpine). Les postes de développement sont en 22 — c'est la
-      # production qui fait foi.
+      # Node 22 : le socle de test l'impose (jsdom charge undici, qui appelle
+      # webidl.util.markAsUncloneable, apparue en Node 21) — et Node 20 est en
+      # fin de vie depuis avril 2026. L'image de production a été alignée sur
+      # la même version majeure.
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
 
       - run: npm ci

@@ -1,5 +1,7 @@
 # Base image
-FROM node:20-alpine AS build
+# Node 22 (LTS) : la 20 est en fin de vie depuis avril 2026, et l'outillage de
+# test exige déjà >= 21. Étape de build uniquement — l'image livrée est nginx.
+FROM node:22-alpine AS build
 
 # Create app directory
 WORKDIR /usr/src/app
