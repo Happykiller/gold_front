@@ -540,6 +540,12 @@ export type AccountQuery = {
   };
 };
 
+export type AccountTypesQueryVariables = Exact<{ [key: string]: never }>;
+
+export type AccountTypesQuery = {
+  accountTypes: Array<{ id: number; label: string }>;
+};
+
 export type AccountsQueryVariables = Exact<{ [key: string]: never }>;
 
 export type AccountsQuery = {
@@ -669,6 +675,24 @@ export type SetOperationReconciledMutationVariables = Exact<{
 
 export type SetOperationReconciledMutation = {
   updateOperation: { id: number };
+};
+
+export type UpdateAccountMutationVariables = Exact<{
+  account_id: number;
+  label?: string | null | undefined;
+  type_id?: number | null | undefined;
+}>;
+
+export type UpdateAccountMutation = {
+  updateAccount: {
+    id: number;
+    label: string;
+    type_id: number;
+    parent_account_id: number | null;
+    description: string | null;
+    balance_reconcilied: number | null;
+    balance_not_reconcilied: number | null;
+  };
 };
 
 export type UpdateOperationMutationVariables = Exact<{

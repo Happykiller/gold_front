@@ -21,6 +21,8 @@ import { GraphqlServiceFake } from '@service/graphql/graphql.service.fake';
 import { GetAccountUsecase } from '@usecase/getAccount/getAccount.usecase';
 import { GraphqlServiceFetch } from '@service/graphql/graphql.service.fetch';
 import { GetAccountsUsecase } from '@usecase/getAccounts/getAccounts.usecase';
+import { UpdateAccountUsecase } from '@usecase/updateAccount/updateAccount.usecase';
+import { GetAccountTypesUsecase } from '@usecase/getAccountTypes/getAccountTypes.usecase';
 import { StorageServiceCookie } from '@service/storage/storage.service.cookie';
 import { GetOperationUsecase } from '@usecase/getOperation/getOperation.usecaset';
 import { GetOperationsUsecase } from '@usecase/getOperations/getOperations.usecase';
@@ -43,6 +45,8 @@ export class Inversify {
   getAccountUsecase: GetAccountUsecase;
   authPasskeyUsecase: AuthPasskeyUsecase;
   getAccountsUsecase: GetAccountsUsecase;
+  updateAccountUsecase: UpdateAccountUsecase;
+  getAccountTypesUsecase: GetAccountTypesUsecase;
   updPasswordUsecase: UpdPasswordUsecase;
   getOperationUsecase: GetOperationUsecase;
   getOperationsUsecase: GetOperationsUsecase;
@@ -66,6 +70,8 @@ export class Inversify {
     this.systemInfoUsecase = new SystemInfoUsecase(this);
     this.getAccountUsecase = new GetAccountUsecase(this);
     this.getAccountsUsecase = new GetAccountsUsecase(this);
+    this.updateAccountUsecase = new UpdateAccountUsecase(this);
+    this.getAccountTypesUsecase = new GetAccountTypesUsecase(this);
     this.authPasskeyUsecase = new AuthPasskeyUsecase(this);
     this.updPasswordUsecase = new UpdPasswordUsecase(this);
     this.getOperationUsecase = new GetOperationUsecase(this);

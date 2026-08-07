@@ -2,30 +2,9 @@
   "ERRORS": {
     "GET_PASSKEY_FOR_USER_FAIL": "Erreurs lors de récupération des clés d'accèes"
   },
-  "loading": "Loading...",
-  "header": {
-    "accounts": "Accounts",
-    "clone": "Clone",
-    "createVir": "Transfer",
-    "graphic": "Charts",
-    "ventilation": "Ventilation",
-    "logout": "Logout",
-    "profile": "Profile",
-    "settings": "Settings"
-  },
-  "graphic": {
-    "title": "Cashflow",
-    "accounts": "Accounts",
-    "startDate": "Start Date",
-    "endDate": "End Date",
-    "generate": "Generate",
-    "reconciled": "Reconciled Balance",
-    "total": "Total Balance",
-    "dateRangeError": "Start date must be before end date.",
-    "filterMode": "Display Mode",
-    "filterReconciled": "Reconciled operations",
-    "filterAll": "All operations",
-    "sumSeries": "Total Sum"
+  "account": {
+    "type-regular": "Account",
+    "type-template": "Template"
   },
   "clone": {
     "send": "Clone",
@@ -46,17 +25,13 @@
     "succeed": "Transfer created: ",
     "title": "Transfer"
   },
-  "ventilation": {
-    "title": "Ventilation",
-    "add_dest": "Add destination",
-    "dest_account": "Destination account",
-    "amount": "Amount / Percentage",
-    "is_percentage": "Percentage?",
-    "send": "Ventilate",
-    "succeed": "Ventilation successful",
-    "error_amount_exceeded": "Total exceeds the amount to ventilate",
-    "total_allocated": "Total allocated",
-    "total_amount": "Total to ventilate"
+  "editAccount": {
+    "title": "Edit account",
+    "label": "Label",
+    "type": "Type",
+    "send": "Update",
+    "succeed": "Account updated",
+    "edit": "Edit account"
   },
   "editOperation": {
     "send": "Update",
@@ -74,9 +49,34 @@
       "front": "Web: "
     }
   },
+  "graphic": {
+    "title": "Cashflow",
+    "accounts": "Accounts",
+    "startDate": "Start Date",
+    "endDate": "End Date",
+    "generate": "Generate",
+    "reconciled": "Reconciled Balance",
+    "total": "Total Balance",
+    "dateRangeError": "Start date must be before end date.",
+    "filterMode": "Display Mode",
+    "filterReconciled": "Reconciled operations",
+    "filterAll": "All operations",
+    "sumSeries": "Total Sum"
+  },
+  "header": {
+    "accounts": "Accounts",
+    "clone": "Clone",
+    "createVir": "Transfer",
+    "graphic": "Charts",
+    "ventilation": "Ventilation",
+    "logout": "Logout",
+    "profile": "Profile",
+    "settings": "Settings"
+  },
   "home": {
     "title": "Gold Service"
   },
+  "loading": "Loading...",
   "login": {
     "AUTH_FAIL_WRONG_CREDENTIAL": "Incorrect credentials",
     "login": "Enter your username",
@@ -138,5 +138,17 @@
     "passwordUpdated": "Password update successful",
     "title": "Profile",
     "UPDATE_PASSWORD_FAIL": "Password change failed"
+  },
+  "ventilation": {
+    "title": "Ventilation",
+    "add_dest": "Add destination",
+    "dest_account": "Destination account",
+    "amount": "Amount / Percentage",
+    "is_percentage": "Percentage?",
+    "send": "Ventilate",
+    "succeed": "Ventilation successful",
+    "error_amount_exceeded": "Total exceeds the amount to ventilate",
+    "total_allocated": "Total allocated",
+    "total_amount": "Total to ventilate"
   }
 }

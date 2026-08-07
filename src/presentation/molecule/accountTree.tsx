@@ -1,8 +1,10 @@
 // src\presentation\molecule\accountTree.tsx
 import * as React from 'react';
+import EditIcon from '@mui/icons-material/Edit';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import TrendingDownIcon from '@mui/icons-material/TrendingDown';
 import { useNavigate, createSearchParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   List,
   ListItem,
@@ -11,6 +13,8 @@ import {
   Chip,
   Stack,
   Box,
+  IconButton,
+  Tooltip,
 } from '@mui/material';
 
 import { FormattedAccount } from '@presentation/molecule/accounts';
@@ -23,6 +27,7 @@ export const AccountTree: React.FC<{ accounts: FormattedAccount[] }> = ({
   accounts,
 }) => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const renderAccount = (account: FormattedAccount) => {
     const hasChildren = account.children.length > 0;
@@ -174,7 +179,7 @@ export const AccountTree: React.FC<{ accounts: FormattedAccount[] }> = ({
                 whiteSpace: 'nowrap',
               }}
             >
-              Modèle
+              {t('account.type-template')}
             </Typography>
           )}
           <Stack
@@ -185,6 +190,23 @@ export const AccountTree: React.FC<{ accounts: FormattedAccount[] }> = ({
             {renderRecoChip(reco)}
             {renderNotRecoChip(notReco)}
           </Stack>
+          <Tooltip title={t('editAccount.edit')}>
+            <IconButton
+              size="small"
+              aria-label={`${t('editAccount.edit')} : ${account.label}`}
+              onClick={() =>
+                navigate({
+                  pathname: '/account_edit',
+                  search: createSearchParams({
+                    account_id: account.id.toString(),
+                  }).toString(),
+                })
+              }
+              sx={{ p: 0.3, opacity: 0.6, '&:hover': { opacity: 1 } }}
+            >
+              <EditIcon sx={{ fontSize: 16 }} />
+            </IconButton>
+          </Tooltip>
         </Box>
         {hasChildren && (
           <List disablePadding dense sx={{ pl: 1.6, pt: 0.1, pb: 0 }}>

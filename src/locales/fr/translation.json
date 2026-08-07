@@ -2,30 +2,9 @@
   "ERRORS": {
     "GET_PASSKEY_FOR_USER_FAIL": "Erreurs lors de récupération des clés d'accèes"
   },
-  "loading": "Chargement...",
-  "header": {
-    "accounts": "Comptes",
-    "clone": "Cloner",
-    "createVir": "Virement",
-    "graphic": "Graphique",
-    "ventilation": "Ventilation",
-    "logout": "Déconnexion",
-    "profile": "Profil",
-    "settings": "Réglages"
-  },
-  "graphic": {
-    "title": "Trésorerie",
-    "accounts": "Comptes",
-    "startDate": "Date de début",
-    "endDate": "Date de fin",
-    "generate": "Générer",
-    "reconciled": "Solde réconcilié",
-    "total": "Solde total",
-    "dateRangeError": "La date de début doit être antérieure à la date de fin.",
-    "filterMode": "Affichage",
-    "filterReconciled": "Opérations réconciliées",
-    "filterAll": "Toutes opérations",
-    "sumSeries": "Total Cumulé"
+  "account": {
+    "type-regular": "Compte",
+    "type-template": "Modèle"
   },
   "clone": {
     "send": "Cloner",
@@ -46,17 +25,13 @@
     "succeed": "Virement créé : ",
     "title": "Virement"
   },
-  "ventilation": {
-    "title": "Ventilation",
-    "add_dest": "Ajouter une destination",
-    "dest_account": "Compte de destination",
-    "amount": "Montant / Pourcentage",
-    "is_percentage": "Pourcentage ?",
-    "send": "Ventiler",
-    "succeed": "Ventilation réussie",
-    "error_amount_exceeded": "Le total dépasse le montant à ventiler",
-    "total_allocated": "Total alloué",
-    "total_amount": "Total à ventiler"
+  "editAccount": {
+    "title": "Édition du compte",
+    "label": "Libellé",
+    "type": "Type",
+    "send": "Mettre à jour",
+    "succeed": "Compte mis à jour",
+    "edit": "Éditer le compte"
   },
   "editOperation": {
     "send": "Mettre à jour",
@@ -74,9 +49,34 @@
       "front": "Web : "
     }
   },
+  "graphic": {
+    "title": "Trésorerie",
+    "accounts": "Comptes",
+    "startDate": "Date de début",
+    "endDate": "Date de fin",
+    "generate": "Générer",
+    "reconciled": "Solde réconcilié",
+    "total": "Solde total",
+    "dateRangeError": "La date de début doit être antérieure à la date de fin.",
+    "filterMode": "Affichage",
+    "filterReconciled": "Opérations réconciliées",
+    "filterAll": "Toutes opérations",
+    "sumSeries": "Total Cumulé"
+  },
+  "header": {
+    "accounts": "Comptes",
+    "clone": "Cloner",
+    "createVir": "Virement",
+    "graphic": "Graphique",
+    "ventilation": "Ventilation",
+    "logout": "Déconnexion",
+    "profile": "Profil",
+    "settings": "Réglages"
+  },
   "home": {
     "title": "Service Gold"
   },
+  "loading": "Chargement...",
   "login": {
     "AUTH_FAIL_WRONG_CREDENTIAL": "Identifiants incorrects",
     "login": "Entrer votre nom d'utilisateur",
@@ -139,5 +139,17 @@
     "passwordUpdated": "Mise à jour du mot de passe réussie",
     "title": "Profil",
     "UPDATE_PASSWORD_FAIL": "Échec du changement de mot de passe"
+  },
+  "ventilation": {
+    "title": "Ventilation",
+    "add_dest": "Ajouter une destination",
+    "dest_account": "Compte de destination",
+    "amount": "Montant / Pourcentage",
+    "is_percentage": "Pourcentage ?",
+    "send": "Ventiler",
+    "succeed": "Ventilation réussie",
+    "error_amount_exceeded": "Le total dépasse le montant à ventiler",
+    "total_allocated": "Total alloué",
+    "total_amount": "Total à ventiler"
   }
 }

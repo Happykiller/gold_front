@@ -58,6 +58,11 @@ const OperationNew = lazy(() =>
     default: module.OperationNew,
   })),
 );
+const EditAccount = lazy(() =>
+  import('@presentation/account_edit').then((module) => ({
+    default: module.EditAccount,
+  })),
+);
 const EditOperation = lazy(() =>
   import('@presentation/operation_edit').then((module) => ({
     default: module.EditOperation,
@@ -176,6 +181,16 @@ const App: React.FC = () => {
             element={
               <LayoutProtectedExt>
                 <Clone />
+              </LayoutProtectedExt>
+            }
+          />
+
+          {/* Route for the account edition page */}
+          <Route
+            path="/account_edit"
+            element={
+              <LayoutProtectedExt>
+                <EditAccount />
               </LayoutProtectedExt>
             }
           />
