@@ -1,0 +1,28 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Node 20 : la version qui tourne réellement en production (image
+      # node:20-alpine). Les postes de développement sont en 22 — c'est la
+      # production qui fait foi.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - run: npm run lint
+
+      # Seule barrière automatique côté front tant que les tests n'existent
+      # pas : la compilation TypeScript en mode strict.
+      - run: npm run build
