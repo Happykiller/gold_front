@@ -187,8 +187,7 @@ export const EditOperation = () => {
                     setVatRateValue(nextValue);
                     setOperation({
                       ...operation,
-                      vat_rate:
-                        nextValue === '' ? undefined : parseFloat(nextValue),
+                      vat_rate: nextValue === '' ? 0 : parseFloat(nextValue),
                     });
                   }}
                   error={!vatRateIsValid}
@@ -288,7 +287,7 @@ export const EditOperation = () => {
               </Grid>
               <Grid size={6}>
                 <ThirdsSelect
-                  value={operation.third_id}
+                  value={operation.third_id ?? ''}
                   label={<Trans>operation.third</Trans>}
                   onChange={(e: any) =>
                     setOperation({ ...operation, third_id: e.target.value })
@@ -297,7 +296,7 @@ export const EditOperation = () => {
               </Grid>
               <Grid size={6}>
                 <OpeCategoriesSelect
-                  value={operation.category_id}
+                  value={operation.category_id ?? ''}
                   label={<Trans>operation.category</Trans>}
                   onChange={(e: any) =>
                     setOperation({ ...operation, category_id: e.target.value })

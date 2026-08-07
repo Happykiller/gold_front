@@ -3,6 +3,8 @@ import { Inversify } from '@src/common/inversify';
 import { AccountUsecaseModel } from '@usecase/model/account.usecase.model';
 import { GetAccountsUsecaseDto } from '@usecase/getAccounts/getAccounts.usecase.dto';
 import { GetAccountsUsecaseModel } from '@usecase/getAccounts/getAccounts.usecase.model';
+import { GraphqlResponse } from '@service/graphql/graphql.response';
+import { AccountsQuery } from '@src/gql/graphql';
 
 export class GetAccountsUsecase {
   constructor(private inversify: Inversify) {}
@@ -13,28 +15,38 @@ export class GetAccountsUsecase {
     _dto?: GetAccountsUsecaseDto,
   ): Promise<GetAccountsUsecaseModel> {
     try {
-      const response: any = await this.inversify.graphqlService.send({
-        operationName: 'accounts',
-        variables: {},
-        query: `query accounts {  
-            accounts {
-              id
-              type_id
-              parent_account_id
-              label
-              description
-              balance_reconcilied
-              balance_not_reconcilied
-              creator_id
-              creation_date
-              modificator_id
-              modification_date
+      const response: GraphqlResponse<AccountsQuery> =
+        await this.inversify.graphqlService.send({
+          operationName: 'accounts',
+          variables: {},
+          query: /* GraphQL */ `
+            query accounts {
+              accounts {
+                id
+                type_id
+                parent_account_id
+                label
+                description
+                balance_reconcilied
+                balance_not_reconcilied
+                creator_id
+                creation_date
+                modificator_id
+                modification_date
+              }
             }
-          }`,
-      });
+          `,
+        });
 
       if (response.errors) {
         throw new Error(response.errors[0].message);
+      }
+
+      // Le serveur peut répondre sans `data` (erreur d'authentification,
+      // réponse tronquée) : sans cette garde, l'accès plus bas lèverait un
+      // TypeError peu lisible au lieu d'un échec explicite.
+      if (!response.data) {
+        throw new Error('Réponse GraphQL sans données');
       }
 
       this.accounts = response.data.accounts.sort(

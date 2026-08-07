@@ -2,6 +2,8 @@ import { CODES } from '@src/common/codes';
 import { Inversify } from '@src/common/inversify';
 import { GetThirdsUsecaseModel } from '@usecase/getThirds/getThirds.usecase.model';
 import { OperationThridUsecaseModel } from '@usecase/model/operationThrid.usecase.model';
+import { GraphqlResponse } from '@service/graphql/graphql.response';
+import { OperationThirdsQuery } from '@src/gql/graphql';
 
 export class GetThirdsUsecase {
   constructor(private inversify: Inversify) {}
@@ -11,19 +13,29 @@ export class GetThirdsUsecase {
   async execute(): Promise<GetThirdsUsecaseModel> {
     try {
       if (this.thirds.length === 0) {
-        const response: any = await this.inversify.graphqlService.send({
-          operationName: 'operationThirds',
-          variables: {},
-          query: `query operationThirds {  
-              operationThirds {
-                id
-                label
+        const response: GraphqlResponse<OperationThirdsQuery> =
+          await this.inversify.graphqlService.send({
+            operationName: 'operationThirds',
+            variables: {},
+            query: /* GraphQL */ `
+              query operationThirds {
+                operationThirds {
+                  id
+                  label
+                }
               }
-            }`,
-        });
+            `,
+          });
 
         if (response.errors) {
           throw new Error(response.errors[0].message);
+        }
+
+        // Le serveur peut répondre sans `data` (erreur d'authentification,
+        // réponse tronquée) : sans cette garde, l'accès plus bas lèverait un
+        // TypeError peu lisible au lieu d'un échec explicite.
+        if (!response.data) {
+          throw new Error('Réponse GraphQL sans données');
         }
 
         this.thirds = response.data.operationThirds.sort(

@@ -26,12 +26,14 @@ export const AccountTree: React.FC<{ accounts: FormattedAccount[] }> = ({
 
   const renderAccount = (account: FormattedAccount) => {
     const hasChildren = account.children.length > 0;
+    // Un compte sans opération a un solde nul côté serveur : on l'affiche
+    // comme un zéro plutôt que de laisser passer un NaN dans les puces.
     const reco = hasChildren
       ? account.balance_reconcilied_aggregate
-      : account.balance_reconcilied;
+      : (account.balance_reconcilied ?? 0);
     const notReco = hasChildren
       ? account.balance_not_reconcilied_aggregate
-      : account.balance_not_reconcilied;
+      : (account.balance_not_reconcilied ?? 0);
 
     const renderRecoChip = (amount: number) => (
       <Chip

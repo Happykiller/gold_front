@@ -2,6 +2,8 @@ import { CODES } from '@src/common/codes';
 import { Inversify } from '@src/common/inversify';
 import { DeleteOperationUsecaseDto } from '@usecase/deleteOperation/deleteOperation.usecase.dto';
 import { DeleteOperationUsecaseModel } from '@usecase/deleteOperation/deleteOperation.usecase.model';
+import { GraphqlResponse } from '@service/graphql/graphql.response';
+import { DeleteOperationMutation } from '@src/gql/graphql';
 
 export class DeleteOperationUsecase {
   constructor(private inversify: Inversify) {}
@@ -10,19 +12,16 @@ export class DeleteOperationUsecase {
     dto: DeleteOperationUsecaseDto,
   ): Promise<DeleteOperationUsecaseModel> {
     try {
-      const response: any = await this.inversify.graphqlService.send({
-        operationName: 'deleteOperation',
-        variables: dto,
-        query: `mutation deleteOperation(
-            $operation_id: Int!
-          ) {
-            deleteOperation (
-              dto: {
-                operation_id: $operation_id
-              }
-            )
-          }`,
-      });
+      const response: GraphqlResponse<DeleteOperationMutation> =
+        await this.inversify.graphqlService.send({
+          operationName: 'deleteOperation',
+          variables: dto,
+          query: /* GraphQL */ `
+            mutation deleteOperation($operation_id: Int!) {
+              deleteOperation(dto: { operation_id: $operation_id })
+            }
+          `,
+        });
 
       if (response.errors) {
         throw new Error(response.errors[0].message);

@@ -17,8 +17,11 @@ export function formatAccounts(
     map.set(acc.id, {
       ...acc,
       children: [],
-      balance_reconcilied_aggregate: acc.balance_reconcilied,
-      balance_not_reconcilied_aggregate: acc.balance_not_reconcilied,
+      // Le schéma autorise un solde nul (compte sans opération) : sans ce
+      // repli sur 0, l'agrégation par la hiérarchie produirait des NaN qui se
+      // propageraient à tous les comptes parents.
+      balance_reconcilied_aggregate: acc.balance_reconcilied ?? 0,
+      balance_not_reconcilied_aggregate: acc.balance_not_reconcilied ?? 0,
     });
   });
 

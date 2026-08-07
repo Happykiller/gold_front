@@ -5,27 +5,12 @@ import { CODES } from '@src/common/codes';
 import { GetOperationsUsecaseModel } from '@usecase/getOperations/getOperations.usecase.model';
 import { GetAccountUsecaseModel } from '@usecase/getAccount/getAccount.usecase.model';
 
-export interface Operation {
-  id: number;
-  type_id: number;
-  status_id: number;
-  amount: number;
-  vat_rate?: number;
-  date: string;
-  account_id_dest?: number;
-  account_dest?: { label: string; id: number };
-  account?: { label: string; id: number };
-  third?: { label: string; id: number };
-  category?: { label: string; id: number };
-  description?: string;
-}
-
-export interface Account {
-  id: number;
-  label: string;
-  balance_reconcilied: number;
-  balance_not_reconcilied: number;
-}
+// Ces deux types décrivaient à la main ce que le hook reçoit, et avaient
+// divergé : `vat_rate` y était optionnel alors que le serveur le renvoie
+// toujours, et les soldes y étaient non nuls alors que le schéma les autorise
+// à l'être. Les dériver du retour des usecases rend la divergence impossible.
+export type Account = NonNullable<GetAccountUsecaseModel['data']>;
+export type Operation = NonNullable<GetOperationsUsecaseModel['data']>[number];
 
 export function useAccountOperations(accountId: number, page: number) {
   const [account, setAccount] = useState<Account | null>(null);
@@ -93,20 +78,23 @@ export function useAccountOperations(accountId: number, page: number) {
         if (action === 'reconcile') {
           // Move amount from "from" to the other balance
           if (from === 'reconciled') {
-            next.balance_reconcilied -= delta;
-            next.balance_not_reconcilied += delta;
+            next.balance_reconcilied = (next.balance_reconcilied ?? 0) - delta;
+            next.balance_not_reconcilied =
+              (next.balance_not_reconcilied ?? 0) + delta;
           } else {
-            next.balance_reconcilied += delta;
-            next.balance_not_reconcilied -= delta;
+            next.balance_reconcilied = (next.balance_reconcilied ?? 0) + delta;
+            next.balance_not_reconcilied =
+              (next.balance_not_reconcilied ?? 0) - delta;
           }
         }
 
         if (action === 'delete') {
           // Remove from current balance only
           if (from === 'reconciled') {
-            next.balance_reconcilied -= delta;
+            next.balance_reconcilied = (next.balance_reconcilied ?? 0) - delta;
           } else {
-            next.balance_not_reconcilied -= delta;
+            next.balance_not_reconcilied =
+              (next.balance_not_reconcilied ?? 0) - delta;
           }
         }
 

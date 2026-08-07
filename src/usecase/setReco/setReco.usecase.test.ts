@@ -24,7 +24,11 @@ describe('SetRecoUsecase', () => {
       query: string;
       variables: Record<string, unknown>;
     };
-    expect(sent.operationName).toBe('updateOperation');
+    // L'opération s'appelait elle aussi « updateOperation », en collision avec
+    // celle de UpdateOperationUsecase : deux documents distincts sous le même
+    // nom, ce que le codegen refuse. Seul le libellé du document change, le
+    // resolver appelé reste bien `updateOperation`.
+    expect(sent.operationName).toBe('setOperationReconciled');
     expect(sent.query).toContain('status_id: 2');
     expect(sent.variables.operation_id).toBe(42);
   });

@@ -1,34 +1,10 @@
-export interface OperationUsecaseModel {
-  id: number;
-  account_id: number;
-  account: {
-    id: number;
-    label: string;
-  };
-  account_id_dest: number;
-  account_dest: {
-    id: number;
-    label: string;
-  };
-  amount: number;
-  vat_rate?: number;
-  date: string;
-  status_id: number;
-  type_id: number;
-  third_id: number;
-  third: {
-    id: number;
-    label: string;
-  };
-  category_id: number;
-  category: {
-    id: number;
-    label: string;
-  };
-  description: string;
-  active: boolean;
-  creator_id: number;
-  creation_date: string;
-  modificator_id: number;
-  modification_date: string;
-}
+import { OperationsQuery } from '@src/gql/graphql';
+
+/**
+ * Une opération, telle que la requête `operations` la renvoie.
+ *
+ * Dérivé du type généré par le codegen : la version manuscrite déclarait des
+ * champs que la requête ne demande pas, et rendait obligatoires des champs
+ * que le schéma autorise à être nuls.
+ */
+export type OperationUsecaseModel = OperationsQuery['operations'][number];

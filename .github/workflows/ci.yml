@@ -24,6 +24,12 @@ jobs:
 
       - run: npm run lint
 
+      # Confronte les requêtes écrites à la main au schéma du serveur, et
+      # échoue si les types versionnés ne correspondent plus. C'est ce qui
+      # transforme une dérive de l'API en erreur de CI, au lieu d'une page
+      # blanche découverte en production.
+      - run: npm run codegen:check
+
       - run: npm test
 
       # `build` enchaîne `tsc --noEmit` puis `vite build` : esbuild ne vérifie

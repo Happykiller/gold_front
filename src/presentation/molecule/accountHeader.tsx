@@ -111,7 +111,7 @@ export const AccountHeader: React.FC<Props> = ({
         <Grid size={{ xs: 12, sm: 6 }} textAlign="left">
           <Typography fontWeight={500} color="#23e47a">
             Balance reconciled:{' '}
-            {account.balance_reconcilied.toLocaleString('fr-FR', {
+            {(account.balance_reconcilied ?? 0).toLocaleString('fr-FR', {
               minimumFractionDigits: 2,
             })}{' '}
             €
@@ -120,7 +120,7 @@ export const AccountHeader: React.FC<Props> = ({
         <Grid size={{ xs: 12, sm: 6 }} textAlign="right">
           <Typography fontWeight={500} color="#28abe1">
             Balance not reconciled:{' '}
-            {account.balance_not_reconcilied.toLocaleString('fr-FR', {
+            {(account.balance_not_reconcilied ?? 0).toLocaleString('fr-FR', {
               minimumFractionDigits: 2,
             })}{' '}
             €

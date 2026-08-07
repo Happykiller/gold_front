@@ -1,14 +1,11 @@
-export interface AccountUsecaseModel {
-  id: number;
-  type_id: number;
-  parent_account_id: number;
-  label: string;
-  description: string;
-  balance_reconcilied: number;
-  balance_not_reconcilied: number;
-  active: boolean;
-  creator_id: number;
-  creation_date: string;
-  modificator_id: number;
-  modification_date: string;
-}
+import { AccountsQuery } from '@src/gql/graphql';
+
+/**
+ * Un compte, tel que la requête `accounts` le renvoie réellement.
+ *
+ * Dérivé du type généré plutôt que réécrit à la main : la version manuscrite
+ * déclarait `active`, jamais demandé par la requête, et donnait pour non
+ * nullables des champs que le schéma autorise à l'être. Le code croyait donc
+ * disposer de données absentes à l'exécution.
+ */
+export type AccountUsecaseModel = AccountsQuery['accounts'][number];
