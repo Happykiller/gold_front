@@ -47,21 +47,12 @@ export default tseslint.config(
       ],
     },
   },
-  // Fichiers de configuration : contexte Node, pas navigateur.
-  // webpack.config.js est en CommonJS — `require` y est légitime. Ce bloc
-  // disparaîtra avec lui lors du passage à Vite.
+  // Fichiers de configuration : ils s'exécutent sous Node, pas dans le
+  // navigateur, et manipulent process.env.
   {
-    files: ['*.config.{js,cjs,mjs,ts}', 'codegen.ts'],
+    files: ['*.config.{js,mjs,ts}', 'codegen.ts'],
     languageOptions: {
       globals: globals.node,
-      sourceType: 'commonjs',
-    },
-    rules: {
-      '@typescript-eslint/no-require-imports': 'off',
-      '@typescript-eslint/no-unused-vars': [
-        'error',
-        { argsIgnorePattern: '^_|^env$|^argv$' },
-      ],
     },
   },
   prettierRecommended,

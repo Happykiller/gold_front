@@ -24,11 +24,10 @@ RUN npm run build
 # Start the server
 FROM nginx:alpine
 
-# Copy build artifacts
+# Copy build artifacts. Vite recopie déjà src/public (publicDir) à la racine de
+# dist/ : favicons, manifest PWA et logos. Un second COPY du dossier public,
+# comme du temps de Webpack, n'est plus nécessaire.
 COPY --from=build /usr/src/app/dist /usr/share/nginx/html
-
-# Copy the public folder (or specific files you need)
-COPY --from=build /usr/src/app/src/public /usr/share/nginx/html
 
 # Copy nginx configuration
 COPY ./nginx.conf /etc/nginx/conf.d/default.conf

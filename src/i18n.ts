@@ -28,7 +28,7 @@ const initI18n = async () => {
       resources,
       supportedLngs: ['en', 'fr'],
       fallbackLng: 'fr',
-      debug: process.env.NODE_ENV === 'development',
+      debug: import.meta.env.DEV,
       interpolation: {
         escapeValue: false,
       },

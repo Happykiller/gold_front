@@ -7,10 +7,14 @@ class Config {
   local_storage_name: string;
 
   constructor() {
-    this.mode = process.env.APP_MODE ?? 'dev';
-    this.port = process.env.APP_PORT ?? '8080';
-    this.api_url = process.env.API_URL ?? 'http://localhost:3000/graphql';
-    this.debug = Boolean(process.env.APP_DEBUG) || false;
+    // Injectées au build par Vite depuis .env puis .env.local (cf. vite.config.ts,
+    // envPrefix). Attention : `mode` ne vaut 'dev' ou 'prod' que si APP_MODE le
+    // dit — toute autre valeur bascule l'application sur le service GraphQL
+    // factice (cf. src/common/inversify.ts).
+    this.mode = import.meta.env.APP_MODE ?? 'dev';
+    this.port = import.meta.env.APP_PORT ?? '8080';
+    this.api_url = import.meta.env.API_URL ?? 'http://localhost:3000/graphql';
+    this.debug = Boolean(import.meta.env.APP_DEBUG) || false;
     this.local_storage_name = 'gold-storage';
   }
 }

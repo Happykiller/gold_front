@@ -1,34 +1,43 @@
-
 {
   "compilerOptions": {
-    "target": "es6",                             // Use modern JavaScript features
-    "module": "esnext",                          // Enable tree-shaking for Webpack
-    "lib": ["dom", "esnext"],                    // Include DOM and latest JavaScript features
-    "strict": true,                              // Enable all strict type-checking options
-    "jsx": "react-jsx",                          // Use the new JSX transform (React 17+)
-    "moduleResolution": "node",                  // Resolve modules like Node.js
-    "esModuleInterop": true,                     // Enable interoperability between CommonJS and ES Modules
-    "skipLibCheck": false,                       // Enable strict type checking for libraries
-    "forceConsistentCasingInFileNames": true,    // Ensure consistent casing in file names
-    "outDir": "./dist",                          // Output directory for compiled files
-    "baseUrl": "./",                             // Base directory for resolving non-relative module names
+    "target": "ES2022",
+    "module": "ESNext",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "strict": true,
+    "jsx": "react-jsx",
+
+    // Vite résout les modules comme un bundler, pas comme Node.
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
+    "useDefineForClassFields": true,
+
+    // C'est esbuild qui transpile ; TypeScript ne sert plus qu'à vérifier les
+    // types (`npm run build` lance `tsc --noEmit` avant `vite build`).
+    "noEmit": true,
+
+    // Types de l'environnement Vite : import.meta.env, import de fichiers .svg…
+    "types": ["vite/client"],
+
+    "skipLibCheck": false,
+
+    "baseUrl": ".",
     "paths": {
       "@src/*": ["src/*"],
       "@presentation/*": ["src/presentation/*"],
       "@usecase/*": ["src/usecase/*"],
       "@service/*": ["src/service/*"],
-      "@pages/*": ["src/pages/*"], 
-      "@components/*": ["src/presentation/*"], 
+      "@pages/*": ["src/pages/*"],
+      "@components/*": ["src/presentation/*"],
       "@usecases/*": ["src/usecase/*"],
       "@services/*": ["src/service/*"],
       "@stores/*": ["src/stores/*"]
-    },
-    "sourceMap": true,                           // Generate source maps for debugging
-    "declaration": true,                         // Generate declaration files (.d.ts)
-    "resolveJsonModule": true,                   // Allow importing JSON files as modules
-    "allowSyntheticDefaultImports": true,       // Allow default imports from modules with no default export
-    "useDefineForClassFields": true             // Ensure class fields follow modern spec
+    }
   },
-  "include": ["src"],                            // Include source files for compilation
-  "exclude": ["node_modules", "dist"]            // Exclude directories
+  "include": ["src", "vite.config.ts"],
+  "exclude": ["node_modules", "dist"]
 }

@@ -19,7 +19,7 @@ export function FooterExt() {
   return (
     <Footer
       systemInfoUsecase={inversify.systemInfoUsecase}
-      frontVersion={process.env.VERSION ?? '1.0.0'}
+      frontVersion={import.meta.env.VERSION ?? '1.0.0'}
       issuesUrl="https://github.com/Happykiller/gold_front/issues"
       projectUrl="https://github.com/users/Happykiller/projects/2/views/1"
       mailto="fabrice.rosito@gmail.com"

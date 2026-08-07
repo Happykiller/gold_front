@@ -3,8 +3,10 @@ node_modules
 npm-debug.log
 yarn-error.log
 
-# Build output
+# Build output — dist est reconstruit dans l'image ; l'envoyer dans le contexte
+# ne ferait qu'alourdir le transfert, avec en prime une configuration locale.
 build
+dist
 
 # TypeScript specific
 *.tsbuildinfo
