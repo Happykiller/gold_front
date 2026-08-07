@@ -53,11 +53,14 @@ export const Graphic: React.FC = () => {
 
   const ITEM_HEIGHT = 48;
   const ITEM_PADDING_TOP = 8;
+  // MUI 9 : PaperProps est remplacé par slotProps.paper.
   const MenuProps = {
-    PaperProps: {
-      style: {
-        maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-        width: 250,
+    slotProps: {
+      paper: {
+        style: {
+          maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+          width: 250,
+        },
       },
     },
   };
@@ -200,12 +203,20 @@ export const Graphic: React.FC = () => {
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
-      <Box p={3}>
+      <Box sx={{ p: 3 }}>
         <Typography variant="h4" gutterBottom>
           {t('graphic.title')}
         </Typography>
 
-        <Box mb={3} display="flex" gap={2} flexWrap="wrap" alignItems="center">
+        <Box
+          sx={{
+            mb: 3,
+            display: 'flex',
+            gap: 2,
+            flexWrap: 'wrap',
+            alignItems: 'center',
+          }}
+        >
           <FormControl sx={{ m: 1, width: 300 }}>
             <InputLabel id="accounts-label">{t('graphic.accounts')}</InputLabel>
             <Select

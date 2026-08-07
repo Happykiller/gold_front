@@ -43,7 +43,7 @@ export const AccountHeader: React.FC<Props> = ({
 
   if (loading)
     return (
-      <Box display="flex" justifyContent="center">
+      <Box sx={{ display: 'flex', justifyContent: 'center' }}>
         <CircularProgress size={32} />
       </Box>
     );
@@ -52,36 +52,41 @@ export const AccountHeader: React.FC<Props> = ({
 
   return (
     <Box
-      mb={2}
-      mt={2}
-      width="100%"
-      maxWidth={950}
-      mx="auto"
-      px={{ xs: 1, sm: 2, md: 0 }}
+      sx={{
+        px: { xs: 1, sm: 2, md: 0 },
+        mb: 2,
+        mt: 2,
+        width: '100%',
+        maxWidth: 950,
+        mx: 'auto',
+      }}
     >
       <Grid
         container
-        alignItems="center"
-        justifyContent="space-between"
         spacing={2}
+        sx={{ alignItems: 'center', justifyContent: 'space-between' }}
       >
         {/* Titre + actions à droite */}
-        <Grid size={{ xs: 12, sm: 5 }} display="flex" alignItems="center">
+        <Grid
+          size={{ xs: 12, sm: 5 }}
+          sx={{ display: 'flex', alignItems: 'center' }}
+        >
           <Typography
             variant="h4"
-            fontWeight={700}
             color="grey.100"
-            sx={{ flex: 1 }}
+            sx={{ fontWeight: 700, flex: 1 }}
           >
             {account.label}
           </Typography>
         </Grid>
         <Grid
           size={{ xs: 12, sm: 7 }}
-          display="flex"
-          justifyContent="flex-end"
-          alignItems="center"
-          gap={2}
+          sx={{
+            display: 'flex',
+            justifyContent: 'flex-end',
+            alignItems: 'center',
+            gap: 2,
+          }}
         >
           {isDesktop && (
             <Tooltip title="Ouvrir la calculatrice">
@@ -103,13 +108,15 @@ export const AccountHeader: React.FC<Props> = ({
       {/* Balances sur une seule ligne */}
       <Grid
         container
-        alignItems="center"
-        justifyContent="space-between"
-        mt={1}
-        mb={1}
+        sx={{
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          mt: 1,
+          mb: 1,
+        }}
       >
-        <Grid size={{ xs: 12, sm: 6 }} textAlign="left">
-          <Typography fontWeight={500} color="#23e47a">
+        <Grid size={{ xs: 12, sm: 6 }} sx={{ textAlign: 'left' }}>
+          <Typography color="#23e47a" sx={{ fontWeight: 500 }}>
             Balance reconciled:{' '}
             {(account.balance_reconcilied ?? 0).toLocaleString('fr-FR', {
               minimumFractionDigits: 2,
@@ -117,8 +124,8 @@ export const AccountHeader: React.FC<Props> = ({
             €
           </Typography>
         </Grid>
-        <Grid size={{ xs: 12, sm: 6 }} textAlign="right">
-          <Typography fontWeight={500} color="#28abe1">
+        <Grid size={{ xs: 12, sm: 6 }} sx={{ textAlign: 'right' }}>
+          <Typography color="#28abe1" sx={{ fontWeight: 500 }}>
             Balance not reconciled:{' '}
             {(account.balance_not_reconcilied ?? 0).toLocaleString('fr-FR', {
               minimumFractionDigits: 2,
@@ -128,7 +135,14 @@ export const AccountHeader: React.FC<Props> = ({
         </Grid>
       </Grid>
       {/* Pagination */}
-      <Box display="flex" alignItems="center" justifyContent="center" mt={1}>
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          mt: 1,
+        }}
+      >
         <IconButton
           size="small"
           disabled={page === 0}
@@ -136,7 +150,7 @@ export const AccountHeader: React.FC<Props> = ({
         >
           <ArrowBackIosIcon />
         </IconButton>
-        <Typography mx={2} fontWeight={500} color="grey.200">
+        <Typography color="grey.200" sx={{ mx: 2, fontWeight: 500 }}>
           Page {page + 1}
         </Typography>
         <IconButton size="small" onClick={() => setPage(page + 1)}>

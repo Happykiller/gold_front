@@ -80,10 +80,12 @@ export const Clone = () => {
 
   return (
     <Box
-      display="flex"
-      justifyContent="center"
-      alignItems="center"
-      sx={{ px: 2 }}
+      sx={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        px: 2,
+      }}
     >
       <Box
         sx={{
@@ -103,20 +105,18 @@ export const Clone = () => {
       >
         <Typography
           variant="h6"
-          fontWeight={700}
-          textAlign="center"
-          mb={2}
           color="text.primary"
+          sx={{ fontWeight: 700, textAlign: 'center', mb: 2 }}
         >
           <Trans>clone.title</Trans>
         </Typography>
 
         {qry.loading ? (
-          <Typography textAlign="center" color="text.secondary">
+          <Typography color="text.secondary" sx={{ textAlign: 'center' }}>
             <Trans>common.loading</Trans>
           </Typography>
         ) : qry.error ? (
-          <Typography textAlign="center" color="error.main">
+          <Typography color="error.main" sx={{ textAlign: 'center' }}>
             <Trans>createVir.{qry.error}</Trans>
           </Typography>
         ) : (
@@ -137,7 +137,7 @@ export const Clone = () => {
                   onChange={(e: any) => setCurrentAccount(e.target.value)}
                 />
               </Grid>
-              <Grid size={12} textAlign="center">
+              <Grid size={12} sx={{ textAlign: 'center' }}>
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                   <DatePicker
                     format="DD/MM/YYYY"
@@ -147,7 +147,7 @@ export const Clone = () => {
                   />
                 </LocalizationProvider>
               </Grid>
-              <Grid size={12} textAlign="center">
+              <Grid size={12} sx={{ textAlign: 'center' }}>
                 <Button
                   type="submit"
                   variant="contained"

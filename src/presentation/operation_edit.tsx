@@ -115,7 +115,7 @@ export const EditOperation = () => {
 
   if (qry.loading) {
     return (
-      <Typography textAlign="center">
+      <Typography sx={{ textAlign: 'center' }}>
         <Trans>common.loading</Trans>
       </Typography>
     );
@@ -123,7 +123,7 @@ export const EditOperation = () => {
 
   if (qry.error) {
     return (
-      <Typography textAlign="center" color="error.main">
+      <Typography color="error.main" sx={{ textAlign: 'center' }}>
         <Trans>editOperation.{qry.error}</Trans>
       </Typography>
     );
@@ -131,10 +131,12 @@ export const EditOperation = () => {
 
   return (
     <Box
-      display="flex"
-      justifyContent="center"
-      alignItems="center"
-      sx={{ px: 2 }}
+      sx={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        px: 2,
+      }}
     >
       <Box
         sx={{
@@ -153,7 +155,10 @@ export const EditOperation = () => {
           p: 3,
         }}
       >
-        <Typography variant="h6" fontWeight={700} textAlign="center" mb={2}>
+        <Typography
+          variant="h6"
+          sx={{ fontWeight: 700, textAlign: 'center', mb: 2 }}
+        >
           <Trans>editOperation.title</Trans>
         </Typography>
 
@@ -303,7 +308,7 @@ export const EditOperation = () => {
                   }
                 />
               </Grid>
-              <Grid size={12} textAlign="center">
+              <Grid size={12} sx={{ textAlign: 'center' }}>
                 <Button
                   type="submit"
                   variant="contained"

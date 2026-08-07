@@ -3,7 +3,7 @@ import {
   Add,
   Delete,
   Done,
-  HelpOutline,
+  HelpOutlined,
   Visibility,
   VisibilityOff,
   VpnKey,
@@ -18,7 +18,7 @@ export const ProfilePage: React.FC = () => (
     icons={{
       visibility: <Visibility fontSize="small" />,
       visibilityOff: <VisibilityOff fontSize="small" />,
-      help: <HelpOutline fontSize="small" />,
+      help: <HelpOutlined fontSize="small" />,
       done: <Done />,
       key: <VpnKey />,
       add: <Add />,

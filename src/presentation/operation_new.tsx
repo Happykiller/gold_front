@@ -102,10 +102,12 @@ export const OperationNew = () => {
 
   return (
     <Box
-      display="flex"
-      justifyContent="center"
-      alignItems="center"
-      sx={{ px: 2 }}
+      sx={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        px: 2,
+      }}
     >
       <Box
         sx={{
@@ -124,16 +126,19 @@ export const OperationNew = () => {
           p: 3,
         }}
       >
-        <Typography variant="h6" fontWeight={700} textAlign="center" mb={2}>
+        <Typography
+          variant="h6"
+          sx={{ fontWeight: 700, textAlign: 'center', mb: 2 }}
+        >
           <Trans>operation_create.title</Trans>
         </Typography>
 
         {qry.loading ? (
-          <Typography textAlign="center">
+          <Typography sx={{ textAlign: 'center' }}>
             <Trans>common.loading</Trans>
           </Typography>
         ) : qry.error ? (
-          <Typography textAlign="center" color="error.main">
+          <Typography color="error.main" sx={{ textAlign: 'center' }}>
             <Trans>operation_create.{qry.error}</Trans>
           </Typography>
         ) : (
@@ -293,7 +298,7 @@ export const OperationNew = () => {
                   }
                 />
               </Grid>
-              <Grid size={12} textAlign="center">
+              <Grid size={12} sx={{ textAlign: 'center' }}>
                 <Button
                   type="submit"
                   variant="contained"

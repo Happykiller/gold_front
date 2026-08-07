@@ -127,7 +127,7 @@ export const CreateVir = () => {
   }, [currentAccountDest]);
 
   const renderLinkedOperations = (
-    <Grid size={12} container spacing={1} justifyContent="center">
+    <Grid size={12} container spacing={1} sx={{ justifyContent: 'center' }}>
       {selectedOperations.map((operation) => (
         <Grid key={operation.id}>
           <Button
@@ -181,11 +181,11 @@ export const CreateVir = () => {
 
   return (
     <Box
-      display="flex"
-      justifyContent="center"
-      alignItems="center"
-      minHeight="100vh"
       sx={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        minHeight: '100vh',
         px: 2,
       }}
     >
@@ -207,20 +207,18 @@ export const CreateVir = () => {
       >
         <Typography
           variant="h6"
-          fontWeight={700}
-          textAlign="center"
-          mb={2}
           color="text.primary"
+          sx={{ fontWeight: 700, textAlign: 'center', mb: 2 }}
         >
           <Trans>createVir.title</Trans>
         </Typography>
 
         {qry.loading ? (
-          <Typography textAlign="center" color="text.secondary">
+          <Typography color="text.secondary" sx={{ textAlign: 'center' }}>
             <Trans>common.loading</Trans>
           </Typography>
         ) : qry.error ? (
-          <Typography textAlign="center" color="error.main">
+          <Typography color="error.main" sx={{ textAlign: 'center' }}>
             <Trans>createVir.{qry.error}</Trans>
           </Typography>
         ) : (
@@ -316,13 +314,13 @@ export const CreateVir = () => {
               <Grid size={6}>{listOperations}</Grid>
               {renderLinkedOperations}
               {sum > 0 && (
-                <Grid size={12} textAlign="center">
+                <Grid size={12} sx={{ textAlign: 'center' }}>
                   <Typography variant="subtitle2" color="primary">
                     {sum} €
                   </Typography>
                 </Grid>
               )}
-              <Grid size={12} textAlign="center">
+              <Grid size={12} sx={{ textAlign: 'center' }}>
                 <Button
                   type="submit"
                   variant="contained"

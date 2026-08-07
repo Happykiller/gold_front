@@ -99,7 +99,7 @@ export const FloatingCalculator: React.FC = () => {
         </IconButton>
       </Box>
 
-      <Box p={2}>
+      <Box sx={{ p: 2 }}>
         {operations.length === 0 ? (
           <Typography variant="body2" color="text.secondary">
             Aucune opération. Cliquez sur une ligne pour en ajouter.
@@ -111,28 +111,34 @@ export const FloatingCalculator: React.FC = () => {
               return (
                 <Typography
                   key={idx}
-                  fontFamily="monospace"
-                  sx={{ color, display: 'flex', alignItems: 'center' }}
+                  sx={{
+                    fontFamily: 'monospace',
+                    color,
+                    display: 'flex',
+                    alignItems: 'center',
+                  }}
                 >
                   {value}
                 </Typography>
               );
             })}
             <Box
-              mt={2}
-              display="flex"
-              justifyContent="space-between"
-              alignItems="center"
+              sx={{
+                mt: 2,
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+              }}
             >
-              <Typography fontWeight={700}>Total</Typography>
-              <Typography fontWeight={700}>
+              <Typography sx={{ fontWeight: 700 }}>Total</Typography>
+              <Typography sx={{ fontWeight: 700 }}>
                 {total.toLocaleString('fr-FR', { minimumFractionDigits: 2 })} €
               </Typography>
             </Box>
           </Box>
         )}
 
-        <Box mt={2} display="flex" justifyContent="flex-end">
+        <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
           <IconButton size="small" onClick={reset}>
             <DeleteSweepIcon fontSize="small" />
           </IconButton>

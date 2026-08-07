@@ -156,11 +156,14 @@ export const Ventilation = () => {
 
   return (
     <Box
-      display="flex"
-      justifyContent="center"
-      alignItems="center"
-      minHeight="100vh"
-      sx={{ px: 2, py: 4 }}
+      sx={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        minHeight: '100vh',
+        px: 2,
+        py: 4,
+      }}
     >
       <Box
         sx={{
@@ -178,16 +181,14 @@ export const Ventilation = () => {
       >
         <Typography
           variant="h6"
-          fontWeight={700}
-          textAlign="center"
-          mb={2}
           color="text.primary"
+          sx={{ fontWeight: 700, textAlign: 'center', mb: 2 }}
         >
           <Trans>ventilation.title</Trans>
         </Typography>
 
         {loading ? (
-          <Typography textAlign="center" color="text.secondary">
+          <Typography color="text.secondary" sx={{ textAlign: 'center' }}>
             <Trans>common.loading</Trans>
           </Typography>
         ) : (
@@ -268,7 +269,7 @@ export const Ventilation = () => {
                   pt: 2,
                 }}
               >
-                <Typography variant="subtitle1" fontWeight={600} mb={2}>
+                <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2 }}>
                   Destinations
                 </Typography>
 
@@ -277,8 +278,7 @@ export const Ventilation = () => {
                     container
                     spacing={2}
                     key={dest.id}
-                    alignItems="center"
-                    mb={2}
+                    sx={{ alignItems: 'center', mb: 2 }}
                   >
                     <Grid size={4}>
                       <AccountsSelect
@@ -353,7 +353,7 @@ export const Ventilation = () => {
               </Grid>
 
               {/* Total Calculation Display */}
-              <Grid size={12} textAlign="center" mt={2}>
+              <Grid size={12} sx={{ textAlign: 'center', mt: 2 }}>
                 <Typography
                   variant="h6"
                   color={
@@ -380,7 +380,7 @@ export const Ventilation = () => {
               </Grid>
 
               {/* Action Button */}
-              <Grid size={12} textAlign="center">
+              <Grid size={12} sx={{ textAlign: 'center' }}>
                 <Button
                   type="submit"
                   variant="contained"

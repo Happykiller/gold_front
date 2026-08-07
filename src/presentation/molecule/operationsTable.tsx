@@ -58,7 +58,7 @@ export const OperationsTable: React.FC<Props> = ({
 
   if (loading)
     return (
-      <Box display="flex" justifyContent="center">
+      <Box sx={{ display: 'flex', justifyContent: 'center' }}>
         <CircularProgress size={32} />
       </Box>
     );
@@ -182,7 +182,7 @@ export const OperationsTable: React.FC<Props> = ({
               justifyContent: 'center',
             }}
           >
-            <Typography color="#fff" fontSize={15}>
+            <Typography color="#fff" sx={{ fontSize: 15 }}>
               {col.label}
             </Typography>
           </Grid>
@@ -194,13 +194,13 @@ export const OperationsTable: React.FC<Props> = ({
           container
           key={operation.id}
           sx={{
+            alignItems: 'center',
             minHeight: 44,
             borderBottom: '1px solid #222638',
             background: 'none',
             '&:hover': { backgroundColor: 'rgba(90,100,130,0.12)' },
             cursor: isXs ? 'pointer' : open ? 'copy' : 'default',
           }}
-          alignItems="center"
           onClick={() => {
             if (isXs) {
               onEditOperation?.(operation);
@@ -286,7 +286,7 @@ export const OperationsTable: React.FC<Props> = ({
                     minWidth: 0,
                   }}
                 >
-                  <Typography noWrap fontWeight={600} sx={{ color }}>
+                  <Typography noWrap sx={{ fontWeight: 600, color }}>
                     {getOperationIcon(sign === '-' ? -1 : 1)}
                     {value}
                   </Typography>
@@ -347,8 +347,7 @@ export const OperationsTable: React.FC<Props> = ({
             <Typography
               noWrap
               color="#b7d6ff"
-              ml={0.4}
-              sx={{ display: { xs: 'none', sm: 'inline' } }}
+              sx={{ ml: 0.4, display: { xs: 'none', sm: 'inline' } }}
             >
               <Trans>{operation.category?.label || ''}</Trans>
             </Typography>

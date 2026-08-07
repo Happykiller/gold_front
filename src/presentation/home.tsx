@@ -10,7 +10,7 @@ export const Home: React.FC = () => {
 
   if (loading) {
     return (
-      <Box display="flex" justifyContent="center">
+      <Box sx={{ display: 'flex', justifyContent: 'center' }}>
         <CircularProgress />
       </Box>
     );
