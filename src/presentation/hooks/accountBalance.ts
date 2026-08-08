@@ -25,19 +25,6 @@ import type { AccountUsecaseModel as Account } from '@usecase/model/account.usec
  */
 
 /**
- * Somme des opérations en attente de pointage.
- *
- * Dérivée, jamais stockée : aucun champ de l'API ne la porte, et le nombre
- * d'opérations concernées n'est exposé nulle part — c'est pourquoi l'en-tête
- * affiche un montant sans compteur.
- */
-export function pendingBalance(account: Account): number {
-  return (
-    (account.balance_not_reconcilied ?? 0) - (account.balance_reconcilied ?? 0)
-  );
-}
-
-/**
  * Pointage d'une opération : elle entre dans le solde pointé et **le solde
  * projeté ne bouge pas**, puisqu'il la comptait déjà.
  *

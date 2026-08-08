@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { applyDelete, applyReconcile, pendingBalance } from './accountBalance';
+import { applyDelete, applyReconcile } from './accountBalance';
 import type { AccountUsecaseModel } from '@usecase/model/account.usecase.model';
 
 /**
@@ -14,33 +14,6 @@ const account = (reconcilied: number | null, notReconcilied: number | null) =>
     balance_reconcilied: reconcilied,
     balance_not_reconcilied: notReconcilied,
   }) as unknown as AccountUsecaseModel;
-
-describe('pendingBalance', () => {
-  it('soustrait le solde pointé du solde projeté', () => {
-    // 1 141,48 pointé sur 451,06 projeté → 690,42 encore en attente, au débit.
-    expect(pendingBalance(account(1141.48, 451.06))).toBeCloseTo(-690.42, 2);
-  });
-
-  it('vaut 0 quand les deux soldes sont nuls', () => {
-    // Un compte sans opération n'a aucun solde : le schéma les autorise à être
-    // `null`, et l'affichage doit les lire comme des zéros.
-    //
-    // Ce cas ne prouve pas les `?? 0` : en JS `null - null` vaut déjà 0. Il
-    // fige le contrat, pas l'implémentation — c'est le cas suivant qui mord.
-    expect(pendingBalance(account(null, null))).toBe(0);
-  });
-
-  it('vaut 0 plutôt que NaN quand un solde est absent de la réponse', () => {
-    // Le codegen déclare ces champs présents, mais le serveur peut ne renvoyer
-    // que des `errors` et une donnée partielle. `undefined - 0` vaut NaN, et un
-    // NaN traverse tout l'affichage sans lever quoi que ce soit.
-    const partial = {
-      balance_reconcilied: 0,
-    } as unknown as AccountUsecaseModel;
-
-    expect(pendingBalance(partial)).toBe(0);
-  });
-});
 
 describe('applyReconcile', () => {
   it('diminue le solde pointé quand on pointe un débit', () => {

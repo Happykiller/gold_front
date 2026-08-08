@@ -16,9 +16,8 @@ import {
 
 import { useCalculatorStore } from '../../stores/useCalculatorStore';
 import { Account } from '@presentation/hooks/useAccountOperations';
-import { pendingBalance } from '@presentation/hooks/accountBalance';
 import { formatEuroAmount } from '@presentation/molecule/operationDisplay';
-import { LINE, MONO_FONT, SURFACE, TEXT } from '@src/theme/tokens';
+import { AMOUNT, LINE, MONO_FONT, SURFACE, TEXT } from '@src/theme/tokens';
 import {
   ACCOUNT_HEADER_HEIGHT,
   ACCOUNT_MAX_WIDTH,
@@ -85,8 +84,7 @@ type Props = {
 const BalanceChip: React.FC<{
   amount: number;
   label: string;
-  highlighted?: boolean;
-}> = ({ amount, label, highlighted }) => (
+}> = ({ amount, label }) => (
   <Box
     sx={(theme) => ({
       display: 'flex',
@@ -94,21 +92,24 @@ const BalanceChip: React.FC<{
       gap: '7px',
       padding: '3px 9px',
       borderRadius: `${theme.radius.sm}px`,
-      background: highlighted ? 'rgba(244, 183, 0, 0.1)' : SURFACE.chip,
+      background: SURFACE.chip,
       whiteSpace: 'nowrap',
     })}
   >
     <Typography
       component="span"
-      sx={(theme) => ({
+      sx={{
         fontFamily: MONO_FONT,
         fontWeight: 500,
         fontSize: 13,
         lineHeight: 1,
         // Toute couleur passe par `sx` : la prop `color` de MUI n'accepte que
         // des clés de palette et n'applique rien, en silence, sur un hexa.
-        color: highlighted ? theme.palette.primary.main : TEXT.title,
-      })}
+        //
+        // Un solde négatif se signale ; l'or reste réservé à l'action et à
+        // l'état « en attente », il n'a rien à faire sur un solde.
+        color: amount < 0 ? AMOUNT.debit : TEXT.title,
+      }}
     >
       {formatEuroAmount(amount)}
     </Typography>
@@ -193,20 +194,21 @@ export const AccountHeader: React.FC<Props> = ({
         {account.label}
       </Typography>
 
+      {/*
+       * Les deux soldes que le produit compare en permanence : ce qui est
+       * prévu, et ce que la banque a validé.
+       *
+       * `balance_not_reconcilied` porte mal son nom — la fonction SQL
+       * `getBalance` l'agrège sur les statuts 1 **et** 2, c'est donc le solde
+       * total projeté, pas le reste à pointer.
+       */}
+      <BalanceChip
+        amount={account.balance_not_reconcilied ?? 0}
+        label={t('account.balance.total')}
+      />
       <BalanceChip
         amount={account.balance_reconcilied ?? 0}
         label={t('account.balance.reconciled')}
-      />
-      {/*
-       * Un montant sans compteur : l'API n'expose ni total ni agrégat de
-       * comptage, et la liste se charge par lots. Un nombre compté sur les
-       * lignes déjà chargées ne concorderait jamais avec ce montant, qui est
-       * global et exact.
-       */}
-      <BalanceChip
-        amount={pendingBalance(account)}
-        label={t('account.balance.pending')}
-        highlighted
       />
 
       {search && (

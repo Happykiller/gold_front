@@ -5,7 +5,7 @@
   "account": {
     "add-operation": "New operation",
     "balance": {
-      "pending": "pending",
+      "total": "total",
       "reconciled": "reconciled"
     },
     "calculator": "Open the calculator",
@@ -96,7 +96,6 @@
     "account_dest": "Destination",
     "action-delete": "Delete",
     "action-edit": "Edit",
-    "action-reconcile": "Reconcile",
     "amount": "Amount",
     "category": "Category",
     "category-other": "Other",

@@ -30,15 +30,21 @@ describe('AccountHeader', () => {
     expect(screen.getByText('1 141,48 €')).toBeInTheDocument();
   });
 
-  it('affiche en attente la différence entre le total projeté et le pointé', () => {
-    // `balance_not_reconcilied` est le solde **total** (statuts 1 et 2), pas la
-    // somme des non-pointées : l'afficher tel quel — ce que faisait l'ancien
-    // en-tête sous le libellé « Balance not reconciled » — donne un chiffre qui
-    // ne veut rien dire à cette place.
+  it('affiche le solde total projeté', () => {
+    // `balance_not_reconcilied` porte mal son nom : la fonction SQL l'agrège
+    // sur les statuts 1 **et** 2. C'est le total, et c'est bien ce qu'on veut
+    // lire ici.
     setup();
 
-    expect(screen.getByText('-690,42 €')).toBeInTheDocument();
-    expect(screen.queryByText('451,06 €')).not.toBeInTheDocument();
+    expect(screen.getByText('451,06 €')).toBeInTheDocument();
+  });
+
+  it('signale un solde négatif sans recourir à l’or', () => {
+    // L'or est réservé à l'action et à l'état « en attente ». Un solde négatif
+    // se lit quand même d'un coup d'œil.
+    setup(account(-12.5, -30));
+
+    expect(screen.getByText('-12,50 €')).toHaveStyle({ color: '#F2635B' });
   });
 
   it('ne rend plus aucune phrase anglaise de solde', () => {
@@ -54,7 +60,7 @@ describe('AccountHeader', () => {
 
     // Les valeurs viennent de fr/translation.json, chargé par renderWithApp.
     expect(screen.getByText('pointé')).toBeInTheDocument();
-    expect(screen.getByText('en attente')).toBeInTheDocument();
+    expect(screen.getByText('total')).toBeInTheDocument();
   });
 
   it('lit deux soldes absents comme des zéros', () => {
