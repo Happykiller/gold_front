@@ -29,6 +29,8 @@ import { TEXT } from '@src/theme/tokens';
 import {
   Operation,
   OPERATIONS_PAGE_SIZE,
+  STATUS_RECONCILED,
+  TYPE_DEBIT,
 } from '@presentation/hooks/useAccountOperations';
 import { GetOperationsUsecaseModel } from '@usecase/getOperations/getOperations.usecase.model';
 import { CreateOperationUsecaseModel } from '@usecase/createOperation/createOperation.usecase.model';
@@ -106,6 +108,12 @@ export const CreateVir = () => {
         account_id: parseInt(currentAccountDest),
         limit: OPERATIONS_PAGE_SIZE,
         offset: 0,
+        // Les critères partent au **serveur**, et non après coup : la requête
+        // ramène un lot de 50, donc filtrer la liste reçue ne verrait que ce
+        // lot-là et pourrait ne rien en garder. On lie une dépense déjà
+        // validée par la banque, donc un débit pointé.
+        type_ids: [TYPE_DEBIT],
+        status_ids: [STATUS_RECONCILED],
       })
       .then((response: GetOperationsUsecaseModel) => {
         if (response.message === CODES.SUCCESS && response.data)
@@ -115,9 +123,10 @@ export const CreateVir = () => {
       .catch((err: Error) => inversify.loggerService.debug(err.message));
   }, [currentAccountDest, operations]);
 
+  // Seule exclusion restante côté client : ce qui est déjà lié. Elle ne peut
+  // pas partir au serveur, elle dépend de la saisie en cours.
   const linkable = (operations ?? []).filter(
     (operation) =>
-      operation.type_id === 2 &&
       !selectedOperations.some((selected) => selected.id === operation.id),
   );
 

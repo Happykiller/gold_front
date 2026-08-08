@@ -26,6 +26,11 @@ export type Operation = NonNullable<GetOperationsUsecaseModel['data']>[number];
 export const STATUS_FOLLOW = 1;
 export const STATUS_RECONCILED = 2;
 
+/** Types d'opération (même seed). Le virement porte deux comptes. */
+export const TYPE_CREDIT = 1;
+export const TYPE_DEBIT = 2;
+export const TYPE_TRANSFER = 3;
+
 /**
  * Taille d'un lot d'opérations, seul endroit où elle est écrite.
  *
