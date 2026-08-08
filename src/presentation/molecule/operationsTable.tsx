@@ -147,6 +147,8 @@ type RowProps = {
   focusable: boolean;
   onSelect: (op: Operation) => void;
   onPick: (op: Operation) => void;
+  /** Navigue vers l'autre compte d'un virement. */
+  onOpenAccount?: (accountId: number) => void;
   onEditOperation?: (op: Operation) => void;
   onDeleteOperation?: (op: Operation) => void;
   onRecoOperation?: (op: Operation) => void;
@@ -156,48 +158,47 @@ type RowProps = {
 const RowAction: React.FC<{
   label: string;
   shortcut?: string;
-  icon?: React.ReactNode;
-  accent?: boolean;
-  compact?: boolean;
+  icon: React.ReactNode;
   onClick: (event: React.MouseEvent) => void;
-}> = ({ label, shortcut, icon, accent, compact, onClick }) => (
-  <Box
-    component="button"
-    type="button"
-    aria-label={label}
-    onClick={onClick}
-    sx={(theme) => ({
-      height: 20,
-      px: '7px',
-      border: 'none',
-      cursor: 'pointer',
-      display: 'flex',
-      alignItems: 'center',
-      gap: '5px',
-      fontSize: 11,
-      fontFamily: 'inherit',
-      borderRadius: `${theme.radius.sm}px`,
-      background: accent ? 'rgba(52, 201, 123, 0.16)' : SURFACE.action,
-      color: accent ? AMOUNT.credit : TEXT.label,
-      '& .MuiSvgIcon-root': { fontSize: 13 },
-    })}
-  >
-    {icon}
-    {!compact && !icon && label}
-    {!compact && shortcut && (
-      <Box
-        component="span"
-        sx={{
-          fontFamily: MONO_FONT,
-          fontWeight: 500,
-          fontSize: 9.5,
-          opacity: 0.7,
-        }}
-      >
-        {shortcut}
-      </Box>
-    )}
-  </Box>
+}> = ({ label, shortcut, icon, onClick }) => (
+  <Tooltip title={label} placement="top">
+    <Box
+      component="button"
+      type="button"
+      aria-label={label}
+      onClick={onClick}
+      sx={(theme) => ({
+        height: 20,
+        px: '7px',
+        border: 'none',
+        cursor: 'pointer',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '5px',
+        fontSize: 11,
+        fontFamily: 'inherit',
+        borderRadius: `${theme.radius.sm}px`,
+        background: SURFACE.action,
+        color: TEXT.label,
+        '& .MuiSvgIcon-root': { fontSize: 13 },
+      })}
+    >
+      {icon}
+      {shortcut && (
+        <Box
+          component="span"
+          sx={{
+            fontFamily: MONO_FONT,
+            fontWeight: 500,
+            fontSize: 9.5,
+            opacity: 0.7,
+          }}
+        >
+          {shortcut}
+        </Box>
+      )}
+    </Box>
+  </Tooltip>
 );
 
 /**
@@ -219,6 +220,7 @@ const OperationRow = React.memo(function OperationRow({
   focusable,
   onSelect,
   onPick,
+  onOpenAccount,
   onEditOperation,
   onDeleteOperation,
   onRecoOperation,
@@ -268,6 +270,9 @@ const OperationRow = React.memo(function OperationRow({
         background: selected ? SURFACE.rowHover : undefined,
         '&:hover': { background: SURFACE.rowHover },
         '&:hover .op-row-desc': { color: TEXT.hover },
+        // Les actions **remplacent** le tiers au survol : les laisser se
+        // chevaucher donnait un « Débite… » tronqué derrière les boutons.
+        [`&:hover .op-row-third, &:focus-within .op-row-third`]: { opacity: 0 },
         ...(selected ? { '& .op-row-desc': { color: TEXT.hover } } : {}),
         // `focus-within` autant que `hover` : sans lui, une tabulation jusqu'aux
         // boutons les laisserait invisibles alors qu'ils ont le focus.
@@ -428,12 +433,31 @@ const OperationRow = React.memo(function OperationRow({
             <Box component="span" sx={{ color: TEXT.tertiary }}>
               {isIncomingTransfer ? '←' : '→'}
             </Box>
+            {/* Un virement porte deux comptes : l'autre bout est une
+                destination de navigation naturelle. */}
             <Box
-              component="span"
+              component="button"
+              type="button"
+              onClick={(e) => {
+                // Sans quoi le clic déclencherait aussi l'envoi de la ligne
+                // vers la calculatrice, ou l'édition sur mobile.
+                e.stopPropagation();
+                const target = isIncomingTransfer
+                  ? operation.account_id
+                  : operation.account_id_dest;
+                if (target != null) onOpenAccount?.(Number(target));
+              }}
               sx={{
+                p: 0,
+                border: 'none',
+                background: 'none',
+                font: 'inherit',
+                color: 'inherit',
+                cursor: 'pointer',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
                 whiteSpace: 'nowrap',
+                '&:hover': { textDecoration: 'underline' },
               }}
             >
               {isIncomingTransfer
@@ -446,7 +470,13 @@ const OperationRow = React.memo(function OperationRow({
 
       <Typography
         noWrap
-        sx={{ display: DISPLAY.third, fontSize: 11, color: TEXT.third }}
+        className="op-row-third"
+        sx={{
+          display: DISPLAY.third,
+          fontSize: 11,
+          color: TEXT.third,
+          transition: 'opacity 120ms ease-in-out',
+        }}
       >
         <Trans>{operation.third?.label || ''}</Trans>
       </Typography>
@@ -505,6 +535,10 @@ const OperationRow = React.memo(function OperationRow({
             onEditOperation?.(operation);
           }}
         />
+        {/* Pas de bouton « Pointer » ici : le glyphe de la colonne Statut porte
+            déjà l'action, et le raccourci ␣ est rappelé par la légende. Deux
+            chemins pour un même geste, c'est le doublon que la colonne Statut
+            avait justement supprimé. */}
         <RowAction
           label={t('operation.action-delete')}
           icon={<DeleteIcon />}
@@ -513,17 +547,6 @@ const OperationRow = React.memo(function OperationRow({
             onDeleteOperation?.(operation);
           }}
         />
-        {!isReconciled && !isXs && (
-          <RowAction
-            label={t('operation.action-reconcile')}
-            shortcut="␣"
-            accent
-            onClick={(e) => {
-              e.stopPropagation();
-              onRecoOperation?.(operation);
-            }}
-          />
-        )}
       </Box>
     </Box>
   );
@@ -541,6 +564,7 @@ type Props = {
   hasMore?: boolean;
   onLoadMore?: () => void;
   error: string | null;
+  onOpenAccount?: (accountId: number) => void;
   onEditOperation?: (op: Operation) => void;
   onDeleteOperation?: (op: Operation) => void;
   onRecoOperation?: (op: Operation) => void;
@@ -555,6 +579,7 @@ export const OperationsTable: React.FC<Props> = ({
   hasMore = false,
   onLoadMore,
   error,
+  onOpenAccount,
   onEditOperation,
   onDeleteOperation,
   onRecoOperation,
@@ -798,6 +823,7 @@ export const OperationsTable: React.FC<Props> = ({
               }
               onSelect={handleSelect}
               onPick={add}
+              onOpenAccount={onOpenAccount}
               onEditOperation={onEditOperation}
               onDeleteOperation={onDeleteOperation}
               onRecoOperation={onRecoOperation}

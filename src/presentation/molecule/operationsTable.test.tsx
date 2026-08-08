@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
@@ -10,6 +10,7 @@ vi.mock('@src/common/inversify', () => ({ default: {} }));
 
 import { OperationsTable } from './operationsTable';
 import { renderWithApp } from '@src/testing/renderWithApp';
+import { useCalculatorStore } from '@stores/useCalculatorStore';
 import type { Operation } from '@presentation/hooks/useAccountOperations';
 
 const CURRENT = 2;
@@ -31,11 +32,17 @@ const operation = (over: Partial<Operation> & { id: number }) =>
     ...over,
   }) as unknown as Operation;
 
+// Le store de la calculatrice est un singleton : sans remise à zéro, un test
+// qui l'ouvre laisserait les suivants en mode « alimenter la calculatrice ».
+const pristineCalculator = useCalculatorStore.getState();
+afterEach(() => useCalculatorStore.setState(pristineCalculator, true));
+
 const setup = (operations: Operation[]) => {
   const handlers = {
     onEditOperation: vi.fn(),
     onDeleteOperation: vi.fn(),
     onRecoOperation: vi.fn(),
+    onOpenAccount: vi.fn(),
   };
   renderWithApp(
     <OperationsTable
@@ -109,6 +116,62 @@ describe('OperationsTable — colonnes', () => {
     expect(within(rows[1]).getByText('→')).toBeInTheDocument();
   });
 
+  it('ouvre l’autre compte d’un virement émis au clic sur sa destination', () => {
+    const { onOpenAccount } = setup([
+      operation({
+        id: 1,
+        type_id: 3,
+        account_id_dest: 9,
+        account_dest: { id: 9, label: 'Épargne' },
+      } as Partial<Operation> & { id: number }),
+    ]);
+
+    screen.getByRole('button', { name: 'Épargne' }).click();
+
+    expect(onOpenAccount).toHaveBeenCalledWith(9);
+  });
+
+  it('ouvre le compte émetteur quand le virement est reçu', () => {
+    // Un virement est une écriture unique portant deux comptes : vu d'ici,
+    // l'autre bout est la source, pas la destination.
+    const { onOpenAccount } = setup([
+      operation({
+        id: 1,
+        type_id: 3,
+        account_id: 7,
+        account_id_dest: CURRENT,
+        account: { id: 7, label: 'Livret' },
+      } as Partial<Operation> & { id: number }),
+    ]);
+
+    screen.getByRole('button', { name: 'Livret' }).click();
+
+    expect(onOpenAccount).toHaveBeenCalledWith(7);
+  });
+
+  it('n’envoie pas la ligne à la calculatrice au clic sur la destination', async () => {
+    // Le clic est arrêté net. Sans cela, calculatrice ouverte, visiter le
+    // compte de destination y empilerait aussi l'opération au passage.
+    const add = vi.fn();
+    useCalculatorStore.setState({ open: true, add });
+    setup([
+      operation({
+        id: 1,
+        type_id: 3,
+        account_id_dest: 9,
+        account_dest: { id: 9, label: 'Épargne' },
+      } as Partial<Operation> & { id: number }),
+    ]);
+    const user = userEvent.setup();
+
+    await user.click(screen.getByRole('button', { name: 'Épargne' }));
+    expect(add).not.toHaveBeenCalled();
+
+    // Mais le clic sur la ligne elle-même, lui, alimente bien la calculatrice.
+    await user.click(screen.getByText('Opération 1'));
+    expect(add).toHaveBeenCalledTimes(1);
+  });
+
   it('traduit les en-têtes de colonnes au lieu de littéraux français en dur', () => {
     setup([operation({ id: 1 })]);
 
@@ -142,6 +205,29 @@ describe('OperationsTable — pointage', () => {
 
     glyph.click();
     expect(onRecoOperation).not.toHaveBeenCalled();
+  });
+
+  it('ne double pas le glyphe par un bouton d’action « Pointer »', () => {
+    // Le glyphe de la colonne Statut porte déjà l'action, et le raccourci est
+    // rappelé par la légende : un second chemin recréerait le doublon que
+    // cette colonne avait justement supprimé.
+    setup([operation({ id: 1, status_id: 1 })]);
+
+    expect(
+      screen.queryByRole('button', { name: 'Pointer' }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('explique ses boutons d’action au survol', async () => {
+    // Deux icônes nues ne disent pas ce qu'elles font. On vérifie l'infobulle
+    // qui s'ouvre, pas seulement le nom accessible : celui-ci resterait
+    // satisfait par un `aria-label` sans qu'aucune bulle n'apparaisse.
+    setup([operation({ id: 1 })]);
+    const user = userEvent.setup();
+
+    await user.hover(screen.getByRole('button', { name: 'Supprimer' }));
+
+    expect(await screen.findByRole('tooltip')).toHaveTextContent('Supprimer');
   });
 
   it('affiche la légende des deux états et le rappel du raccourci', () => {

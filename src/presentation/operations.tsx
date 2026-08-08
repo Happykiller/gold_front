@@ -118,6 +118,32 @@ export const Operations = () => {
     [removeOperation, removeBalances, accountId],
   );
 
+  /**
+   * L'autre bout d'un virement se visite d'un clic.
+   *
+   * Mémoïsée comme les autres : elle descend jusqu'à chaque ligne, qui est
+   * mémoïsée — une callback recréée à chaque rendu suffirait à annuler
+   * l'optimisation sur toute la liste accumulée.
+   */
+  const handleOpenAccount = React.useCallback(
+    (targetAccountId: number) => {
+      // Les critères suivent le changement de compte. Les laisser tomber de
+      // l'URL sans vider l'état les rendrait actifs mais invisibles : la liste
+      // resterait filtrée sans que rien ne l'explique.
+      const params: Record<string, string> = {
+        account_id: targetAccountId.toString(),
+      };
+      const serializedTokens = serializeTokens(tokens);
+      if (serializedTokens) params.q = serializedTokens;
+
+      navigate({
+        pathname: '/operations',
+        search: createSearchParams(params).toString(),
+      });
+    },
+    [navigate, tokens],
+  );
+
   const handleRecoOperation = React.useCallback(
     (operation: Operation) => {
       inversify.setRecoUsecase
@@ -167,6 +193,7 @@ export const Operations = () => {
         hasMore={hasMore}
         onLoadMore={loadMore}
         error={errorOps}
+        onOpenAccount={handleOpenAccount}
         onEditOperation={handleEditOperation}
         onDeleteOperation={handleDeleteOperation}
         onRecoOperation={handleRecoOperation}
