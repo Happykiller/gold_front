@@ -6,8 +6,11 @@ import { useTranslation } from 'react-i18next';
 import { Box, IconButton, Tooltip, Typography } from '@mui/material';
 
 import { FormattedAccount } from '@presentation/hooks/accounts';
-import { formatEuroAmount } from '@presentation/molecule/operationDisplay';
-import { AMOUNT, LINE, MONO_FONT, SURFACE, TEXT } from '@src/theme/tokens';
+import {
+  formatEuroAmount,
+  getBalanceColor,
+} from '@presentation/molecule/operationDisplay';
+import { LINE, MONO_FONT, SURFACE, TEXT } from '@src/theme/tokens';
 
 /**
  * Un solde, en chasse fixe.
@@ -32,7 +35,9 @@ const Balance: React.FC<{
         fontVariantNumeric: 'tabular-nums',
         whiteSpace: 'nowrap',
         cursor: 'help',
-        color: dim ? TEXT.meta : amount < 0 ? AMOUNT.debit : AMOUNT.credit,
+        // Le solde secondaire reste en retrait : c'est la hiérarchie, pas le
+        // signe, qui décide de sa couleur.
+        color: dim ? TEXT.meta : getBalanceColor(amount),
       }}
     >
       {formatEuroAmount(amount)}

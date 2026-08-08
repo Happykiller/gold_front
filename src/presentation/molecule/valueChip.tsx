@@ -2,8 +2,11 @@
 import * as React from 'react';
 import { Box, Typography } from '@mui/material';
 
-import { formatEuroAmount } from '@presentation/molecule/operationDisplay';
-import { AMOUNT, MONO_FONT, SURFACE, TEXT } from '@src/theme/tokens';
+import {
+  formatEuroAmount,
+  getBalanceColor,
+} from '@presentation/molecule/operationDisplay';
+import { MONO_FONT, SURFACE, TEXT } from '@src/theme/tokens';
 
 type Props = {
   /** Le montant, ou une valeur déjà mise en forme. */
@@ -47,7 +50,7 @@ export const ValueChip: React.FC<Props> = ({ value, label, signed = true }) => {
           //
           // Un solde négatif se signale ; l'or reste réservé à l'action et à
           // l'état « en attente », il n'a rien à faire sur un solde.
-          color: signed && numeric && value < 0 ? AMOUNT.debit : TEXT.title,
+          color: signed && numeric ? getBalanceColor(value) : TEXT.title,
         }}
       >
         {numeric ? formatEuroAmount(value) : value}

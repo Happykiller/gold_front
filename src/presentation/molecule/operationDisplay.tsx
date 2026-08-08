@@ -170,6 +170,23 @@ export function getOperationVatRate(operation: Operation) {
     : DEFAULT_VAT_RATE;
 }
 
+/**
+ * La couleur d'un solde.
+ *
+ * Trois cas, et non deux : un solde nul n'est ni un gain ni une perte. Le
+ * traiter comme « non négatif » le peignait en vert, si bien qu'un compte
+ * modèle — dont le solde pointé vaut toujours zéro — s'affichait comme
+ * créditeur.
+ *
+ * Trois règles concurrentes s'étaient installées, une par écran : positif vert
+ * dans l'arbre des comptes, gris dans le sélecteur, blanc dans l'en-tête.
+ */
+export function getBalanceColor(amount: number): string {
+  if (amount < 0) return AMOUNT.debit;
+  if (amount > 0) return AMOUNT.credit;
+  return AMOUNT.neutral;
+}
+
 export function formatEuroAmount(amount: number) {
   return `${amount.toLocaleString('fr-FR', {
     minimumFractionDigits: 2,

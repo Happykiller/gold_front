@@ -4,8 +4,11 @@ import { Typography } from '@mui/material';
 
 import inversify from '@src/common/inversify';
 import { RefSelect, type RefItem } from '@presentation/molecule/refSelect';
-import { formatEuroAmount } from '@presentation/molecule/operationDisplay';
-import { AMOUNT, MONO_FONT, TEXT } from '@src/theme/tokens';
+import {
+  formatEuroAmount,
+  getBalanceColor,
+} from '@presentation/molecule/operationDisplay';
+import { MONO_FONT } from '@src/theme/tokens';
 
 /** Ce que la requête `accounts` renvoie en plus du libellé. */
 type AccountItem = RefItem & {
@@ -64,7 +67,7 @@ export const AccountsSelect: React.FC<AccountsSelectProps> = ({
                   fontWeight: 500,
                   fontSize: 12,
                   fontVariantNumeric: 'tabular-nums',
-                  color: amount < 0 ? AMOUNT.debit : TEXT.meta,
+                  color: getBalanceColor(amount),
                 }}
               >
                 {formatEuroAmount(amount)}
