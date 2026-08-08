@@ -52,4 +52,31 @@ describe('OpeCategoriesSelect', () => {
       within(list).queryByText('operation.category-other'),
     ).not.toBeInTheDocument();
   });
+
+  it('montre le pictogramme de chaque catégorie', async () => {
+    // Le même que dans la liste des opérations : c'est ce qui rend les deux
+    // écrans lisibles ensemble.
+    mocks.execute.mockResolvedValue({
+      message: CODES.SUCCESS,
+      data: [{ id: 1, label: 'Alimentation' }],
+    });
+    renderWithApp(
+      <OpeCategoriesSelect value="" label="Catégorie" onChange={vi.fn()} />,
+    );
+    const user = userEvent.setup();
+
+    await waitFor(() =>
+      expect(screen.getByRole('combobox')).not.toHaveAttribute(
+        'aria-disabled',
+        'true',
+      ),
+    );
+    await user.click(screen.getByRole('combobox'));
+    const item = within(await screen.findByRole('listbox')).getByRole(
+      'option',
+      { name: /Alimentation/ },
+    );
+
+    expect(item.querySelector('svg')).toBeInTheDocument();
+  });
 });

@@ -2,6 +2,7 @@
 import * as React from 'react';
 import { Trans } from 'react-i18next';
 import {
+  Box,
   FormControl,
   InputLabel,
   MenuItem,
@@ -56,6 +57,14 @@ export type RefSelectProps = {
   required?: boolean;
   /** Restreint la liste — le type de compte, par exemple. */
   filter?: (item: RefItem) => boolean;
+  /**
+   * Une icône devant chaque entrée.
+   *
+   * Optionnelle parce que tous les référentiels n'en ont pas : seules les
+   * catégories portent un pictogramme, et il est déjà calculé pour la liste
+   * des opérations.
+   */
+  renderIcon?: (item: RefItem) => React.ReactNode;
   /** Espacement laissé à l'appelant : la brique ne décide pas de sa marge. */
   sx?: SxProps<Theme>;
 };
@@ -78,6 +87,7 @@ export const RefSelect: React.FC<RefSelectProps> = ({
   emptyValue = '',
   required = false,
   filter,
+  renderIcon,
   sx,
 }) => {
   const [items, setItems] = React.useState<RefItem[] | null>(null);
@@ -141,6 +151,20 @@ export const RefSelect: React.FC<RefSelectProps> = ({
         )}
         {visible.map((item) => (
           <MenuItem key={item.id} value={item.id}>
+            {renderIcon && (
+              <Box
+                component="span"
+                sx={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  mr: '8px',
+                  lineHeight: 0,
+                  '& .MuiSvgIcon-root': { fontSize: 16 },
+                }}
+              >
+                {renderIcon(item)}
+              </Box>
+            )}
             <Typography noWrap sx={{ fontSize: 13.5 }}>
               {translateLabels ? <Trans>{item.label}</Trans> : item.label}
             </Typography>
