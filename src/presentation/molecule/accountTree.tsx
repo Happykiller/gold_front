@@ -135,12 +135,19 @@ export const AccountTree: React.FC<{ accounts: FormattedAccount[] }> = ({
               gap: '12px',
             }}
           >
-            <Balance amount={total} title={t('account.balance.total')} />
+            {/*
+             * Le solde **pointé** d'abord, et en avant : c'est l'argent que la
+             * banque a validé, celui sur lequel on décide. Le projeté vient
+             * après, en retrait — il informe, il ne tranche pas.
+             *
+             * L'ordre inverse avait été introduit par erreur au passage sur
+             * cette molecule, alors que la hiérarchie d'origine était juste.
+             */}
             <Balance
               amount={reconciled}
               title={t('account.balance.reconciled')}
-              dim
             />
+            <Balance amount={total} title={t('account.balance.total')} dim />
           </Box>
 
           <Tooltip title={t('editAccount.edit')} placement="top">

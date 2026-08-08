@@ -146,6 +146,30 @@ describe('AccountTree', () => {
     ).toBeInTheDocument();
   });
 
+  it('met le solde pointé en avant, le projeté en retrait', async () => {
+    // La hiérarchie, pas seulement la présence des deux nombres : c'est
+    // exactement ce qui avait été inversé. Le pointé est l'argent validé par
+    // la banque — celui sur lequel on décide — et il vient en premier.
+    setup([
+      account({
+        id: 1,
+        balance_reconcilied: 900,
+        balance_not_reconcilied: 1200.5,
+      }),
+    ]);
+
+    const reconciled = screen.getByText('900,00 €');
+    const total = screen.getByText('1 200,50 €');
+
+    expect(
+      reconciled.compareDocumentPosition(total) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+    // Et le projeté est le discret des deux.
+    expect(total).toHaveStyle({ color: 'rgb(109, 116, 144)' });
+    expect(reconciled).not.toHaveStyle({ color: 'rgb(109, 116, 144)' });
+  });
+
   it('nomme chacun des deux soldes au survol', async () => {
     // Deux nombres nus côte à côte ne disent pas lequel est lequel. Les
     // flèches ↗ ↘ que portait l'ancienne version ne le disaient pas non plus —
