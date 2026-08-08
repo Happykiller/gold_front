@@ -3,6 +3,11 @@ import '@fontsource/roboto';
 import '@fontsource/montserrat';
 import '@fontsource/roboto/400.css';
 import '@fontsource/montserrat/600.css';
+// Tout ce qui est chiffré — identifiants, montants, soldes — est rendu en
+// chasse fixe pour que les colonnes s'alignent verticalement. La pile système
+// qui servait jusqu'ici variait d'une machine à l'autre.
+import '@fontsource/roboto-mono/400.css';
+import '@fontsource/roboto-mono/500.css';
 
 import React, { useMemo } from 'react';
 import ReactDOM from 'react-dom/client';

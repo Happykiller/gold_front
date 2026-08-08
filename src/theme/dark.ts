@@ -3,6 +3,7 @@ import { createTheme, responsiveFontSizes } from '@mui/material/styles';
 
 import {
   createSharedComponents,
+  sharedRadius,
   sharedShape,
   sharedTypography,
 } from './shared';
@@ -29,6 +30,7 @@ export const darkTheme = responsiveFontSizes(
       ...darkPalette,
     },
     shape: sharedShape,
+    radius: sharedRadius,
     typography: {
       ...sharedTypography,
       h1: { ...sharedTypography.h1, color: darkPalette.text.primary },

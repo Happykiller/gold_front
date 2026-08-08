@@ -9,4 +9,19 @@ declare module '@mui/material/styles' {
   interface PaletteOptions {
     gradient?: string;
   }
+
+  /** Échelle de rayons, voir `sharedRadius` dans `theme/shared.ts`. */
+  interface Radius {
+    sm: number;
+    md: number;
+    lg: number;
+  }
+
+  interface Theme {
+    radius: Radius;
+  }
+
+  interface ThemeOptions {
+    radius?: Radius;
+  }
 }

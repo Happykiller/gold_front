@@ -9,6 +9,27 @@ export const sharedShape = {
   borderRadius: 10,
 };
 
+/**
+ * Échelle de rayons de l'application, exposée en `theme.radius`.
+ *
+ * Il n'en existait aucune : chaque écran improvisait (`2`, `1.5`, `'16px'`,
+ * `{ xs: 0, sm: 4 }`), et le résultat était un vocabulaire de formes
+ * incohérent d'un écran à l'autre.
+ *
+ * `lg` (6 px) est la valeur **maximale** visée. `sharedShape.borderRadius`
+ * reste à 10 pour l'instant : c'est le rayon par défaut de tous les composants
+ * MUI, et le ramener à 6 changerait les sept écrans qui ne sont pas encore
+ * passés par cette échelle.
+ */
+export const sharedRadius = {
+  /** Puces, boutons d'action, jetons de recherche. */
+  sm: 3,
+  /** Champs, boutons, conteneurs internes. */
+  md: 4,
+  /** Conteneur de page. */
+  lg: 6,
+};
+
 export const sharedTypography = {
   fontFamily: ['Montserrat', 'Roboto', 'sans-serif'].join(','),
   h1: {
