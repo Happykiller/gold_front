@@ -5,29 +5,33 @@ const baseTheme = createTheme();
 const { breakpoints, typography } = baseTheme;
 const { pxToRem } = typography;
 
-export const sharedShape = {
-  borderRadius: 10,
-};
-
 /**
  * Échelle de rayons de l'application, exposée en `theme.radius`.
  *
  * Il n'en existait aucune : chaque écran improvisait (`2`, `1.5`, `'16px'`,
  * `{ xs: 0, sm: 4 }`), et le résultat était un vocabulaire de formes
  * incohérent d'un écran à l'autre.
- *
- * `lg` (6 px) est la valeur **maximale** visée. `sharedShape.borderRadius`
- * reste à 10 pour l'instant : c'est le rayon par défaut de tous les composants
- * MUI, et le ramener à 6 changerait les sept écrans qui ne sont pas encore
- * passés par cette échelle.
  */
 export const sharedRadius = {
   /** Puces, boutons d'action, jetons de recherche. */
   sm: 3,
   /** Champs, boutons, conteneurs internes. */
   md: 4,
-  /** Conteneur de page. */
+  /** Conteneur de page — la valeur **maximale** de l'application. */
   lg: 6,
+};
+
+/**
+ * Rayon par défaut de tous les composants MUI, et de ceux de `sunny-ui` qui
+ * lisent `theme.shape`.
+ *
+ * Il valait 10 et le plafond annoncé par l'échelle était 6 : la contradiction
+ * était assumée le temps que les autres écrans migrent, puisque les ramener
+ * d'un coup aurait changé leur aspect au milieu d'un chantier qui ne les
+ * concernait pas. Cette condition est levée.
+ */
+export const sharedShape = {
+  borderRadius: sharedRadius.lg,
 };
 
 export const sharedTypography = {
@@ -67,7 +71,8 @@ export const createSharedComponents = (buttonPalette: {
   MuiButton: {
     styleOverrides: {
       root: {
-        borderRadius: 10,
+        // Lu dans l'échelle, et non recopié : le doublon avait déjà divergé.
+        borderRadius: sharedRadius.md,
         fontWeight: 600,
         letterSpacing: '0.05em',
         textTransform: 'none',

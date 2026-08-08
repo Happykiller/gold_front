@@ -64,8 +64,17 @@ export const SURFACE = {
   /** Bandeau de séparation de jour. */
   band: '#0F1322',
   rowHover: '#12172A',
+  /**
+   * Surface flottante — menu, infobulle, calculatrice, boîte de dialogue.
+   *
+   * Nettement plus claire que la page : c'est elle qui dit « ceci passe
+   * au-dessus », à la place de l'ombre portée dorée qu'on a retirée.
+   */
+  raised: '#141A2E',
   /** Champ de saisie. */
   field: '#101425',
+  /** Champ inactif : présent, mais visiblement hors service. */
+  disabled: 'rgba(255, 255, 255, 0.03)',
   /** Fond discret d'une puce ou d'un bouton d'action. */
   chip: 'rgba(255, 255, 255, 0.05)',
   action: 'rgba(255, 255, 255, 0.07)',
@@ -81,6 +90,32 @@ export const LINE = {
   band: 'rgba(255, 255, 255, 0.05)',
   /** Bordure d'un champ de saisie. */
   field: '1px solid rgba(255, 255, 255, 0.09)',
+  /** Le même champ survolé : il répond, sans crier. */
+  fieldHover: '1px solid rgba(255, 255, 255, 0.16)',
+};
+
+/**
+ * Fonds des messages d'état.
+ *
+ * Teintés à 12 % de leur couleur sémantique plutôt que pleins : un bandeau
+ * d'alerte opaque écrase tout ce qui l'entoure, alors qu'il n'est presque
+ * jamais l'objet de l'écran.
+ */
+export const STATE = {
+  errorBg: 'rgba(242, 99, 91, 0.12)',
+  warningBg: 'rgba(244, 183, 0, 0.12)',
+  successBg: 'rgba(52, 201, 123, 0.12)',
+  infoBg: 'rgba(142, 202, 230, 0.12)',
+};
+
+/**
+ * Élévation d'une surface flottante.
+ *
+ * Une ombre noire portée, et non le halo doré de 32 px de l'ancien langage :
+ * l'or sert à désigner une action, pas à faire léviter un conteneur.
+ */
+export const SHADOW = {
+  raised: '0 8px 24px rgba(0, 0, 0, 0.45)',
 };
 
 /**
