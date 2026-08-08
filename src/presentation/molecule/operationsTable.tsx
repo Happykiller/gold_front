@@ -1,11 +1,12 @@
 // src\presentation\molecule\operationsTable.tsx
 import * as React from 'react';
-import { Trans } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 import { useMediaQuery } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import CheckIcon from '@mui/icons-material/Check';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditNoteIcon from '@mui/icons-material/EditNote';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
 import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import { Operation } from '@presentation/hooks/useAccountOperations';
@@ -36,21 +37,18 @@ import { useInfiniteScroll } from '@presentation/hooks/useInfiniteScroll';
  * en parcourant la liste. L'identifiant, la date et le tiers se consultent, ils
  * ne se lisent pas : les laisser au même niveau de contraste que le libellé
  * donnait huit champs d'égale importance et aucun point d'entrée pour l'œil.
+ *
+ * Ces couleurs passent toutes par `sx`, jamais par la prop `color` de
+ * `Typography` : celle-ci ne reconnaît que les **clés de la palette**
+ * (`primary`, `textSecondary`…). Une valeur hexadécimale ne correspond à aucun
+ * variant, ne produit aucune règle CSS, et le texte hérite alors de la couleur
+ * ambiante. Le défaut est silencieux — le blanc hérité ressemblait à s'y
+ * méprendre au `#e7e7ef` demandé, et trois cellules l'écrivaient en vain
+ * depuis l'origine.
  */
 const TEXT_PRIMARY = '#e8eaf0';
 const TEXT_MUTED = '#5a6478';
 const TEXT_HEADER = '#7b8496';
-
-/**
- * Ces couleurs passent toutes par `sx`, jamais par la prop `color` de
- * `Typography`.
- *
- * La prop ne reconnaît que les **clés de la palette** (`primary`,
- * `textSecondary`…) : une valeur hexadécimale ne correspond à aucun variant, ne
- * produit aucune règle CSS, et le texte hérite alors de la couleur ambiante.
- * Le défaut est silencieux — le blanc hérité ressemblait à s'y méprendre au
- * `#e7e7ef` demandé, et trois cellules l'écrivaient en vain depuis l'origine.
- */
 
 /**
  * Chasse fixe pour la date et le montant.
@@ -88,6 +86,9 @@ const COLUMNS = [
     md: 0.75,
     display: { xs: 'none', md: 'flex' },
   },
+  // Marqueur de ligne : premier élément visible sur mobile, où l'identifiant
+  // est masqué. L'icône vaut action — cliquer pointe l'opération.
+  { label: 'État', key: 'state', xs: 1, sm: 1, md: 0.75, display: 'flex' },
   { label: 'Date', key: 'date', xs: 2, sm: 1.5, md: 1, display: 'flex' },
   // Réduite à son icône : le libellé est passé en infobulle, la colonne n'a
   // donc plus besoin que de la place d'un pictogramme.
@@ -117,7 +118,8 @@ const COLUMNS = [
     md: 1.25,
     display: { xs: 'none', md: 'flex' },
   },
-  { label: '', key: 'actions', xs: 2, sm: 2, md: 1.5, display: 'flex' },
+  // Deux boutons depuis que le pointage est passé dans la colonne État.
+  { label: '', key: 'actions', xs: 1, sm: 1, md: 0.75, display: 'flex' },
 ] as const;
 
 type Column = (typeof COLUMNS)[number];
@@ -131,13 +133,41 @@ const COL = Object.fromEntries(COLUMNS.map((col) => [col.key, col])) as Record<
 const justifyOf = (key: Column['key']) =>
   key === 'desc' ? 'flex-start' : key === 'amount' ? 'flex-end' : 'center';
 
-/** Taille et alignement d'une cellule, à partir de sa colonne. */
-const cellProps = (key: Column['key']) => ({
+/**
+ * Classe portée par la cellule d'actions, ciblée depuis la ligne pour la
+ * révéler au survol.
+ */
+const ACTIONS_CLASS = 'op-row-actions';
+
+/**
+ * Taille et alignement d'une cellule, à partir de sa colonne.
+ *
+ * `variant: 'header'` reprend les mêmes dimensions sans le comportement de
+ * survol : l'en-tête n'appartient à aucune ligne, il resterait effacé pour
+ * toujours.
+ */
+const cellProps = (key: Column['key'], variant: 'row' | 'header' = 'row') => ({
   size: { xs: COL[key].xs, sm: COL[key].sm, md: COL[key].md },
+  className: key === 'actions' && variant === 'row' ? ACTIONS_CLASS : undefined,
   sx: {
     display: COL[key].display,
     alignItems: 'center',
     justifyContent: justifyOf(key),
+    ...(key === 'actions' && variant === 'row'
+      ? {
+          // Effacées au repos, révélées au survol de leur ligne : trois icônes
+          // par ligne sur une liste qui en accumule des centaines, c'est le
+          // bruit le plus dense de l'écran.
+          //
+          // `opacity` et non `display` : la place reste réservée, sinon la
+          // ligne se réorganiserait sous le curseur au moment de viser.
+          //
+          // Sur mobile, elles restent visibles — il n'y a pas de survol sur un
+          // écran tactile, les masquer les rendrait inatteignables.
+          opacity: { xs: 1, sm: 0 },
+          transition: 'opacity 120ms ease-in-out',
+        }
+      : {}),
   },
 });
 
@@ -173,6 +203,9 @@ const OperationRow = React.memo(function OperationRow({
   onRecoOperation,
 }: RowProps) {
   const theme = useTheme();
+  const { t } = useTranslation();
+  // Statut 2 = rapprochée. Le serveur ne connaît pas le chemin inverse.
+  const isReconciled = operation.status_id === 2;
 
   const renderDest = () => {
     if (
@@ -229,6 +262,12 @@ const OperationRow = React.memo(function OperationRow({
         borderBottom: '1px solid #222638',
         background: 'none',
         '&:hover': { backgroundColor: 'rgba(90,100,130,0.12)' },
+        // `focus-within` autant que `hover` : sans lui, une tabulation
+        // jusqu'aux boutons les laisserait invisibles alors qu'ils ont le
+        // focus.
+        [`&:hover .${ACTIONS_CLASS}, &:focus-within .${ACTIONS_CLASS}`]: {
+          opacity: 1,
+        },
         cursor: isXs ? 'pointer' : calculatorOpen ? 'copy' : 'default',
       }}
       onClick={() => {
@@ -248,6 +287,58 @@ const OperationRow = React.memo(function OperationRow({
         >
           {operation.id}
         </Typography>
+      </Grid>
+      <Grid {...cellProps('state')}>
+        {/* L'icône porte l'action : cliquer pointe l'opération. Le bouton
+            dédié de la colonne Actions faisait double emploi avec un état
+            qu'on doit de toute façon pouvoir lire d'un coup d'œil. */}
+        <Tooltip
+          title={
+            isReconciled
+              ? t('operation.status-reconciled')
+              : t('operation.reconcile')
+          }
+          placement="top"
+        >
+          <Box
+            component="span"
+            role={isReconciled ? undefined : 'button'}
+            aria-label={
+              isReconciled
+                ? t('operation.status-reconciled')
+                : t('operation.reconcile')
+            }
+            tabIndex={isReconciled ? undefined : 0}
+            onClick={(e) => {
+              e.stopPropagation();
+              if (!isReconciled) onRecoOperation?.(operation);
+            }}
+            onKeyDown={(e) => {
+              if (isReconciled) return;
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                e.stopPropagation();
+                onRecoOperation?.(operation);
+              }
+            }}
+            sx={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              lineHeight: 0,
+              // Déjà pointée : l'état se lit, il ne se reprend pas — le
+              // serveur ne sait pas dépointer une opération.
+              cursor: isReconciled ? 'default' : 'pointer',
+              color: isReconciled ? '#23e47a' : TEXT_MUTED,
+              '&:hover': { color: isReconciled ? '#23e47a' : '#23e47a' },
+            }}
+          >
+            {isReconciled ? (
+              <CheckCircleIcon sx={{ fontSize: 18 }} />
+            ) : (
+              <RadioButtonUncheckedIcon sx={{ fontSize: 18 }} />
+            )}
+          </Box>
+        </Tooltip>
       </Grid>
       <Grid {...cellProps('date')}>
         {/* L'année est retirée de l'affichage, mais la liste remonte jusqu'à
@@ -361,17 +452,8 @@ const OperationRow = React.memo(function OperationRow({
             <EditNoteIcon />
           </IconButton>
         )}
-        {operation.status_id === 1 && (
-          <IconButton
-            size="small"
-            onClick={(e) => {
-              e.stopPropagation();
-              onRecoOperation?.(operation);
-            }}
-          >
-            <CheckIcon />
-          </IconButton>
-        )}
+        {/* Le bouton de pointage a rejoint la colonne État : son icône y dit
+            déjà l'état, autant qu'elle porte l'action. */}
       </Grid>
     </Grid>
   );
@@ -467,7 +549,7 @@ export const OperationsTable: React.FC<Props> = ({
             automatiquement l'alignement de sa colonne, notamment le montant
             passé à droite. */}
         {COLUMNS.map((col) => (
-          <Grid key={col.key} {...cellProps(col.key)}>
+          <Grid key={col.key} {...cellProps(col.key, 'header')}>
             <Typography
               noWrap
               sx={{

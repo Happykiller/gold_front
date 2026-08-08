@@ -76,6 +76,18 @@ const REF_FIELDS: Record<RefField, keyof Referentials> = {
 };
 
 /**
+ * Préfixes acceptés en saisie, ramenés au champ canonique.
+ *
+ * `normalize` ayant déjà retiré les accents, `état:` et `etat:` arrivent ici
+ * sous la même forme.
+ */
+const FIELD_ALIASES: Record<string, RefField> = {
+  etat: 'statut',
+  categorie: 'cat',
+  compte: 'enveloppe',
+};
+
+/**
  * Comparaison indulgente : casse et accents ignorés.
  *
  * Nécessaire côté client parce que la base ne le fait pas — sa collation
@@ -91,13 +103,43 @@ export function normalize(value: string): string {
 }
 
 /** Raccourcis nus, reconnus avant d'être traités comme du texte libre. */
+const RECONCILED = 'operation.status-reconciled';
+const FOLLOW = 'operation.status-follow';
+
+/**
+ * Valeurs acceptées pour `etat:` / `statut:`, en plus des libellés affichés.
+ *
+ * Il en faut, parce que le libellé traduit ne contient pas toujours le mot
+ * qu'on tape : « Pointée » ne contient pas « reco ». Chercher uniquement dans
+ * le libellé rendrait `etat:reco` infructueux alors que c'est la saisie la
+ * plus naturelle.
+ */
+const STATUS_ALIASES: Record<string, string> = {
+  reco: RECONCILED,
+  recon: RECONCILED,
+  reconcilie: RECONCILED,
+  reconciliee: RECONCILED,
+  rapproche: RECONCILED,
+  rapprochee: RECONCILED,
+  pointe: RECONCILED,
+  pointee: RECONCILED,
+  attente: FOLLOW,
+  'en attente': FOLLOW,
+  suivi: FOLLOW,
+  follow: FOLLOW,
+  'non pointe': FOLLOW,
+  'non pointee': FOLLOW,
+  'a pointer': FOLLOW,
+};
+
+/** Raccourcis reconnus sans préfixe, avant d'être traités comme du texte. */
 const STATUS_SHORTCUTS: Record<string, string> = {
-  pointe: 'operation.status-reconciled',
-  pointee: 'operation.status-reconciled',
-  reconcilie: 'operation.status-reconciled',
-  'non pointe': 'operation.status-follow',
-  'non pointee': 'operation.status-follow',
-  'a pointer': 'operation.status-follow',
+  pointe: RECONCILED,
+  pointee: RECONCILED,
+  reconcilie: RECONCILED,
+  'non pointe': FOLLOW,
+  'non pointee': FOLLOW,
+  'a pointer': FOLLOW,
 };
 
 /**
@@ -139,6 +181,36 @@ export function matchRef(
     ...scored.filter(({ hay }) => hay.startsWith(needle)),
     ...scored.filter(({ hay }) => !hay.startsWith(needle)),
   ].map(({ item }) => item);
+}
+
+/** Ramène un préfixe saisi au champ canonique, ou `null` s'il est inconnu. */
+export function resolveField(prefix: string): RefField | null {
+  const normalized = normalize(prefix);
+  if (normalized in REF_FIELDS) return normalized as RefField;
+  return FIELD_ALIASES[normalized] ?? null;
+}
+
+/**
+ * Résout la valeur d'un jeton de référentiel.
+ *
+ * Pour le statut, les alias priment sur la recherche dans les libellés :
+ * `etat:reco` doit trouver « Pointée », dont le libellé ne contient pas
+ * « reco ».
+ */
+function matchRefValue(
+  field: RefField,
+  value: string,
+  refs: Referentials,
+  translate: (label: string) => string,
+): RefItem | undefined {
+  if (field === 'statut') {
+    const alias = STATUS_ALIASES[normalize(value)];
+    if (alias) {
+      const byAlias = refs.status.find((s) => s.label === alias);
+      if (byAlias) return byAlias;
+    }
+  }
+  return matchRef(refs[REF_FIELDS[field]], value, translate)[0];
 }
 
 /** `>50`, `<=50`, `=50`, `50..80`, ou `50` (égalité implicite). */
@@ -208,9 +280,9 @@ export function parseToken(
   if (split) {
     const { prefix, value } = split;
 
-    if (prefix in REF_FIELDS) {
-      const field = prefix as RefField;
-      const match = matchRef(refs[REF_FIELDS[field]], value, translate)[0];
+    const field = resolveField(prefix);
+    if (field) {
+      const match = matchRefValue(field, value, refs, translate);
       if (!match) return null;
       return {
         kind: 'ref',
@@ -403,13 +475,21 @@ export function suggest(
   const out: Suggestion[] = [];
   const split = splitPrefix(trimmed);
 
-  if (split && split.prefix in REF_FIELDS) {
-    const field = split.prefix as RefField;
-    for (const item of matchRef(
-      refs[REF_FIELDS[field]],
-      split.value,
-      translate,
-    )) {
+  const prefixedField = split ? resolveField(split.prefix) : null;
+  if (split && prefixedField) {
+    const field = prefixedField;
+    // Un alias de valeur (`etat:reco`) désigne une entrée précise : la
+    // proposer seule plutôt que d'égrener tout le référentiel.
+    const exact =
+      field === 'statut'
+        ? matchRefValue(field, split.value, refs, translate)
+        : undefined;
+    const candidates =
+      exact && STATUS_ALIASES[normalize(split.value)]
+        ? [exact]
+        : matchRef(refs[REF_FIELDS[field]], split.value, translate);
+
+    for (const item of candidates) {
       const label = translate(item.label);
       out.push({
         input: `${field}:${label}`,

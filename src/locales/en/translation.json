@@ -92,15 +92,19 @@
     "category-other": "Other",
     "date": "Date",
     "description": "Description",
+    "ht_amount": "Amount excl. VAT",
     "id": "ID",
+    "reconcile": "Reconcile this operation",
+    "state": "State",
     "status": "Status",
+    "status-follow": "Pending",
+    "status-reconciled": "Reconciled",
     "third": "Third party",
-    "vat_amount": "VAT amount",
-    "vat_rate": "VAT rate (%)",
     "third-otherCredit": "Creditor",
     "third-otherDebit": "Debtor",
     "ttc_amount": "Amount incl. VAT",
-    "ht_amount": "Amount excl. VAT"
+    "vat_amount": "VAT amount",
+    "vat_rate": "VAT rate (%)"
   },
   "operation_create": {
     "send": "Create",

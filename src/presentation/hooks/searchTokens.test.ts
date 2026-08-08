@@ -115,6 +115,46 @@ describe('parseToken — référentiels', () => {
     expect(parse('non pointé')).toMatchObject({ field: 'statut', id: 1 });
     expect(parse('pointé')).toMatchObject({ field: 'statut', id: 2 });
   });
+
+  it.each(['etat', 'état', 'statut', 'ETAT'])(
+    'accepte le préfixe %s pour l’état',
+    (prefix) => {
+      expect(parse(`${prefix}:reco`)).toMatchObject({
+        field: 'statut',
+        id: 2,
+      });
+    },
+  );
+
+  it.each([
+    ['reco', 2],
+    ['reconcilié', 2],
+    ['pointée', 2],
+    ['rapproché', 2],
+    ['attente', 1],
+    ['en attente', 1],
+    ['non pointé', 1],
+  ])('résout la valeur d’état « %s »', (value, id) => {
+    // Indispensable : le libellé traduit est « Pointée », qui ne contient pas
+    // « reco ». Sans alias, la saisie la plus naturelle ne trouverait rien.
+    expect(parse(`etat:${value}`)).toMatchObject({ field: 'statut', id });
+  });
+
+  it('accepte aussi le libellé affiché', () => {
+    expect(parse('etat:Pointé')).toMatchObject({ field: 'statut', id: 2 });
+  });
+
+  it('rejette un état inconnu', () => {
+    expect(parse('etat:zzz')).toBeNull();
+  });
+
+  it('accepte les autres alias de préfixe', () => {
+    expect(parse('categorie:ali')).toMatchObject({ field: 'cat', id: 2 });
+    expect(parse('compte:Vacances')).toMatchObject({
+      field: 'enveloppe',
+      id: 9,
+    });
+  });
 });
 
 describe('parseToken — texte', () => {
