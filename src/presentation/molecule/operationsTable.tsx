@@ -263,6 +263,8 @@ const OperationRow = React.memo(function OperationRow({
         borderBottom: LINE.row,
         fontSize: 12.5,
         outline: 'none',
+        // Repère de la cellule d'actions, qui se superpose hors flux.
+        position: 'relative',
         background: selected ? SURFACE.rowHover : undefined,
         '&:hover': { background: SURFACE.rowHover },
         '&:hover .op-row-desc': { color: TEXT.hover },
@@ -467,14 +469,22 @@ const OperationRow = React.memo(function OperationRow({
       <Box
         className={ACTIONS_CLASS}
         sx={{
-          gridColumn: { xs: 'auto', sm: '5 / span 1', md: '6 / span 2' },
-          // `gridRow` explicite, sans quoi le placement automatique renonce à
-          // la rangée 1 — ses colonnes 6 et 7 sont déjà prises par destination
-          // et tiers — et crée une **seconde rangée** : les boutons tombaient
-          // alors sous leur ligne, à cheval sur la suivante.
-          gridRow: 1,
+          // Superposition par positionnement absolu, et non par placement de
+          // grille. Une cellule de grille ne peut pas se superposer sans être
+          // placée explicitement, et un item explicitement placé est posé
+          // **avant** les items auto-placés : réserver la rangée 1, colonnes 6
+          // et 7, évinçait destination et tiers vers une seconde rangée, où
+          // ils réapparaissaient sous l'identifiant. Hors flux, la cellule ne
+          // dispute plus aucune place à personne.
+          //
+          // Sauf en `xs`, où les boutons sont visibles en permanence — il n'y a
+          // pas de survol sur un écran tactile — et doivent donc occuper une
+          // vraie colonne au lieu de recouvrir le montant.
+          position: { xs: 'static', sm: 'absolute' },
+          right: '20px',
+          top: 0,
+          bottom: 0,
           justifySelf: 'end',
-          alignSelf: 'center',
           display: 'flex',
           alignItems: 'center',
           gap: '3px',
@@ -718,12 +728,18 @@ export const OperationsTable: React.FC<Props> = ({
             sx={{
               display: DISPLAY[col.key],
               textAlign: col.align,
-              // La colonne Statut est étroite : l'interlettrage y volerait la
-              // place d'une lettre.
-              letterSpacing: col.key === 'statut' ? 0 : undefined,
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
               whiteSpace: 'nowrap',
+              ...(col.key === 'statut'
+                ? {
+                    // 26 px ne contiennent pas « STATUT » : tronqué, il se
+                    // lisait « STATI ». On laisse déborder dans les gouttières
+                    // de 12 px, libres de part et d'autre — la description est
+                    // alignée à gauche, le montant à droite. L'interlettrage
+                    // saute pour la même raison de place.
+                    overflow: 'visible',
+                    letterSpacing: 0,
+                  }
+                : { overflow: 'hidden', textOverflow: 'ellipsis' }),
             }}
           >
             {col.labelKey ? t(col.labelKey) : ''}
