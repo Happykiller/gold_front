@@ -22,19 +22,19 @@ type AccountsSelectProps = {
   onChange: (value: string) => void;
   /** 0 = tous, 1 = compte, 2 = modèle. */
   type?: number;
-  /**
-   * Affiche le solde **tous statuts** de chaque compte.
-   *
-   * C'est `balance_not_reconcilied`, qui agrège les opérations en attente et
-   * pointées — le solde projeté, malgré son nom. Sur un compte modèle, il dit
-   * ce que le clonage va déverser ; c'est l'information qui manque au moment
-   * de choisir.
-   */
-  showBalance?: boolean;
 };
 
 /**
  * Sélecteur de compte.
+ *
+ * Chaque entrée porte son **solde tous statuts** — `balance_not_reconcilied`,
+ * qui agrège les opérations en attente et pointées, le solde projeté malgré
+ * son nom. C'est l'information qui manque au moment de choisir : sur un
+ * modèle, elle dit ce que le clonage va déverser ; sur un compte réel, de quoi
+ * on dispose.
+ *
+ * Elle ne coûte rien au formulaire : elle vit dans la liste déroulante, pas
+ * dans le champ fermé, qui n'affiche que le libellé.
  *
  * Sa sentinelle de vide vaut `0` et non la chaîne vide : les formulaires qui
  * l'emploient envoient un identifiant numérique.
@@ -44,7 +44,6 @@ export const AccountsSelect: React.FC<AccountsSelectProps> = ({
   label,
   onChange,
   type = 0,
-  showBalance = false,
 }) => (
   <RefSelect
     value={value}
@@ -55,27 +54,23 @@ export const AccountsSelect: React.FC<AccountsSelectProps> = ({
     filter={
       type === 0 ? undefined : (item) => (item as AccountItem).type_id === type
     }
-    renderTrailing={
-      showBalance
-        ? (item) => {
-            const amount = (item as AccountItem).balance_not_reconcilied ?? 0;
-            return (
-              <Typography
-                component="span"
-                sx={{
-                  fontFamily: MONO_FONT,
-                  fontWeight: 500,
-                  fontSize: 12,
-                  fontVariantNumeric: 'tabular-nums',
-                  color: getBalanceColor(amount),
-                }}
-              >
-                {formatEuroAmount(amount)}
-              </Typography>
-            );
-          }
-        : undefined
-    }
+    renderTrailing={(item) => {
+      const amount = (item as AccountItem).balance_not_reconcilied ?? 0;
+      return (
+        <Typography
+          component="span"
+          sx={{
+            fontFamily: MONO_FONT,
+            fontWeight: 500,
+            fontSize: 12,
+            fontVariantNumeric: 'tabular-nums',
+            color: getBalanceColor(amount),
+          }}
+        >
+          {formatEuroAmount(amount)}
+        </Typography>
+      );
+    }}
     sx={{ m: 1 }}
   />
 );

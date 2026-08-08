@@ -30,7 +30,7 @@ const accounts = [
   },
 ];
 
-const setup = (props: { type?: number; showBalance?: boolean } = {}) => {
+const setup = (props: { type?: number } = {}) => {
   mocks.execute.mockResolvedValue({ message: CODES.SUCCESS, data: accounts });
   renderWithApp(
     <AccountsSelect value="" label="Compte" onChange={vi.fn()} {...props} />,
@@ -56,23 +56,24 @@ describe('AccountsSelect', () => {
     expect(within(list).queryByText('Courant')).not.toBeInTheDocument();
   });
 
-  it('montre le solde tous statuts quand on le demande', async () => {
-    // Sur un compte modèle, ce solde dit ce que le clonage va déverser :
-    // c'est l'information qui manquait au moment de choisir.
-    const user = setup({ type: 2, showBalance: true });
+  it('montre le solde tous statuts de chaque compte', async () => {
+    // Sur un modèle, ce solde dit ce que le clonage va déverser ; sur un
+    // compte réel, de quoi on dispose. Il est là partout, sans option.
+    const user = setup({ type: 2 });
 
     const list = await open(user);
 
     expect(within(list).getByText('-1 450,53 €')).toBeInTheDocument();
   });
 
-  it('ne montre aucun solde par défaut', async () => {
-    // Les autres écrans choisissent un compte de destination : le solde y
-    // serait du bruit.
-    const user = setup({ type: 2 });
+  it('laisse le champ fermé au seul libellé', async () => {
+    // Le solde vit dans la liste déroulante : il ne coûte aucune largeur au
+    // formulaire, qui reste lisible sur deux colonnes.
+    const user = setup();
+    await waitFor(() => expect(field()).toBeEnabled());
+    await user.click(field());
+    await user.click(await screen.findByText('Courant'));
 
-    const list = await open(user);
-
-    expect(within(list).queryByText(/€/)).not.toBeInTheDocument();
+    expect(field()).toHaveValue('Courant');
   });
 });

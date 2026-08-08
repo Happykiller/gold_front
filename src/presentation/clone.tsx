@@ -68,7 +68,6 @@ export const Clone = () => {
           <AccountsSelect
             value={currentTemplate}
             type={2}
-            showBalance
             label={<Trans>clone.template</Trans>}
             onChange={setCurrentTemplate}
           />

@@ -8,6 +8,7 @@ import {
   MenuItem,
   Checkbox,
   ListItemText,
+  Typography,
 } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import dayjs, { Dayjs } from 'dayjs';
@@ -24,7 +25,11 @@ import { GetAccountsUsecaseModel } from '@usecase/getAccounts/getAccounts.usecas
 import { PageShell } from '@presentation/molecule/pageShell';
 import { AsyncState } from '@presentation/molecule/asyncState';
 import { chartTheme, chartSumSeriesStyle } from '@src/theme/highcharts';
-import { LINE } from '@src/theme/tokens';
+import { LINE, MONO_FONT } from '@src/theme/tokens';
+import {
+  formatEuroAmount,
+  getBalanceColor,
+} from '@presentation/molecule/operationDisplay';
 
 export const Graphic: React.FC = () => {
   const { t } = useTranslation();
@@ -259,6 +264,24 @@ export const Graphic: React.FC = () => {
                   checked={selectedAccounts.indexOf(account.id) > -1}
                 />
                 <ListItemText primary={account.label} />
+                {/* Le même solde que dans les autres listes de comptes : il
+                    dit ce qu'on s'apprête à mettre sur la courbe. */}
+                <Typography
+                  component="span"
+                  sx={{
+                    ml: 'auto',
+                    pl: '12px',
+                    fontFamily: MONO_FONT,
+                    fontWeight: 500,
+                    fontSize: 12,
+                    fontVariantNumeric: 'tabular-nums',
+                    color: getBalanceColor(
+                      account.balance_not_reconcilied ?? 0,
+                    ),
+                  }}
+                >
+                  {formatEuroAmount(account.balance_not_reconcilied ?? 0)}
+                </Typography>
               </MenuItem>
             ))}
           </Select>
