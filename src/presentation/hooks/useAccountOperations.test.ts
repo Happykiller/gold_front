@@ -174,4 +174,61 @@ describe('useAccountOperations', () => {
     act(() => result.current.loadMore());
     expect(mocks.getOperations).toHaveBeenCalledTimes(1);
   });
+
+  it('transmet les critères de recherche au usecase', async () => {
+    mocks.getOperations.mockReturnValue(success(batch(3)));
+
+    renderHook(() =>
+      useAccountOperations(1, { category_ids: [7], amount_min: 50 }),
+    );
+
+    await waitFor(() => expect(mocks.getOperations).toHaveBeenCalled());
+    expect(mocks.getOperations.mock.calls[0][0]).toMatchObject({
+      account_id: 1,
+      category_ids: [7],
+      amount_min: 50,
+    });
+  });
+
+  it('repart du premier lot quand les critères changent', async () => {
+    mocks.getOperations.mockReturnValue(success(batch(OPERATIONS_PAGE_SIZE)));
+
+    const { result, rerender } = renderHook(
+      ({ filters }) => useAccountOperations(1, filters),
+      { initialProps: { filters: {} as Record<string, unknown> } },
+    );
+    await waitFor(() =>
+      expect(result.current.operations).toHaveLength(OPERATIONS_PAGE_SIZE),
+    );
+    act(() => result.current.loadMore());
+    await waitFor(() => expect(mocks.getOperations).toHaveBeenCalledTimes(2));
+
+    rerender({ filters: { category_ids: [7] } });
+
+    await waitFor(() => expect(mocks.getOperations).toHaveBeenCalledTimes(3));
+    // Repartir à l'offset 0 : les lignes déjà chargées ne correspondent plus
+    // aux nouveaux critères.
+    expect(offsetOfCall(2)).toBe(0);
+    await waitFor(() =>
+      expect(result.current.operations).toHaveLength(OPERATIONS_PAGE_SIZE),
+    );
+  });
+
+  it('ne relance rien quand les critères gardent la même valeur', async () => {
+    // `filters` est un objet reconstruit à chaque rendu : sans clé sérialisée
+    // stable, chaque rendu relancerait une série — en boucle.
+    mocks.getOperations.mockReturnValue(success(batch(3)));
+
+    const { rerender } = renderHook(
+      ({ filters }) => useAccountOperations(1, filters),
+      { initialProps: { filters: { category_ids: [7, 2] } } },
+    );
+    await waitFor(() => expect(mocks.getOperations).toHaveBeenCalledTimes(1));
+
+    // Même contenu, objet différent, et listes dans un autre ordre.
+    rerender({ filters: { category_ids: [2, 7] } });
+    rerender({ filters: { category_ids: [7, 2] } });
+
+    expect(mocks.getOperations).toHaveBeenCalledTimes(1);
+  });
 });

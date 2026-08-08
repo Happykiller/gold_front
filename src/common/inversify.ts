@@ -31,6 +31,8 @@ import { CloneOperationsUsecase } from '@usecase/cloneOperations/cloneOperations
 import { UpdateOperationUsecase } from '@usecase/updateOperation/updateOperation.usecase';
 import { DeleteOperationUsecase } from '@usecase/deleteOperation/deleteOperation.usecase';
 import { GetOpeCategoriesUsecase } from '@usecase/getOpeCategories/getOpeCategories.usecase';
+import { GetOpeTypesUsecase } from '@usecase/getOpeTypes/getOpeTypes.usecase';
+import { GetOpeStatusUsecase } from '@usecase/getOpeStatus/getOpeStatus.usecase';
 import { GetCashflowUsecase } from '@usecase/getCashflow/getCashflow.usecase';
 
 export class Inversify {
@@ -57,6 +59,10 @@ export class Inversify {
   updateOperationUsecase: UpdateOperationUsecase;
   deleteOperationUsecase: DeleteOperationUsecase;
   getOpeCategoriesUsecase: GetOpeCategoriesUsecase;
+  // `GetOpeTypesUsecase` existait sans être câblé : la classe était écrite,
+  // testée par le contrat, mais aucune propriété ne l'exposait.
+  getOpeTypesUsecase: GetOpeTypesUsecase;
+  getOpeStatusUsecase: GetOpeStatusUsecase;
   getPasskeyForUserUsecase: GetPasskeyForUserUsecase;
   getCashflowUsecase: GetCashflowUsecase;
 
@@ -83,6 +89,8 @@ export class Inversify {
     this.updateOperationUsecase = new UpdateOperationUsecase(this);
     this.deleteOperationUsecase = new DeleteOperationUsecase(this);
     this.getOpeCategoriesUsecase = new GetOpeCategoriesUsecase(this);
+    this.getOpeTypesUsecase = new GetOpeTypesUsecase(this);
+    this.getOpeStatusUsecase = new GetOpeStatusUsecase(this);
     this.getPasskeyForUserUsecase = new GetPasskeyForUserUsecase(this);
     this.getCashflowUsecase = new GetCashflowUsecase(this);
 

@@ -330,6 +330,52 @@ export function tokenLabel(token: Token): string {
   return `${token.field} ${token.op} ${token.from}${unit}`;
 }
 
+/**
+ * Forme textuelle **re-parsable** d'un jeton, pour l'URL.
+ *
+ * Distincte de `tokenLabel`, qui vise la lisibilité (« montant > 50 € ») et ne
+ * repasserait pas dans `parseToken`.
+ */
+export function tokenToInput(token: Token): string {
+  if (token.kind === 'ref') return `${token.field}:${token.label}`;
+  if (token.kind === 'text')
+    return token.field === 'desc' ? `desc:${token.value}` : token.value;
+  if (token.to !== undefined)
+    return `${token.field}:${token.from}..${token.to}`;
+  return `${token.field}:${token.op}${token.from}`;
+}
+
+/** Sérialise une barre entière pour l'URL. */
+export function serializeTokens(tokens: Token[]): string {
+  return tokens.map(tokenToInput).join(';');
+}
+
+/**
+ * Relit une barre depuis l'URL.
+ *
+ * Les jetons qui ne se résolvent plus — une catégorie supprimée depuis le
+ * partage du lien — sont écartés silencieusement plutôt que de bloquer
+ * l'affichage.
+ */
+export function deserializeTokens(
+  serialized: string,
+  refs: Referentials = EMPTY_REFERENTIALS,
+  translate: (label: string) => string = (l) => l,
+): Token[] {
+  if (!serialized) return [];
+  const seen = new Set<string>();
+  const out: Token[] = [];
+  for (const part of serialized.split(';')) {
+    const token = parseToken(part, refs, translate);
+    if (!token) continue;
+    const key = tokenKey(token);
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push(token);
+  }
+  return out;
+}
+
 /** Identité d'un jeton, pour éviter les doublons dans la barre. */
 export function tokenKey(token: Token): string {
   if (token.kind === 'ref') return `${token.field}:${token.id}`;

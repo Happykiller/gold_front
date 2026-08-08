@@ -143,8 +143,19 @@ export type GetOperationLinkInputResolver = {
 
 export type GetOperationsInputResolver = {
   account_id: Scalars['Int']['input'];
+  amount_max?: InputMaybe<Scalars['Float']['input']>;
+  amount_min?: InputMaybe<Scalars['Float']['input']>;
+  category_ids?: InputMaybe<Array<Scalars['Int']['input']>>;
+  date_from?: InputMaybe<Scalars['String']['input']>;
+  date_to?: InputMaybe<Scalars['String']['input']>;
+  description?: InputMaybe<Scalars['String']['input']>;
+  dest_account_ids?: InputMaybe<Array<Scalars['Int']['input']>>;
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
+  status_ids?: InputMaybe<Array<Scalars['Int']['input']>>;
+  text?: InputMaybe<Scalars['String']['input']>;
+  third_ids?: InputMaybe<Array<Scalars['Int']['input']>>;
+  type_ids?: InputMaybe<Array<Scalars['Int']['input']>>;
 };
 
 export type GetUserResolverDto = {
@@ -585,6 +596,12 @@ export type OperationCategoriesQuery = {
   operationCategories: Array<{ id: number; label: string }>;
 };
 
+export type OperationStatusQueryVariables = Exact<{ [key: string]: never }>;
+
+export type OperationStatusQuery = {
+  operationStatus: Array<{ id: number; label: string }>;
+};
+
 export type OperationTypesQueryVariables = Exact<{ [key: string]: never }>;
 
 export type OperationTypesQuery = {
@@ -623,6 +640,17 @@ export type OperationsQueryVariables = Exact<{
   account_id: number;
   limit: number;
   offset: number;
+  category_ids?: Array<number> | number | null | undefined;
+  third_ids?: Array<number> | number | null | undefined;
+  dest_account_ids?: Array<number> | number | null | undefined;
+  type_ids?: Array<number> | number | null | undefined;
+  status_ids?: Array<number> | number | null | undefined;
+  description?: string | null | undefined;
+  text?: string | null | undefined;
+  amount_min?: number | null | undefined;
+  amount_max?: number | null | undefined;
+  date_from?: string | null | undefined;
+  date_to?: string | null | undefined;
 }>;
 
 export type OperationsQuery = {

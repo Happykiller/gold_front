@@ -4,6 +4,7 @@ import inversify from '@src/common/inversify';
 import { CODES } from '@src/common/codes';
 import { GetOperationsUsecaseModel } from '@usecase/getOperations/getOperations.usecase.model';
 import { GetAccountUsecaseModel } from '@usecase/getAccount/getAccount.usecase.model';
+import type { OperationFilters } from '@presentation/hooks/searchTokens';
 
 // Ces deux types décrivaient à la main ce que le hook reçoit, et avaient
 // divergé : `vat_rate` y était optionnel alors que le serveur le renvoie
@@ -22,7 +23,35 @@ export type Operation = NonNullable<GetOperationsUsecaseModel['data']>[number];
  */
 export const OPERATIONS_PAGE_SIZE = 50;
 
-export function useAccountOperations(accountId: number) {
+const NO_FILTERS: OperationFilters = {};
+
+/**
+ * Identité stable d'un jeu de critères.
+ *
+ * `filters` est un objet reconstruit à chaque rendu : le prendre tel quel en
+ * dépendance d'effet relancerait une série de chargement à chaque rendu, donc
+ * en boucle. Les listes sont triées avant sérialisation pour que deux jeux
+ * équivalents produisent la même clé.
+ */
+function filtersKey(filters: OperationFilters): string {
+  const normalized: Record<string, unknown> = {};
+  for (const key of Object.keys(filters).sort()) {
+    const value = filters[key as keyof OperationFilters];
+    if (value === undefined || value === null) continue;
+    if (Array.isArray(value)) {
+      if (value.length === 0) continue;
+      normalized[key] = [...value].sort((a, b) => a - b);
+    } else {
+      normalized[key] = value;
+    }
+  }
+  return JSON.stringify(normalized);
+}
+
+export function useAccountOperations(
+  accountId: number,
+  filters: OperationFilters = NO_FILTERS,
+) {
   const [account, setAccount] = useState<Account | null>(null);
   const [operations, setOperations] = useState<Operation[] | null>(null);
   const [loadingAccount, setLoadingAccount] = useState(false);
@@ -58,6 +87,12 @@ export function useAccountOperations(accountId: number) {
       .finally(() => setLoadingAccount(false));
   }, [accountId, refreshToken]);
 
+  // Les critères sont lus au moment de l'appel, via une ref : c'est leur
+  // **clé** qui pilote les dépendances, pas l'objet lui-même.
+  const filtersRef = useRef(filters);
+  filtersRef.current = filters;
+  const filterKey = filtersKey(filters);
+
   const fetchBatch = useCallback(
     (offset: number, run: number) => {
       if (fetchingRef.current) return;
@@ -73,6 +108,7 @@ export function useAccountOperations(accountId: number) {
           account_id: accountId,
           limit: OPERATIONS_PAGE_SIZE,
           offset,
+          ...filtersRef.current,
         })
         .then((resp: GetOperationsUsecaseModel) => {
           if (run !== runRef.current) return;
@@ -105,7 +141,9 @@ export function useAccountOperations(accountId: number) {
           else setLoadingMore(false);
         });
     },
-    [accountId],
+    // `filterKey` et non `filters` : l'objet change d'identité à chaque rendu,
+    // sa clé ne change qu'au changement réel de critères.
+    [accountId, filterKey],
   );
 
   useEffect(() => {

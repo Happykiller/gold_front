@@ -15,18 +15,47 @@ export class GetOperationsUsecase {
       const response: GraphqlResponse<OperationsQuery> =
         await this.inversify.graphqlService.send({
           operationName: 'operations',
-          variables: {
-            account_id: dto.account_id,
-            limit: dto.limit,
-            offset: dto.offset,
-          },
+          variables: { ...dto },
           // `limit` était un littéral dans la requête : la taille du lot était
           // donc figée ici autant que dans le calcul de l'offset. En variable,
           // elle redevient une décision de l'appelant.
+          //
+          // Les critères de filtrage sont tous nullables : une requête sans
+          // aucun d'eux produit exactement la requête d'avant la recherche.
           query: /* GraphQL */ `
-            query operations($account_id: Int!, $limit: Int!, $offset: Int!) {
+            query operations(
+              $account_id: Int!
+              $limit: Int!
+              $offset: Int!
+              $category_ids: [Int!]
+              $third_ids: [Int!]
+              $dest_account_ids: [Int!]
+              $type_ids: [Int!]
+              $status_ids: [Int!]
+              $description: String
+              $text: String
+              $amount_min: Float
+              $amount_max: Float
+              $date_from: String
+              $date_to: String
+            ) {
               operations(
-                dto: { account_id: $account_id, limit: $limit, offset: $offset }
+                dto: {
+                  account_id: $account_id
+                  limit: $limit
+                  offset: $offset
+                  category_ids: $category_ids
+                  third_ids: $third_ids
+                  dest_account_ids: $dest_account_ids
+                  type_ids: $type_ids
+                  status_ids: $status_ids
+                  description: $description
+                  text: $text
+                  amount_min: $amount_min
+                  amount_max: $amount_max
+                  date_from: $date_from
+                  date_to: $date_to
+                }
               ) {
                 id
                 account_id

@@ -113,8 +113,14 @@
   "operations": {
     "actions": "Actions",
     "deleteSucced": "Deletion successful",
+    "empty": "No operation on this account",
     "end_of_list": "End of list",
+    "no_result": "No operation matches these criteria",
     "recoSucced": "Reconciliation successful",
+    "search": {
+      "placeholder": "Search — cat:food, montant:>50, desc:isp…",
+      "suggestions": "suggestions"
+    },
     "title": "Operations"
   },
   "profile": {

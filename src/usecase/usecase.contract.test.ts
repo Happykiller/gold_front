@@ -12,6 +12,7 @@ import { GetAccountsUsecase } from '@usecase/getAccounts/getAccounts.usecase';
 import { GetCashflowUsecase } from '@usecase/getCashflow/getCashflow.usecase';
 import { GetOpeCategoriesUsecase } from '@usecase/getOpeCategories/getOpeCategories.usecase';
 import { GetOpeTypesUsecase } from '@usecase/getOpeTypes/getOpeTypes.usecase';
+import { GetOpeStatusUsecase } from '@usecase/getOpeStatus/getOpeStatus.usecase';
 import { GetOperationUsecase } from '@usecase/getOperation/getOperation.usecaset';
 import { GetOperationsUsecase } from '@usecase/getOperations/getOperations.usecase';
 import { GetThirdsUsecase } from '@usecase/getThirds/getThirds.usecase';
@@ -105,6 +106,12 @@ const cases: Case[] = [
     build: (i) => new GetOpeTypesUsecase(i),
     operationName: 'operationTypes',
     dataKey: 'operationTypes',
+  },
+  {
+    name: 'GetOpeStatusUsecase',
+    build: (i) => new GetOpeStatusUsecase(i),
+    operationName: 'operationStatus',
+    dataKey: 'operationStatus',
   },
   {
     name: 'GetThirdsUsecase',

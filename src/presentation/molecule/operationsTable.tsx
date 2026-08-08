@@ -6,7 +6,6 @@ import { useTheme } from '@mui/material/styles';
 import CheckIcon from '@mui/icons-material/Check';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditNoteIcon from '@mui/icons-material/EditNote';
-import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import { Operation } from '@presentation/hooks/useAccountOperations';
@@ -20,10 +19,10 @@ import {
 } from '@mui/material';
 
 import {
-  getOperationIcon,
   getCategoryIcon,
   formatEuroAmount,
   formatOperationDate,
+  formatOperationDateFull,
   getOperationVatBreakdown,
   getVisualAmountMeta,
 } from '@presentation/molecule/operationDisplay';
@@ -31,13 +30,54 @@ import { useCalculatorStore } from '@stores/useCalculatorStore';
 import { useInfiniteScroll } from '@presentation/hooks/useInfiniteScroll';
 
 /**
- * Définition des colonnes.
+ * Hiérarchie de lecture.
+ *
+ * La description est ce qui identifie une opération — c'est elle qu'on cherche
+ * en parcourant la liste. L'identifiant, la date et le tiers se consultent, ils
+ * ne se lisent pas : les laisser au même niveau de contraste que le libellé
+ * donnait huit champs d'égale importance et aucun point d'entrée pour l'œil.
+ */
+const TEXT_PRIMARY = '#e8eaf0';
+const TEXT_MUTED = '#5a6478';
+const TEXT_HEADER = '#7b8496';
+
+/**
+ * Ces couleurs passent toutes par `sx`, jamais par la prop `color` de
+ * `Typography`.
+ *
+ * La prop ne reconnaît que les **clés de la palette** (`primary`,
+ * `textSecondary`…) : une valeur hexadécimale ne correspond à aucun variant, ne
+ * produit aucune règle CSS, et le texte hérite alors de la couleur ambiante.
+ * Le défaut est silencieux — le blanc hérité ressemblait à s'y méprendre au
+ * `#e7e7ef` demandé, et trois cellules l'écrivaient en vain depuis l'origine.
+ */
+
+/**
+ * Chasse fixe pour la date et le montant.
+ *
+ * Ce n'est pas un effet de style : à largeur de caractère constante, les
+ * virgules décimales et les symboles € se superposent d'une ligne à l'autre, et
+ * la colonne des montants se compare d'un coup d'œil au lieu de se lire nombre
+ * par nombre. C'est aussi pourquoi cette colonne s'aligne à droite — centrée,
+ * la chasse fixe ne servirait à rien.
+ */
+const MONO_FONT =
+  'ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace';
+
+/**
+ * Définition des colonnes, dans l'ordre d'affichage.
  *
  * Hissée hors du composant : elle ne dépend de rien, et y rester la faisait
  * reconstruire à chaque rendu. La `Map` remplace les `columns.find(...)` qui
  * étaient répétés trois fois par cellule, soit vingt-quatre parcours du
  * tableau par ligne — supportable sur une page de 25, plus du tout quand la
  * liste s'accumule au fil du scroll.
+ *
+ * Chaque palier doit totaliser 12. La description est visible partout, y
+ * compris sur mobile où elle récupère la place de la catégorie — celle-ci n'y
+ * affiche qu'une icône et occupait pourtant trois colonnes. En contrepartie le
+ * tiers disparaît en `sm` : sept colonnes n'entrent pas dans douze, et c'est
+ * l'information la moins déterminante.
  */
 const COLUMNS = [
   {
@@ -45,44 +85,39 @@ const COLUMNS = [
     key: 'id',
     xs: 0,
     sm: 0,
-    md: 1,
+    md: 0.75,
     display: { xs: 'none', md: 'flex' },
   },
-  { label: 'Date', key: 'date', xs: 3, sm: 2, md: 1.25, display: 'flex' },
+  { label: 'Date', key: 'date', xs: 2, sm: 1.5, md: 1, display: 'flex' },
+  // Réduite à son icône : le libellé est passé en infobulle, la colonne n'a
+  // donc plus besoin que de la place d'un pictogramme.
+  { label: 'Cat.', key: 'category', xs: 1, sm: 1, md: 1, display: 'flex' },
+  { label: 'Desc.', key: 'desc', xs: 4, sm: 4, md: 3.75, display: 'flex' },
   {
     label: 'Montant',
     key: 'amount',
     xs: 3,
     sm: 2,
-    md: 1.25,
+    md: 1.5,
     display: 'flex',
   },
   {
     label: 'Dest.',
     key: 'dest',
     xs: 0,
-    sm: 2,
+    sm: 1.5,
     md: 1.25,
     display: { xs: 'none', sm: 'flex' },
   },
-  { label: 'Cat.', key: 'category', xs: 3, sm: 2, md: 2, display: 'flex' },
   {
     label: 'Tiers',
     key: 'third',
     xs: 0,
-    sm: 2,
-    md: 1.25,
-    display: { xs: 'none', sm: 'flex' },
-  },
-  {
-    label: 'Desc.',
-    key: 'desc',
-    xs: 0,
     sm: 0,
-    md: 2,
+    md: 1.25,
     display: { xs: 'none', md: 'flex' },
   },
-  { label: '', key: 'actions', xs: 3, sm: 2, md: 2, display: 'flex' },
+  { label: '', key: 'actions', xs: 2, sm: 2, md: 1.5, display: 'flex' },
 ] as const;
 
 type Column = (typeof COLUMNS)[number];
@@ -92,13 +127,17 @@ const COL = Object.fromEntries(COLUMNS.map((col) => [col.key, col])) as Record<
   Column
 >;
 
+/** Le libellé se lit à gauche, les montants s'alignent à droite. */
+const justifyOf = (key: Column['key']) =>
+  key === 'desc' ? 'flex-start' : key === 'amount' ? 'flex-end' : 'center';
+
 /** Taille et alignement d'une cellule, à partir de sa colonne. */
 const cellProps = (key: Column['key']) => ({
   size: { xs: COL[key].xs, sm: COL[key].sm, md: COL[key].md },
   sx: {
     display: COL[key].display,
     alignItems: 'center',
-    justifyContent: key === 'desc' ? 'flex-start' : 'center',
+    justifyContent: justifyOf(key),
   },
 });
 
@@ -163,10 +202,7 @@ const OperationRow = React.memo(function OperationRow({
     return null;
   };
 
-  const { value, color, sign } = getVisualAmountMeta(
-    operation,
-    current_account_id,
-  );
+  const { value, color } = getVisualAmountMeta(operation, current_account_id);
   const { vatRate, ttc, ht, vatAmount } = getOperationVatBreakdown(operation);
 
   const tooltipContent = (
@@ -204,77 +240,105 @@ const OperationRow = React.memo(function OperationRow({
       }}
     >
       <Grid {...cellProps('id')}>
-        <Typography noWrap color="#e7e7ef">
+        {/* Même traitement que la date : un identifiant se consulte, il ne se
+            lit pas — et comme elle, c'est du numérique, donc chasse fixe. */}
+        <Typography
+          noWrap
+          sx={{ color: TEXT_MUTED, fontFamily: MONO_FONT, fontSize: 13 }}
+        >
           {operation.id}
         </Typography>
       </Grid>
       <Grid {...cellProps('date')}>
-        <Typography noWrap color="#e7e7ef">
-          {formatOperationDate(operation.date)}
-        </Typography>
-      </Grid>
-      <Grid {...cellProps('amount')}>
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 0.5,
-            minWidth: 0,
-          }}
+        {/* L'année est retirée de l'affichage, mais la liste remonte jusqu'à
+            2018 : l'infobulle la rend au survol plutôt que de la perdre. */}
+        <Tooltip
+          title={formatOperationDateFull(operation.date)}
+          placement="top"
         >
-          <Typography noWrap sx={{ fontWeight: 600, color }}>
-            {getOperationIcon(sign === '-' ? -1 : 1)}
-            {value}
-          </Typography>
-          <Tooltip
-            title={tooltipContent}
-            placement="top"
-            arrow
-            enterTouchDelay={0}
-            leaveTouchDelay={3000}
+          <Typography
+            noWrap
+            sx={{ color: TEXT_MUTED, fontFamily: MONO_FONT, fontSize: 13 }}
           >
-            <Box
-              component="span"
-              onClick={(e) => e.stopPropagation()}
-              sx={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                color: '#8f98ad',
-                cursor: 'help',
-                lineHeight: 0,
-              }}
-            >
-              <InfoOutlinedIcon sx={{ fontSize: 15 }} />
-            </Box>
-          </Tooltip>
-        </Box>
-      </Grid>
-      <Grid {...cellProps('dest')}>
-        <Typography noWrap color="#e7e7ef">
-          {renderDest()}
-        </Typography>
+            {formatOperationDate(operation.date)}
+          </Typography>
+        </Tooltip>
       </Grid>
       <Grid {...cellProps('category')}>
-        {getCategoryIcon(operation.category?.label ?? '')}
-        <Typography
-          noWrap
-          color="#b7d6ff"
-          sx={{ ml: 0.4, display: { xs: 'none', sm: 'inline' } }}
+        {/* Le libellé passe en infobulle : l'icône et sa couleur suffisent à
+            reconnaître une catégorie d'un coup d'œil, et la colonne rend sa
+            largeur à la description. */}
+        {/* Chaîne vide et non élément vide quand la catégorie manque : un
+            `<Trans>` reste truthy, et MUI afficherait une bulle vide. */}
+        <Tooltip
+          title={
+            operation.category?.label ? (
+              <Trans>{operation.category.label}</Trans>
+            ) : (
+              ''
+            )
+          }
+          placement="top"
         >
-          <Trans>{operation.category?.label || ''}</Trans>
-        </Typography>
-      </Grid>
-      <Grid {...cellProps('third')}>
-        <Typography noWrap color="#e7e7ef">
-          <Trans>{operation.third?.label || ''}</Trans>
-        </Typography>
+          <Box
+            component="span"
+            sx={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              cursor: 'help',
+              lineHeight: 0,
+              // `getCategoryIcon` prévoit une marge pour un libellé qui n'est
+              // plus là : sans cela l'icône serait décentrée dans sa cellule.
+              '& .MuiSvgIcon-root': { mr: 0 },
+            }}
+          >
+            {getCategoryIcon(operation.category?.label ?? '')}
+          </Box>
+        </Tooltip>
       </Grid>
       <Grid {...cellProps('desc')}>
         <Tooltip title={operation.description || ''} placement="top">
-          <Typography noWrap color="#b0b3c6">
+          <Typography noWrap sx={{ color: TEXT_PRIMARY }}>
             {operation.description || ''}
           </Typography>
         </Tooltip>
+      </Grid>
+      <Grid {...cellProps('amount')}>
+        {/* Le ⓘ a disparu : le montant lui-même porte le détail de TVA. Une
+            icône par ligne pour une information consultée occasionnellement
+            encombrait la colonne qu'on lit le plus. */}
+        <Tooltip
+          title={tooltipContent}
+          placement="top"
+          arrow
+          enterTouchDelay={0}
+          leaveTouchDelay={3000}
+        >
+          {/* Pas d'icône ↗ ↘ : le signe et la couleur disent déjà le sens. */}
+          <Typography
+            noWrap
+            sx={{
+              fontWeight: 600,
+              color,
+              fontFamily: MONO_FONT,
+              fontVariantNumeric: 'tabular-nums',
+              cursor: 'help',
+            }}
+          >
+            {value}
+          </Typography>
+        </Tooltip>
+      </Grid>
+      <Grid {...cellProps('dest')}>
+        <Typography noWrap sx={{ color: TEXT_PRIMARY }}>
+          {renderDest()}
+        </Typography>
+      </Grid>
+      <Grid {...cellProps('third')}>
+        {/* En retrait comme la date, mais sans chasse fixe : c'est du texte. */}
+        <Typography noWrap sx={{ color: TEXT_MUTED, fontSize: 13 }}>
+          <Trans>{operation.third?.label || ''}</Trans>
+        </Typography>
       </Grid>
       <Grid {...cellProps('actions')}>
         <IconButton
@@ -318,6 +382,8 @@ type Props = {
   operations: Operation[] | null;
   /** Chargement du premier lot : la table n'a encore rien à montrer. */
   loading: boolean;
+  /** Au moins un critère est actif : une liste vide est alors le cas nominal. */
+  filtered?: boolean;
   /** Chargement d'un lot suivant : la table reste affichée. */
   loadingMore?: boolean;
   hasMore?: boolean;
@@ -332,6 +398,7 @@ export const OperationsTable: React.FC<Props> = ({
   current_account_id,
   operations,
   loading,
+  filtered = false,
   loadingMore = false,
   hasMore = false,
   onLoadMore,
@@ -396,17 +463,21 @@ export const OperationsTable: React.FC<Props> = ({
           py: 1,
         }}
       >
+        {/* Même `cellProps` que les cellules : l'en-tête suit ainsi
+            automatiquement l'alignement de sa colonne, notamment le montant
+            passé à droite. */}
         {COLUMNS.map((col) => (
-          <Grid
-            size={{ xs: col.xs, sm: col.sm, md: col.md }}
-            key={col.key}
-            sx={{
-              display: col.display,
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <Typography color="#fff" sx={{ fontSize: 15 }}>
+          <Grid key={col.key} {...cellProps(col.key)}>
+            <Typography
+              noWrap
+              sx={{
+                color: TEXT_HEADER,
+                fontSize: 11,
+                fontWeight: 600,
+                letterSpacing: '0.08em',
+                textTransform: 'uppercase',
+              }}
+            >
               {col.label}
             </Typography>
           </Grid>
@@ -438,8 +509,17 @@ export const OperationsTable: React.FC<Props> = ({
       >
         {loadingMore && <CircularProgress size={24} />}
         {!loadingMore && error && <Box color="error.main">{error}</Box>}
+        {/* Une liste vide n'avait aucun message : la table affichait son
+            en-tête et du vide. Avec un critère actif, c'est le cas nominal. */}
+        {!loadingMore && !error && operations.length === 0 && (
+          <Typography sx={{ color: TEXT_HEADER, fontSize: 14 }}>
+            <Trans>
+              {filtered ? 'operations.no_result' : 'operations.empty'}
+            </Trans>
+          </Typography>
+        )}
         {!loadingMore && !error && !hasMore && operations.length > 0 && (
-          <Typography color="#8f98ad" sx={{ fontSize: 14 }}>
+          <Typography sx={{ color: TEXT_HEADER, fontSize: 14 }}>
             <Trans>operations.end_of_list</Trans>
           </Typography>
         )}

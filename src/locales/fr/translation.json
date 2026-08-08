@@ -114,8 +114,14 @@
   "operations": {
     "actions": "Actions",
     "deleteSucced": "Suppression réussie",
+    "empty": "Aucune opération sur ce compte",
     "end_of_list": "Fin de la liste",
+    "no_result": "Aucune opération ne correspond à ces critères",
     "recoSucced": "Réconciliation réussie",
+    "search": {
+      "placeholder": "Rechercher — cat:alimentation, montant:>50, desc:fai…",
+      "suggestions": "suggestions"
+    },
     "title": "Opérations"
   },
   "profile": {

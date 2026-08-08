@@ -19,7 +19,6 @@ import LocalDiningIcon from '@mui/icons-material/LocalDining';
 import BeachAccessIcon from '@mui/icons-material/BeachAccess';
 import CelebrationIcon from '@mui/icons-material/Celebration';
 import CardGiftcardIcon from '@mui/icons-material/CardGiftcard';
-import TrendingDownIcon from '@mui/icons-material/TrendingDown';
 import SportsEsportsIcon from '@mui/icons-material/SportsEsports';
 import HealthAndSafetyIcon from '@mui/icons-material/HealthAndSafety';
 import EmojiTransportationIcon from '@mui/icons-material/EmojiTransportation';
@@ -143,32 +142,6 @@ export function getCategoryIcon(categoryLabel: string) {
   );
 }
 
-export function getOperationIcon(amount: number) {
-  if (amount < 0)
-    return (
-      <TrendingDownIcon
-        sx={{
-          color: '#ff5f5f',
-          fontSize: 18,
-          verticalAlign: 'middle',
-          mr: 0.5,
-        }}
-      />
-    );
-  if (amount > 0)
-    return (
-      <TrendingUpIcon
-        sx={{
-          color: '#23e47a',
-          fontSize: 18,
-          verticalAlign: 'middle',
-          mr: 0.5,
-        }}
-      />
-    );
-  return null;
-}
-
 export function getVisualAmountMeta(
   operation: Operation,
   currentAccountId: number,
@@ -224,7 +197,13 @@ export function getOperationVatBreakdown(operation: Operation) {
   };
 }
 
+/** Jour et mois seulement : dans une liste triée par date, l'année encombre. */
 export function formatOperationDate(date: string) {
+  return dayjs(parseInt(date)).format('DD/MM');
+}
+
+/** Date complète, pour l'infobulle : la liste remonte jusqu'à 2018. */
+export function formatOperationDateFull(date: string) {
   return dayjs(parseInt(date)).format('DD/MM/YYYY');
 }
 
