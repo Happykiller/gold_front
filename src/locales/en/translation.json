@@ -117,6 +117,7 @@
     "type": "Type",
     "vat": "VAT",
     "vat_amount": "VAT amount",
+    "vat_rate-hint": "A value between 0 and 100",
     "vat_rate": "VAT rate (%)"
   },
   "operation_create": {

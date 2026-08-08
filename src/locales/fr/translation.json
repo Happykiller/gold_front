@@ -117,6 +117,7 @@
     "type": "Type",
     "vat": "TVA",
     "vat_amount": "Montant TVA",
+    "vat_rate-hint": "Une valeur entre 0 et 100",
     "vat_rate": "Taux de TVA (%)"
   },
   "operation_create": {
