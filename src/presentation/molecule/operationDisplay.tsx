@@ -24,6 +24,7 @@ import HealthAndSafetyIcon from '@mui/icons-material/HealthAndSafety';
 import EmojiTransportationIcon from '@mui/icons-material/EmojiTransportation';
 
 import { Operation } from '@presentation/hooks/useAccountOperations';
+import { AMOUNT } from '@src/theme/tokens';
 
 const DEFAULT_VAT_RATE = 20;
 
@@ -151,22 +152,24 @@ export function getVisualAmountMeta(
     ' €';
 
   if (operation.type_id === 1) {
-    return { sign: '+', color: '#23e47a', value: `+${baseAmount}` }; // Crédit
+    return { sign: '+', color: AMOUNT.credit, value: `+${baseAmount}` }; // Crédit
   }
 
   if (operation.type_id === 2) {
-    return { sign: '-', color: '#ff5f5f', value: `-${baseAmount}` }; // Débit
+    return { sign: '-', color: AMOUNT.debit, value: `-${baseAmount}` }; // Débit
   }
 
   if (operation.type_id === 3) {
     if (operation.account_id_dest === currentAccountId) {
-      return { sign: '+', color: '#40a9ff', value: `+${baseAmount}` }; // Virement reçu
+      // Virement reçu : même couleur que la colonne Destination, c'est le même
+      // mouvement vu de l'autre bout.
+      return { sign: '+', color: AMOUNT.destination, value: `+${baseAmount}` };
     } else {
-      return { sign: '-', color: '#b388ff', value: `-${baseAmount}` }; // Virement envoyé
+      return { sign: '-', color: AMOUNT.regulation, value: `-${baseAmount}` }; // Virement émis
     }
   }
 
-  return { sign: '', color: '#ccc', value: baseAmount }; // Fallback
+  return { sign: '', color: AMOUNT.neutral, value: baseAmount }; // Fallback
 }
 
 export function getOperationVatRate(operation: Operation) {
