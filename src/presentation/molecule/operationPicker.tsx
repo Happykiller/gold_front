@@ -74,6 +74,9 @@ export const OperationPicker: React.FC<Props> = ({
       }}
       onChange={(_event, operation) => operation && onPick(operation)}
       renderOption={(props, operation) => {
+        // MUI dérive sa clé de `getOptionLabel` : toutes les opérations sans
+        // description partageraient donc la même, et React en omettrait
+        // silencieusement. On la remplace par l'identifiant, seul unique.
         const { key, ...rest } =
           props as React.HTMLAttributes<HTMLLIElement> & { key: string };
         const { value, color } = getVisualAmountMeta(
@@ -84,7 +87,7 @@ export const OperationPicker: React.FC<Props> = ({
         return (
           <Box
             component="li"
-            key={key}
+            key={operation.id}
             {...rest}
             sx={{ display: 'block !important', py: '4px !important' }}
           >

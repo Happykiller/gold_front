@@ -109,6 +109,34 @@ describe('OperationPicker', () => {
     expect(field()).toHaveValue('');
   });
 
+  it('donne une clé distincte à deux opérations sans description', async () => {
+    // MUI dérive sa clé d'option de `getOptionLabel` : deux opérations sans
+    // description partageaient donc la clé « Sans description ».
+    //
+    // On écoute la console, et non le nombre d'options rendues : React
+    // **tolère** les clés dupliquées — il avertit, il ne supprime rien — donc
+    // une assertion sur le rendu resterait verte. L'avertissement est le seul
+    // signal de ce défaut, et il annonce des identités de composant qui
+    // s'échangent d'un rendu à l'autre.
+    const consoleError = vi
+      .spyOn(console, 'error')
+      .mockImplementation(() => {});
+    const { user } = setup([
+      operation({ id: 1, description: '', amount: 10 }),
+      operation({ id: 2, description: '', amount: 20 }),
+    ]);
+
+    await user.click(field());
+    await screen.findAllByRole('option');
+
+    const duplicateKeyWarnings = consoleError.mock.calls.filter((call) =>
+      String(call[0]).includes('same key'),
+    );
+    consoleError.mockRestore();
+
+    expect(duplicateKeyWarnings).toEqual([]);
+  });
+
   it('reste inactif quand il n’y a rien à lier', () => {
     setup([]);
 

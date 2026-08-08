@@ -155,14 +155,16 @@ export const RefSelect: React.FC<RefSelectProps> = ({
         onChange(option ? String(option.id) : String(emptyValue))
       }
       renderOption={(props, option) => {
-        // `key` est fourni dans les props depuis MUI 9 : le laisser dans le
-        // spread déclenche un avertissement React à chaque rendu.
+        // MUI dérive sa clé de `getOptionLabel`. Deux entrées homonymes — deux
+        // comptes du même nom, par exemple — se retrouveraient donc avec la
+        // même clé, et React en omettrait une sans rien dire. L'identifiant est
+        // le seul discriminant sûr.
         const { key, ...rest } =
           props as React.HTMLAttributes<HTMLLIElement> & {
             key: string;
           };
         return (
-          <Box component="li" key={key} {...rest}>
+          <Box component="li" key={option.id} {...rest}>
             <Box
               component="span"
               sx={{

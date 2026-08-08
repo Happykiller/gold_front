@@ -41,9 +41,12 @@ export default tseslint.config(
       '@typescript-eslint/explicit-function-return-type': 'off',
       '@typescript-eslint/explicit-module-boundary-types': 'off',
       // Les paramètres préfixés d'un underscore sont volontairement inutilisés.
+      // `ignoreRestSiblings` couvre l'autre cas : écarter une propriété par
+      // déstructuration — `const { key, ...rest } = props` — est la façon
+      // idiomatique de ne pas la propager.
       '@typescript-eslint/no-unused-vars': [
         'error',
-        { argsIgnorePattern: '^_' },
+        { argsIgnorePattern: '^_', ignoreRestSiblings: true },
       ],
     },
   },
