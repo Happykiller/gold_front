@@ -5,14 +5,7 @@ import { Trans, useTranslation } from 'react-i18next';
 import { Delete, Info, Send } from '@mui/icons-material';
 import { createSearchParams, useNavigate } from 'react-router-dom';
 import { DatePicker } from '@mui/x-date-pickers';
-import {
-  Box,
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
-  Typography,
-} from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import EuroIcon from '@mui/icons-material/Euro';
 import DescriptionIcon from '@mui/icons-material/Description';
 
@@ -30,6 +23,7 @@ import {
   SubmitBar,
 } from '@presentation/molecule/formLayout';
 import { RowAction } from '@presentation/molecule/rowAction';
+import { OperationPicker } from '@presentation/molecule/operationPicker';
 import { formatEuroAmount } from '@presentation/molecule/operationDisplay';
 import { TEXT } from '@src/theme/tokens';
 import {
@@ -198,32 +192,14 @@ export const CreateVir = () => {
 
         <FormSection title={t('createVir.operations')} columns={1}>
           <FormRow>
-            <FormControl variant="standard" fullWidth sx={{ m: 1 }}>
-              <InputLabel>
-                <Trans>createVir.operations</Trans>
-              </InputLabel>
-              <Select
-                variant="standard"
-                size="small"
-                value=""
-                onChange={(event) => {
-                  const picked = linkable.find(
-                    (operation) => String(operation.id) === event.target.value,
-                  );
-                  if (picked)
-                    setSelectedOperations((prev) => [...prev, picked]);
-                }}
-              >
-                {linkable.map((operation) => (
-                  <MenuItem key={operation.id} value={String(operation.id)}>
-                    <Typography noWrap sx={{ fontSize: 13.5 }}>
-                      {formatEuroAmount(operation.amount)} —{' '}
-                      {operation.description}
-                    </Typography>
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
+            <OperationPicker
+              label={<Trans>createVir.operations</Trans>}
+              operations={linkable}
+              currentAccountId={parseInt(currentAccountDest)}
+              onPick={(operation) =>
+                setSelectedOperations((prev) => [...prev, operation])
+              }
+            />
           </FormRow>
 
           {selectedOperations.length > 0 && (

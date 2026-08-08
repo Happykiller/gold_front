@@ -113,6 +113,7 @@
     "description": "Description",
     "ht_amount": "Montant HT",
     "id": "ID",
+    "no-description": "Sans description",
     "reconcile": "Pointer cette opération",
     "status": "Statut",
     "status-follow": "En attente",
