@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { screen, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 // La table atteint le singleton d'injection par la chaîne
 // `useCalculatorStore` → `useAccountOperations`, et celui-ci charge le bundle
@@ -150,5 +151,83 @@ describe('OperationsTable — pointage', () => {
       screen.getByText('pointé — présent sur le relevé'),
     ).toBeInTheDocument();
     expect(screen.getByText(/␣ sur la ligne sélectionnée/)).toBeInTheDocument();
+  });
+});
+
+const rows = () => screen.getAllByRole('row');
+
+describe('OperationsTable — sélection et clavier', () => {
+  it('n’expose qu’une seule ligne à la tabulation', () => {
+    // Sans tabindex mouvant, une liste de 300 lignes poserait 300 arrêts entre
+    // la barre de recherche et le pied de page.
+    setup([operation({ id: 1 }), operation({ id: 2 }), operation({ id: 3 })]);
+
+    const focusable = rows().filter((row) => row.tabIndex === 0);
+
+    expect(focusable).toHaveLength(1);
+    expect(focusable[0]).toHaveAttribute('data-op-id', '1');
+  });
+
+  it('pointe la ligne sélectionnée avec ␣', async () => {
+    const { onRecoOperation } = setup([
+      operation({ id: 1, status_id: 1 }),
+      operation({ id: 2, status_id: 1 }),
+    ]);
+    const user = userEvent.setup();
+
+    rows()[0].focus();
+    await user.keyboard(' ');
+
+    expect(onRecoOperation).toHaveBeenCalledTimes(1);
+    expect(onRecoOperation.mock.calls[0][0].id).toBe(1);
+  });
+
+  it('ne fait rien quand ␣ vise une ligne déjà pointée', async () => {
+    const { onRecoOperation } = setup([operation({ id: 1, status_id: 2 })]);
+    const user = userEvent.setup();
+
+    rows()[0].focus();
+    await user.keyboard(' ');
+
+    expect(onRecoOperation).not.toHaveBeenCalled();
+  });
+
+  it('empêche la page de défiler quand ␣ pointe', () => {
+    setup([operation({ id: 1, status_id: 1 })]);
+
+    const event = new KeyboardEvent('keydown', {
+      key: ' ',
+      bubbles: true,
+      cancelable: true,
+    });
+    rows()[0].dispatchEvent(event);
+
+    expect(event.defaultPrevented).toBe(true);
+  });
+
+  it('déplace la sélection et le focus avec les flèches', async () => {
+    setup([operation({ id: 1 }), operation({ id: 2 }), operation({ id: 3 })]);
+    const user = userEvent.setup();
+
+    rows()[0].focus();
+    await user.keyboard('{ArrowDown}');
+
+    expect(rows()[1]).toHaveFocus();
+    expect(rows()[1]).toHaveAttribute('aria-selected', 'true');
+    expect(rows()[0]).toHaveAttribute('aria-selected', 'false');
+  });
+
+  it('édite la ligne sélectionnée avec E', async () => {
+    const { onEditOperation } = setup([
+      operation({ id: 1 }),
+      operation({ id: 2 }),
+    ]);
+    const user = userEvent.setup();
+
+    rows()[1].focus();
+    await user.keyboard('E');
+
+    expect(onEditOperation).toHaveBeenCalledTimes(1);
+    expect(onEditOperation.mock.calls[0][0].id).toBe(2);
   });
 });

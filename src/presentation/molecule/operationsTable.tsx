@@ -142,6 +142,14 @@ type RowProps = {
   isXs: boolean;
   /** La calculatrice flottante est ouverte : le clic sur une ligne l'alimente. */
   calculatorOpen: boolean;
+  /** Ligne courante du clavier. Primitif : la mémoïsation tient. */
+  selected: boolean;
+  /**
+   * Une seule ligne est atteignable par tabulation. Sans cela, une liste de
+   * 300 lignes poserait 300 arrêts entre la recherche et le pied de page.
+   */
+  focusable: boolean;
+  onSelect: (op: Operation) => void;
   onPick: (op: Operation) => void;
   onEditOperation?: (op: Operation) => void;
   onDeleteOperation?: (op: Operation) => void;
@@ -211,6 +219,9 @@ const OperationRow = React.memo(function OperationRow({
   current_account_id,
   isXs,
   calculatorOpen,
+  selected,
+  focusable,
+  onSelect,
   onPick,
   onEditOperation,
   onDeleteOperation,
@@ -246,13 +257,20 @@ const OperationRow = React.memo(function OperationRow({
 
   return (
     <Box
+      role="row"
+      aria-selected={selected}
+      data-op-id={operation.id}
+      tabIndex={focusable ? 0 : -1}
       sx={{
         ...GRID_SX,
         height: ROW_HEIGHT,
         borderBottom: LINE.row,
         fontSize: 12.5,
+        outline: 'none',
+        background: selected ? SURFACE.rowHover : undefined,
         '&:hover': { background: SURFACE.rowHover },
         '&:hover .op-row-desc': { color: TEXT.hover },
+        ...(selected ? { '& .op-row-desc': { color: TEXT.hover } } : {}),
         // `focus-within` autant que `hover` : sans lui, une tabulation jusqu'aux
         // boutons les laisserait invisibles alors qu'ils ont le focus.
         [`&:hover .${ACTIONS_CLASS}, &:focus-within .${ACTIONS_CLASS}`]: {
@@ -261,7 +279,11 @@ const OperationRow = React.memo(function OperationRow({
         },
         cursor: isXs ? 'pointer' : calculatorOpen ? 'copy' : 'default',
       }}
+      onFocus={() => onSelect(operation)}
       onClick={() => {
+        // La sélection d'abord : le reste de la sémantique du clic ne change
+        // pas, seulement son ordre.
+        onSelect(operation);
         if (isXs) onEditOperation?.(operation);
         else if (calculatorOpen) onPick(operation);
       }}
@@ -546,6 +568,86 @@ export const OperationsTable: React.FC<Props> = ({
     [operations, i18n.language],
   );
 
+  /**
+   * Ligne courante du clavier.
+   *
+   * Ici et pas dans `useAccountOperations` : la sélection n'est pas une donnée
+   * du serveur. Ni dans `operations.tsx` : personne d'autre n'en a besoin.
+   */
+  const [selectedId, setSelectedId] = React.useState<number | null>(null);
+  const containerRef = React.useRef<HTMLDivElement | null>(null);
+
+  // La ligne sélectionnée peut disparaître : on la supprime, ou un critère de
+  // recherche la fait sortir de la liste.
+  React.useEffect(() => {
+    if (selectedId === null) return;
+    if (!operations?.some((op) => op.id === selectedId)) setSelectedId(null);
+  }, [operations, selectedId]);
+
+  const handleSelect = React.useCallback(
+    (op: Operation) => setSelectedId(op.id),
+    [],
+  );
+
+  /**
+   * Raccourcis, gérés au niveau du conteneur et non de la ligne : l'événement
+   * remonte, un seul gestionnaire suffit, et la navigation se fait sur la
+   * liste **plate** — dans les groupes, elle buterait sur chaque bandeau.
+   */
+  const handleKeyDown = (event: React.KeyboardEvent) => {
+    const target = event.target as HTMLElement | null;
+    // `E` est une lettre nue : le jour où un champ apparaît dans la table
+    // (saisie en ligne), l'absence de garde la rendrait intapable.
+    if (
+      target instanceof HTMLInputElement ||
+      target instanceof HTMLTextAreaElement ||
+      target?.isContentEditable
+    )
+      return;
+
+    const flat = operations ?? [];
+    const index = flat.findIndex((op) => op.id === selectedId);
+    const current = index >= 0 ? flat[index] : null;
+
+    const move = (delta: number) => {
+      if (!flat.length) return;
+      const next =
+        index < 0 ? 0 : Math.min(flat.length - 1, Math.max(0, index + delta));
+      setSelectedId(flat[next].id);
+      containerRef.current
+        ?.querySelector<HTMLElement>(`[data-op-id="${flat[next].id}"]`)
+        ?.focus();
+    };
+
+    if (event.key === 'ArrowDown') {
+      // Sans `preventDefault`, la page défile en même temps que la sélection.
+      event.preventDefault();
+      move(1);
+      return;
+    }
+    if (event.key === 'ArrowUp') {
+      event.preventDefault();
+      move(-1);
+      return;
+    }
+    if (event.key === ' ') {
+      // Impératif : Espace fait autrement défiler la page d'un écran à chaque
+      // pointage.
+      event.preventDefault();
+      // Une opération déjà pointée ne se reprend pas — silencieusement, sans
+      // bascule optimiste qui aurait à revenir en arrière.
+      if (current && current.status_id !== STATUS_RECONCILED)
+        onRecoOperation?.(current);
+      return;
+    }
+    if (event.key === 'e' || event.key === 'E' || event.key === 'Enter') {
+      if (current) {
+        event.preventDefault();
+        onEditOperation?.(current);
+      }
+    }
+  };
+
   if (loading)
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center' }}>
@@ -560,6 +662,9 @@ export const OperationsTable: React.FC<Props> = ({
 
   return (
     <Box
+      ref={containerRef}
+      role="grid"
+      onKeyDown={handleKeyDown}
       sx={{
         width: '100%',
         maxWidth: ACCOUNT_MAX_WIDTH,
@@ -655,6 +760,15 @@ export const OperationsTable: React.FC<Props> = ({
               current_account_id={current_account_id}
               isXs={isXs}
               calculatorOpen={calculatorOpen}
+              selected={operation.id === selectedId}
+              // Exactement une ligne dans l'ordre de tabulation : celle qui est
+              // sélectionnée, ou la première à défaut.
+              focusable={
+                selectedId === null
+                  ? operation.id === operations[0]?.id
+                  : operation.id === selectedId
+              }
+              onSelect={handleSelect}
               onPick={add}
               onEditOperation={onEditOperation}
               onDeleteOperation={onDeleteOperation}
