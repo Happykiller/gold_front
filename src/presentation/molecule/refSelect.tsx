@@ -58,6 +58,13 @@ export type RefSelectProps = {
    * des opérations.
    */
   renderIcon?: (item: RefItem) => React.ReactNode;
+  /**
+   * Une valeur en fin de ligne — un solde, un compteur.
+   *
+   * Poussée à droite plutôt qu'accolée au libellé : elle se compare d'une
+   * entrée à l'autre, ce qui suppose qu'elle s'aligne verticalement.
+   */
+  renderTrailing?: (item: RefItem) => React.ReactNode;
   /** Espacement laissé à l'appelant : la brique ne décide pas de sa marge. */
   sx?: SxProps<Theme>;
 };
@@ -87,6 +94,7 @@ export const RefSelect: React.FC<RefSelectProps> = ({
   required = false,
   filter,
   renderIcon,
+  renderTrailing,
   sx,
 }) => {
   const { t } = useTranslation();
@@ -172,6 +180,7 @@ export const RefSelect: React.FC<RefSelectProps> = ({
                 alignItems: 'center',
                 gap: '8px',
                 minWidth: 0,
+                width: '100%',
               }}
             >
               {renderIcon && (
@@ -189,6 +198,11 @@ export const RefSelect: React.FC<RefSelectProps> = ({
               <Typography component="span" noWrap sx={{ fontSize: 13.5 }}>
                 {labelOf(option)}
               </Typography>
+              {renderTrailing && (
+                <Box component="span" sx={{ ml: 'auto', pl: '12px' }}>
+                  {renderTrailing(option)}
+                </Box>
+              )}
             </Box>
           </Box>
         );
