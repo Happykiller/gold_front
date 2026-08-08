@@ -32,10 +32,15 @@ export type RefSelectProps = {
    *  distinguait les trois copies de ce composant. */
   load: () => Promise<RefResponse>;
   /**
-   * Les libellés du référentiel sont des **clés i18n** venues de la base
-   * (`operation.type-credit`, `operation.status-follow`, `operation.third-*`).
-   * Les comptes et les catégories, eux, sont saisis par l'utilisateur et
-   * s'affichent tels quels.
+   * Les libellés du référentiel viennent de la base sous forme de **clés
+   * i18n** (`operation.type-credit`, `operation.status-follow`,
+   * `operation.third-*`, `operation.category-other`).
+   *
+   * À activer dès qu'un seul libellé du référentiel peut être une clé : la
+   * traduction laisse intacte une chaîne sans clé correspondante, donc un
+   * référentiel mixte — les catégories, saisies par l'utilisateur sauf une —
+   * se traite comme un référentiel fermé. Ne pas l'activer, en revanche,
+   * affiche la clé brute.
    */
   translateLabels?: boolean;
   /**

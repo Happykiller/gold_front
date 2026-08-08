@@ -109,6 +109,35 @@ describe('RefSelect', () => {
     expect(screen.queryByText('Courant')).not.toBeInTheDocument();
   });
 
+  it('traduit les clés d’un référentiel mixte sans toucher aux libellés saisis', async () => {
+    // Le cas qui a mordu : les catégories sont saisies par l'utilisateur, sauf
+    // `operation.category-other` que pose le seed. Un référentiel peut donc
+    // mélanger les deux, et priver la liste de traduction affiche la clé brute
+    // au milieu de libellés bien rendus.
+    const { user } = setup({
+      translateLabels: true,
+      load: () =>
+        ok([
+          { id: 1, label: 'Alimentation' },
+          { id: 2, label: 'operation.category-other' },
+        ]),
+    });
+    await waitFor(() =>
+      expect(screen.getByRole('combobox')).not.toHaveAttribute(
+        'aria-disabled',
+        'true',
+      ),
+    );
+    await open(user);
+    const list = await screen.findByRole('listbox');
+
+    expect(within(list).getByText('Autre')).toBeInTheDocument();
+    expect(within(list).getByText('Alimentation')).toBeInTheDocument();
+    expect(
+      within(list).queryByText('operation.category-other'),
+    ).not.toBeInTheDocument();
+  });
+
   it('affiche l’erreur du usecase plutôt que de lever', async () => {
     // Un usecase ne lève jamais : il rend un message d'échec, que les
     // composants lisent sans `try/catch`.
