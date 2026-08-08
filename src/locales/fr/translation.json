@@ -3,6 +3,13 @@
     "GET_PASSKEY_FOR_USER_FAIL": "Erreurs lors de récupération des clés d'accèes"
   },
   "account": {
+    "add-operation": "Nouvelle opération",
+    "balance": {
+      "pending": "en attente",
+      "reconciled": "pointé"
+    },
+    "calculator": "Ouvrir la calculatrice",
+    "refresh": "Rafraîchir",
     "type-regular": "Compte",
     "type-template": "Modèle"
   },
@@ -87,6 +94,9 @@
   "operation": {
     "account": "Compte",
     "account_dest": "Destination",
+    "action-delete": "Supprimer",
+    "action-edit": "Éditer",
+    "action-reconcile": "Pointer",
     "amount": "Montant",
     "category": "Catégorie",
     "category-other": "Autre",
@@ -103,6 +113,7 @@
     "third-otherDebit": "Débiteur",
     "ttc_amount": "Montant TTC",
     "type": "Type",
+    "vat": "TVA",
     "vat_amount": "Montant TVA",
     "vat_rate": "Taux de TVA (%)"
   },
@@ -119,10 +130,13 @@
     "deleteSucced": "Suppression réussie",
     "empty": "Aucune opération sur ce compte",
     "end_of_list": "Fin de la liste",
+    "legend-hint": "clic sur le statut pour pointer · ␣ sur la ligne sélectionnée",
+    "legend-pending": "en attente — saisi, pas encore passé",
+    "legend-reconciled": "pointé — présent sur le relevé",
     "no_result": "Aucune opération ne correspond à ces critères",
     "recoSucced": "Réconciliation réussie",
     "search": {
-      "placeholder": "Rechercher — cat:alimentation, montant:>50, desc:fai…",
+      "placeholder": "Rechercher — cat:, montant:>50, desc:, tiers:, statut:non-pointé",
       "suggestions": "suggestions"
     },
     "title": "Opérations"

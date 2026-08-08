@@ -3,6 +3,13 @@
     "GET_PASSKEY_FOR_USER_FAIL": "Erreurs lors de récupération des clés d'accèes"
   },
   "account": {
+    "add-operation": "New operation",
+    "balance": {
+      "pending": "pending",
+      "reconciled": "reconciled"
+    },
+    "calculator": "Open the calculator",
+    "refresh": "Refresh",
     "type-regular": "Account",
     "type-template": "Template"
   },
@@ -87,6 +94,9 @@
   "operation": {
     "account": "Account",
     "account_dest": "Destination",
+    "action-delete": "Delete",
+    "action-edit": "Edit",
+    "action-reconcile": "Reconcile",
     "amount": "Amount",
     "category": "Category",
     "category-other": "Other",
@@ -102,6 +112,8 @@
     "third-otherCredit": "Creditor",
     "third-otherDebit": "Debtor",
     "ttc_amount": "Amount incl. VAT",
+    "type": "Type",
+    "vat": "VAT",
     "vat_amount": "VAT amount",
     "vat_rate": "VAT rate (%)"
   },
@@ -118,10 +130,13 @@
     "deleteSucced": "Deletion successful",
     "empty": "No operation on this account",
     "end_of_list": "End of list",
+    "legend-hint": "click the status to reconcile · ␣ on the selected row",
+    "legend-pending": "pending — entered, not cleared yet",
+    "legend-reconciled": "reconciled — on the statement",
     "no_result": "No operation matches these criteria",
     "recoSucced": "Reconciliation successful",
     "search": {
-      "placeholder": "Search — cat:food, montant:>50, desc:isp…",
+      "placeholder": "Search — cat:, montant:>50, desc:, tiers:, statut:non-pointé",
       "suggestions": "suggestions"
     },
     "title": "Operations"
