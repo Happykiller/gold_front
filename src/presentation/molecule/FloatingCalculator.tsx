@@ -1,6 +1,7 @@
 // src\presentation\molecule\FloatingCalculator.tsx
 import { Typography } from '@mui/material';
 import React, { useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import CloseIcon from '@mui/icons-material/Close';
 import { useSearchParams } from 'react-router-dom';
 import { Box, IconButton, Paper } from '@mui/material';
@@ -8,14 +9,17 @@ import DeleteSweepIcon from '@mui/icons-material/DeleteSweep';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 
 import { useCalculatorStore } from '@stores/useCalculatorStore';
-import { Operation } from '@components/hooks/useAccountOperations';
+import { LINE, MONO_FONT, SHADOW, SURFACE, TEXT } from '@src/theme/tokens';
+import { Operation } from '@presentation/hooks/useAccountOperations';
 import {
+  formatEuroAmount,
   getSignedAmount,
   getVisualAmountMeta,
-} from '@components/molecule/operationDisplay';
+} from '@presentation/molecule/operationDisplay';
 
 export const FloatingCalculator: React.FC = () => {
   const [searchParams] = useSearchParams();
+  const { t } = useTranslation();
   const boxRef = useRef<HTMLDivElement>(null);
   const { open, close, operations, reset } = useCalculatorStore();
   const accountId = parseInt(searchParams.get('account_id') ?? '0');
@@ -71,11 +75,14 @@ export const FloatingCalculator: React.FC = () => {
         position: 'fixed',
         left: position.x,
         top: position.y,
-        width: 300,
-        borderRadius: 2,
-        bgcolor: 'background.paper',
+        width: 280,
+        borderRadius: (theme) => `${theme.radius.lg}px`,
+        background: SURFACE.raised,
+        border: LINE.block,
         zIndex: 1300,
-        boxShadow: (theme) => `0 0 15px ${theme.palette.primary.main}`,
+        // Une ombre noire, comme toute surface flottante. Le halo doré de 15 px
+        // était le dernier vestige de l'ancien langage dans le dépôt.
+        boxShadow: SHADOW.raised,
         cursor: 'default',
       }}
     >
@@ -101,21 +108,22 @@ export const FloatingCalculator: React.FC = () => {
 
       <Box sx={{ p: 2 }}>
         {operations.length === 0 ? (
-          <Typography variant="body2" color="text.secondary">
-            Aucune opération. Cliquez sur une ligne pour en ajouter.
+          <Typography sx={{ fontSize: 12.5, color: TEXT.meta }}>
+            {t('calculator.empty')}
           </Typography>
         ) : (
           <Box>
             {operations.map((op: Operation, idx) => {
-              const { value, color } = getVisualAmountMeta(op, accountId); // ou current_account_id si dispo
+              const { value, color } = getVisualAmountMeta(op, accountId);
               return (
                 <Typography
                   key={idx}
                   sx={{
-                    fontFamily: 'monospace',
+                    fontFamily: MONO_FONT,
+                    fontSize: 12.5,
+                    fontVariantNumeric: 'tabular-nums',
+                    textAlign: 'right',
                     color,
-                    display: 'flex',
-                    alignItems: 'center',
                   }}
                 >
                   {value}
@@ -130,16 +138,29 @@ export const FloatingCalculator: React.FC = () => {
                 alignItems: 'center',
               }}
             >
-              <Typography sx={{ fontWeight: 700 }}>Total</Typography>
-              <Typography sx={{ fontWeight: 700 }}>
-                {total.toLocaleString('fr-FR', { minimumFractionDigits: 2 })} €
+              <Typography sx={{ fontSize: 11, color: TEXT.meta }}>
+                {t('calculator.total')}
+              </Typography>
+              <Typography
+                sx={{
+                  fontFamily: MONO_FONT,
+                  fontWeight: 500,
+                  fontSize: 13,
+                  color: TEXT.title,
+                }}
+              >
+                {formatEuroAmount(total)}
               </Typography>
             </Box>
           </Box>
         )}
 
         <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
-          <IconButton size="small" onClick={reset}>
+          <IconButton
+            size="small"
+            aria-label={t('calculator.reset')}
+            onClick={reset}
+          >
             <DeleteSweepIcon fontSize="small" />
           </IconButton>
         </Box>

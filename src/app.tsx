@@ -1,6 +1,6 @@
 // src\app.tsx
 import React, { Suspense, lazy } from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { Close as CloseIcon } from '@mui/icons-material';
 
 import { LayoutPublicExt } from './presentation/layout/LayoutPublicExt';
@@ -116,16 +116,11 @@ const App: React.FC = () => {
           />
 
           {/* Route for root */}
-          <Route
-            path="/"
-            element={
-              <LayoutProtectedExt>
-                <Home />
-              </LayoutProtectedExt>
-            }
-          />
+          {/* La racine renvoie sur `/accounts`, la route que porte la barre de
+              navigation. Les deux rendaient le même écran : deux URL pour une
+              page, dont une que rien ne désignait. */}
+          <Route path="/" element={<Navigate to="/accounts" replace />} />
 
-          {/* Route for the profil page */}
           <Route
             path="/accounts"
             element={

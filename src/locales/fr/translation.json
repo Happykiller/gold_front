@@ -14,6 +14,11 @@
     "type-regular": "Compte",
     "type-template": "Modèle"
   },
+  "calculator": {
+    "empty": "Aucune opération. Cliquez une ligne pour en ajouter.",
+    "reset": "Vider la calculatrice",
+    "total": "Total"
+  },
   "clone": {
     "send": "Cloner",
     "succeed": "Clonage réussi",

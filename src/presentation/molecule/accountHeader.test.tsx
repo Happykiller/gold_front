@@ -3,6 +3,7 @@ import { screen } from '@testing-library/react';
 
 import { AccountHeader } from './accountHeader';
 import { renderWithApp } from '@src/testing/renderWithApp';
+import { AMOUNT } from '@src/theme/tokens';
 import type { Account } from '@presentation/hooks/useAccountOperations';
 
 const account = (reconcilied: number | null, notReconcilied: number | null) =>
@@ -44,7 +45,7 @@ describe('AccountHeader', () => {
     // se lit quand même d'un coup d'œil.
     setup(account(-12.5, -30));
 
-    expect(screen.getByText('-12,50 €')).toHaveStyle({ color: '#F2635B' });
+    expect(screen.getByText('-12,50 €')).toHaveStyle({ color: AMOUNT.debit });
   });
 
   it('ne rend plus aucune phrase anglaise de solde', () => {

@@ -14,6 +14,11 @@
     "type-regular": "Account",
     "type-template": "Template"
   },
+  "calculator": {
+    "empty": "No operation. Click a row to add one.",
+    "reset": "Clear the calculator",
+    "total": "Total"
+  },
   "clone": {
     "send": "Clone",
     "succeed": "Cloning successful",
