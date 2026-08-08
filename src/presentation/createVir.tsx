@@ -187,7 +187,6 @@ export const CreateVir = () => {
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        minHeight: '100vh',
         px: 2,
       }}
     >

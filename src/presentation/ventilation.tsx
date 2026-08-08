@@ -160,7 +160,6 @@ export const Ventilation = () => {
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        minHeight: '100vh',
         px: 2,
         py: 4,
       }}

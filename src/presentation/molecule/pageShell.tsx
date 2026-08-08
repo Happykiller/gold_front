@@ -47,9 +47,13 @@ export const PageShell: React.FC<Props> = ({
       width: '100%',
       maxWidth: width === 'form' ? FORM_WIDTH : APP_MAX_WIDTH,
       mx: 'auto',
-      // Le layout centre verticalement son conteneur : sans cela, un écran
-      // court dérive vers le milieu de la fenêtre.
-      alignSelf: 'flex-start',
+      // Le conteneur du layout est un flex en colonne avec
+      // `justifyContent: center` : un écran court dérive donc vers le milieu de
+      // la fenêtre. On ne peut pas le corriger depuis le thème — c'est écrit
+      // en `sx` dans la bibliothèque — mais une marge basse automatique absorbe
+      // l'espace libre et gagne sur `justify-content`. `alignSelf` serait sans
+      // effet : il porte sur l'axe transversal, donc horizontal ici.
+      mb: 'auto',
     }}
   >
     {title && (
