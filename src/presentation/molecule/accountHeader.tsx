@@ -207,7 +207,7 @@ export const AccountHeader: React.FC<Props> = ({
                 ...iconButtonSx,
                 ml: '4px',
                 background: theme.palette.primary.main,
-                color: '#181203',
+                color: TEXT.onAccent,
                 '&:hover': { background: theme.palette.primary.light },
               }}
             >

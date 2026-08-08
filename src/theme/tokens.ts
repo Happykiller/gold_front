@@ -38,6 +38,8 @@ export const TEXT = {
   id: '#454B5E',
   /** Tiers. */
   third: '#636A80',
+  /** Sur fond doré — le seul endroit où le texte est sombre. */
+  onAccent: '#181203',
 };
 
 /**

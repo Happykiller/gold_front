@@ -120,26 +120,17 @@ export function getCategoryIcon(categoryLabel: string) {
 
   const match = map[label ?? ''];
 
+  // Ni marge ni taille imposée : l'icône se rend seule dans sa cellule, et la
+  // marge qui traînait ici pour un libellé disparu obligeait chaque appelant à
+  // la neutraliser.
   if (match) {
     return React.cloneElement(match.icon, {
-      sx: {
-        color: match.color,
-        fontSize: 20,
-        mr: 0.5,
-        verticalAlign: 'middle',
-      },
+      sx: { color: match.color, verticalAlign: 'middle' },
     });
   }
 
   return (
-    <CategoryIcon
-      sx={{
-        color: '#a9b1c2',
-        fontSize: 20,
-        mr: 0.5,
-        verticalAlign: 'middle',
-      }}
-    />
+    <CategoryIcon sx={{ color: AMOUNT.neutral, verticalAlign: 'middle' }} />
   );
 }
 

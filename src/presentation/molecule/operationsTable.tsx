@@ -322,8 +322,7 @@ const OperationRow = React.memo(function OperationRow({
             justifyContent: 'center',
             cursor: 'help',
             lineHeight: 0,
-            // `getCategoryIcon` dimensionne pour un libellé qui n'est plus là.
-            '& .MuiSvgIcon-root': { fontSize: 12, mr: 0 },
+            '& .MuiSvgIcon-root': { fontSize: 12 },
           }}
         >
           {getCategoryIcon(operation.category?.label ?? '')}
