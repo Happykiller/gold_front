@@ -95,7 +95,6 @@
     "ht_amount": "Montant HT",
     "id": "ID",
     "reconcile": "Pointer cette opération",
-    "state": "État",
     "status": "Statut",
     "status-follow": "En attente",
     "status-reconciled": "Pointée",

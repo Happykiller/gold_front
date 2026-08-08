@@ -95,7 +95,6 @@
     "ht_amount": "Amount excl. VAT",
     "id": "ID",
     "reconcile": "Reconcile this operation",
-    "state": "State",
     "status": "Status",
     "status-follow": "Pending",
     "status-reconciled": "Reconciled",

@@ -88,7 +88,7 @@ const COLUMNS = [
   },
   // Marqueur de ligne : premier élément visible sur mobile, où l'identifiant
   // est masqué. L'icône vaut action — cliquer pointe l'opération.
-  { label: 'État', key: 'state', xs: 1, sm: 1, md: 0.75, display: 'flex' },
+  { label: 'Statut', key: 'statut', xs: 1, sm: 1, md: 0.75, display: 'flex' },
   { label: 'Date', key: 'date', xs: 2, sm: 1.5, md: 1, display: 'flex' },
   // Réduite à son icône : le libellé est passé en infobulle, la colonne n'a
   // donc plus besoin que de la place d'un pictogramme.
@@ -118,7 +118,7 @@ const COLUMNS = [
     md: 1.25,
     display: { xs: 'none', md: 'flex' },
   },
-  // Deux boutons depuis que le pointage est passé dans la colonne État.
+  // Deux boutons depuis que le pointage est passé dans la colonne Statut.
   { label: '', key: 'actions', xs: 1, sm: 1, md: 0.75, display: 'flex' },
 ] as const;
 
@@ -288,7 +288,7 @@ const OperationRow = React.memo(function OperationRow({
           {operation.id}
         </Typography>
       </Grid>
-      <Grid {...cellProps('state')}>
+      <Grid {...cellProps('statut')}>
         {/* L'icône porte l'action : cliquer pointe l'opération. Le bouton
             dédié de la colonne Actions faisait double emploi avec un état
             qu'on doit de toute façon pouvoir lire d'un coup d'œil. */}
@@ -452,7 +452,7 @@ const OperationRow = React.memo(function OperationRow({
             <EditNoteIcon />
           </IconButton>
         )}
-        {/* Le bouton de pointage a rejoint la colonne État : son icône y dit
+        {/* Le bouton de pointage a rejoint la colonne Statut : son icône y dit
             déjà l'état, autant qu'elle porte l'action. */}
       </Grid>
     </Grid>
