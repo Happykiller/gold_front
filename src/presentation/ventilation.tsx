@@ -2,18 +2,11 @@ import dayjs from 'dayjs';
 import * as React from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { Add, Delete, Send, Info } from '@mui/icons-material';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
+import { DatePicker } from '@mui/x-date-pickers';
 import {
   Box,
   Button,
   Typography,
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
-  useTheme,
-  Grid,
   Switch,
   FormControlLabel,
   IconButton,
@@ -25,6 +18,16 @@ import inversify from '@src/common/inversify';
 import { useFlashStore, Input } from '@happykiller/sunny-ui';
 import { AccountsSelect } from '@presentation/molecule/accountsSelect';
 import { OpeCategoriesSelect } from '@presentation/molecule/opeCategoriesSelect';
+import { OpeStatusSelect } from '@presentation/molecule/opeRefSelects';
+import { PageShell } from '@presentation/molecule/pageShell';
+import { AsyncState } from '@presentation/molecule/asyncState';
+import {
+  FormSection,
+  FormRow,
+  SubmitBar,
+} from '@presentation/molecule/formLayout';
+import { formatEuroAmount } from '@presentation/molecule/operationDisplay';
+import { AMOUNT, LINE, TEXT } from '@src/theme/tokens';
 import { CreateOperationUsecaseModel } from '@usecase/createOperation/createOperation.usecase.model';
 import {
   destinationAmount,
@@ -35,7 +38,6 @@ import {
 } from '@presentation/ventilation.calc';
 
 export const Ventilation = () => {
-  const theme = useTheme();
   const { t } = useTranslation();
   const flash = useFlashStore();
 
@@ -155,244 +157,182 @@ export const Ventilation = () => {
   };
 
   return (
-    <Box
-      sx={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        px: 2,
-        py: 4,
-      }}
-    >
-      <Box
-        sx={{
-          borderRadius: { xs: 0, sm: '16px' },
-          boxShadow: {
-            xs: 'none',
-            sm: `0 0 32px 0 ${theme.palette.primary.main}55`,
-          },
-          border: { xs: 'none', sm: `2px solid ${theme.palette.primary.main}` },
-          maxWidth: 800,
-          width: '100%',
-          background: { xs: 0, sm: theme.palette.background.default },
-          p: 3,
-        }}
-      >
-        <Typography
-          variant="h6"
-          color="text.primary"
-          sx={{ fontWeight: 700, textAlign: 'center', mb: 2 }}
-        >
-          <Trans>ventilation.title</Trans>
-        </Typography>
+    <PageShell title={t('ventilation.title')} width="full">
+      <AsyncState loading={loading}>
+        <form onSubmit={handleCreateOperation}>
+          <FormSection columns={3}>
+            <DatePicker
+              format="DD/MM/YYYY"
+              label={<Trans>operation.date</Trans>}
+              value={currentDate}
+              onChange={(newValue) => setCurrentDate(newValue)}
+              slotProps={{
+                textField: { variant: 'standard', fullWidth: true },
+              }}
+            />
+            <OpeStatusSelect
+              value={currentStatus}
+              label={<Trans>operation.status</Trans>}
+              onChange={(e) => setCurrentStatus(e.target.value)}
+            />
+            <OpeCategoriesSelect
+              value={categoryId}
+              label={<Trans>operation.category</Trans>}
+              onChange={(e) => setCategoryId(e.target.value)}
+            />
+          </FormSection>
 
-        {loading ? (
-          <Typography color="text.secondary" sx={{ textAlign: 'center' }}>
-            <Trans>common.loading</Trans>
-          </Typography>
-        ) : (
-          <form onSubmit={handleCreateOperation}>
-            <Grid container spacing={2}>
-              {/* Common Fields */}
-              <Grid size={4}>
-                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                  <DatePicker
-                    format="DD/MM/YYYY"
-                    label={<Trans>operation.date</Trans>}
-                    value={currentDate}
-                    onChange={(newValue: any) => setCurrentDate(newValue)}
-                  />
-                </LocalizationProvider>
-              </Grid>
-              <Grid size={4}>
-                <FormControl variant="standard" fullWidth>
-                  <InputLabel>
-                    <Trans>operation.status</Trans>
-                  </InputLabel>
-                  <Select
-                    value={currentStatus}
-                    variant="standard"
-                    onChange={(e) => setCurrentStatus(e.target.value)}
-                  >
-                    <MenuItem value="1">A suivre</MenuItem>
-                    <MenuItem value="2">Réconcilier</MenuItem>
-                  </Select>
-                </FormControl>
-              </Grid>
+          <FormSection>
+            <AccountsSelect
+              value={originAccount}
+              label={<Trans>operation.account</Trans>}
+              onChange={(e) => setOriginAccount(e.target.value)}
+            />
+            <Input
+              label={<Trans>ventilation.total_amount</Trans>}
+              tooltip={t('operation.amount-hint')}
+              regex="^[0-9]+([.,][0-9]{1,2})?$"
+              require
+              virgin={amount.value === '0.00'}
+              entity={amount}
+              onChange={setAmount}
+              startIcon={<EuroIcon fontSize="small" />}
+              icons={{ help: <Info fontSize="small" /> }}
+            />
+            <FormRow>
+              <Input
+                label={<Trans>operation.description</Trans>}
+                require
+                virgin={description.value === ''}
+                entity={description}
+                onChange={setDescription}
+                regex="^.+$"
+              />
+            </FormRow>
+          </FormSection>
 
-              <Grid size={4}>
-                <OpeCategoriesSelect
-                  value={categoryId}
-                  label={<Trans>operation.category</Trans>}
-                  onChange={(e: any) => setCategoryId(e.target.value)}
-                />
-              </Grid>
-
-              <Grid size={6}>
-                <AccountsSelect
-                  value={originAccount}
-                  label={<Trans>operation.account</Trans>}
-                  onChange={(e: any) => setOriginAccount(e.target.value)}
-                />
-              </Grid>
-              <Grid size={6}>
-                <Input
-                  label={<Trans>ventilation.total_amount</Trans>}
-                  tooltip="Saisir un montant numérique"
-                  regex="^[0-9]+([.,][0-9]{1,2})?$"
-                  require
-                  virgin={amount.value === '0.00'}
-                  entity={amount}
-                  onChange={setAmount}
-                  startIcon={<EuroIcon fontSize="small" />}
-                  icons={{ help: <Info fontSize="small" /> }}
-                />
-              </Grid>
-
-              <Grid size={12} sx={{ mt: 2 }}>
-                <Input
-                  label={<Trans>operation.description</Trans>}
-                  require
-                  virgin={description.value === ''}
-                  entity={description}
-                  onChange={setDescription}
-                  regex="^.+$"
-                />
-              </Grid>
-
-              <Grid
-                size={12}
+          <FormSection title={t('ventilation.destinations')} columns={1}>
+            {calculatedDestinations.map((dest) => (
+              <Box
+                key={dest.id}
                 sx={{
-                  mt: 3,
-                  borderTop: `1px solid ${theme.palette.divider}`,
-                  pt: 2,
+                  display: 'grid',
+                  gridTemplateColumns: {
+                    xs: '1fr',
+                    sm: 'minmax(0, 2fr) auto minmax(0, 1fr) 34px',
+                  },
+                  columnGap: '14px',
+                  alignItems: 'center',
+                  borderBottom: LINE.row,
+                  py: '4px',
                 }}
               >
-                <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2 }}>
-                  Destinations
-                </Typography>
-
-                {calculatedDestinations.map((dest) => (
-                  <Grid
-                    container
-                    spacing={2}
-                    key={dest.id}
-                    sx={{ alignItems: 'center', mb: 2 }}
-                  >
-                    <Grid size={4}>
-                      <AccountsSelect
-                        value={dest.accountId}
-                        label={<Trans>ventilation.dest_account</Trans>}
-                        onChange={(e: any) =>
-                          updateDestination(
-                            dest.id,
-                            'accountId',
-                            e.target.value,
-                          )
-                        }
-                      />
-                    </Grid>
-                    <Grid size={2}>
-                      <FormControlLabel
-                        control={
-                          <Switch
-                            checked={dest.isPercentage}
-                            onChange={(e) =>
-                              updateDestination(
-                                dest.id,
-                                'isPercentage',
-                                e.target.checked,
-                              )
-                            }
-                          />
-                        }
-                        label={
-                          <Typography variant="caption">
-                            <Trans>ventilation.is_percentage</Trans>
-                          </Typography>
-                        }
-                      />
-                    </Grid>
-                    <Grid size={4}>
-                      <Input
-                        label={<Trans>ventilation.amount</Trans>}
-                        regex="^[0-9]+([.,][0-9]{1,2})?$"
-                        require
-                        entity={dest.amountStr}
-                        onChange={(val: any) =>
-                          updateDestination(dest.id, 'amountStr', val)
-                        }
-                      />
-                      <Typography variant="caption" color="text.secondary">
-                        {dest.isPercentage
-                          ? `→ ${dest.actualAmount.toFixed(2)} €`
-                          : `→ ${dest.actualAmount.toFixed(2)} €`}
-                      </Typography>
-                    </Grid>
-                    <Grid size={2}>
-                      <IconButton
-                        color="error"
-                        onClick={() => removeDestination(dest.id)}
-                        disabled={destinations.length === 1}
-                      >
-                        <Delete />
-                      </IconButton>
-                    </Grid>
-                  </Grid>
-                ))}
-
-                <Button
-                  variant="outlined"
-                  startIcon={<Add />}
-                  onClick={addDestination}
-                  sx={{ mt: 1 }}
-                >
-                  <Trans>ventilation.add_dest</Trans>
-                </Button>
-              </Grid>
-
-              {/* Total Calculation Display */}
-              <Grid size={12} sx={{ textAlign: 'center', mt: 2 }}>
-                <Typography
-                  variant="h6"
-                  color={
-                    exceeded
-                      ? 'error.main'
-                      : isFullyAllocated(destinations, parsedTotalAmount)
-                        ? 'success.main'
-                        : 'warning.main'
+                <AccountsSelect
+                  value={dest.accountId}
+                  label={<Trans>ventilation.dest_account</Trans>}
+                  onChange={(e) =>
+                    updateDestination(dest.id, 'accountId', e.target.value)
                   }
+                />
+                <FormControlLabel
+                  control={
+                    <Switch
+                      size="small"
+                      checked={dest.isPercentage}
+                      onChange={(e) =>
+                        updateDestination(
+                          dest.id,
+                          'isPercentage',
+                          e.target.checked,
+                        )
+                      }
+                    />
+                  }
+                  label={
+                    <Typography sx={{ fontSize: 11.5, color: TEXT.label }}>
+                      <Trans>ventilation.is_percentage</Trans>
+                    </Typography>
+                  }
+                />
+                <Box>
+                  <Input
+                    label={<Trans>ventilation.amount</Trans>}
+                    regex="^[0-9]+([.,][0-9]{1,2})?$"
+                    require
+                    entity={dest.amountStr}
+                    onChange={(val: { value: string; valid: boolean }) =>
+                      updateDestination(dest.id, 'amountStr', val)
+                    }
+                  />
+                  {/* Le montant réel d'une part exprimée en pourcentage. La
+                      version précédente écrivait un ternaire dont les deux
+                      branches étaient identiques. */}
+                  {dest.isPercentage && (
+                    <Typography sx={{ fontSize: 11, color: TEXT.meta }}>
+                      → {formatEuroAmount(dest.actualAmount)}
+                    </Typography>
+                  )}
+                </Box>
+                <IconButton
+                  aria-label={t('operation.action-delete')}
+                  onClick={() => removeDestination(dest.id)}
+                  disabled={destinations.length === 1}
+                  size="small"
+                  sx={{ '& .MuiSvgIcon-root': { fontSize: 16 } }}
                 >
-                  <Trans>ventilation.total_allocated</Trans> : {allocated} € /{' '}
-                  {parsedTotalAmount} €
-                </Typography>
-                {exceeded && (
-                  <Typography variant="subtitle2" color="error.main">
-                    <Trans>ventilation.error_amount_exceeded</Trans>
-                  </Typography>
-                )}
-                {error && (
-                  <Typography variant="subtitle2" color="error.main">
-                    {error}
-                  </Typography>
-                )}
-              </Grid>
+                  <Delete />
+                </IconButton>
+              </Box>
+            ))}
 
-              {/* Action Button */}
-              <Grid size={12} sx={{ textAlign: 'center' }}>
-                <Button
-                  type="submit"
-                  variant="contained"
-                  startIcon={<Send fontSize="small" />}
-                  disabled={!isValid}
-                >
-                  <Trans>ventilation.send</Trans>
-                </Button>
-              </Grid>
-            </Grid>
-          </form>
-        )}
-      </Box>
-    </Box>
+            <Button
+              variant="outlined"
+              size="small"
+              startIcon={<Add />}
+              onClick={addDestination}
+              sx={{ mt: '10px', justifySelf: 'start' }}
+            >
+              <Trans>ventilation.add_dest</Trans>
+            </Button>
+          </FormSection>
+
+          {/* Le total réparti : rouge s'il dépasse, vert s'il tombe juste,
+              orange tant qu'il reste un reliquat. */}
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'baseline',
+              gap: '8px',
+              mt: '16px',
+              fontSize: 13,
+              color: exceeded
+                ? AMOUNT.debit
+                : isFullyAllocated(destinations, parsedTotalAmount)
+                  ? AMOUNT.credit
+                  : 'warning.main',
+            }}
+          >
+            <Trans>ventilation.total_allocated</Trans>
+            <Box component="span" sx={{ fontWeight: 500 }}>
+              {formatEuroAmount(allocated)} /{' '}
+              {formatEuroAmount(parsedTotalAmount)}
+            </Box>
+            {exceeded && (
+              <Typography sx={{ fontSize: 12.5, color: AMOUNT.debit }}>
+                <Trans>ventilation.error_amount_exceeded</Trans>
+              </Typography>
+            )}
+          </Box>
+
+          <SubmitBar
+            label={<Trans>ventilation.send</Trans>}
+            icon={<Send fontSize="small" />}
+            errorNamespace="ventilation"
+            error={error}
+            disabled={!isValid}
+          />
+        </form>
+      </AsyncState>
+    </PageShell>
   );
 };

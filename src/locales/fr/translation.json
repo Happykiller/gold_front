@@ -169,6 +169,7 @@
   "ventilation": {
     "title": "Ventilation",
     "add_dest": "Ajouter une destination",
+    "destinations": "Destinations",
     "dest_account": "Compte de destination",
     "amount-hint": "Un montant numérique, par exemple 125,50",
     "amount": "Montant / Pourcentage",
