@@ -148,26 +148,26 @@ export const OperationNew = () => {
           <OpeTypesSelect
             value={operation.type_id}
             label={<Trans>operation.type</Trans>}
-            onChange={(e) =>
-              setOperation({ ...operation, type_id: Number(e.target.value) })
+            onChange={(value) =>
+              setOperation({ ...operation, type_id: Number(value) })
             }
           />
           <AccountsSelect
             value={operation.account_id}
             type={0}
             label={<Trans>operation.account</Trans>}
-            onChange={(e) =>
-              setOperation({ ...operation, account_id: Number(e.target.value) })
+            onChange={(value) =>
+              setOperation({ ...operation, account_id: Number(value) })
             }
           />
           {operation.type_id === 3 && (
             <AccountsSelect
               value={operation.account_id_dest ?? ''}
               label={<Trans>operation.account_dest</Trans>}
-              onChange={(e) =>
+              onChange={(value) =>
                 setOperation({
                   ...operation,
-                  account_id_dest: Number(e.target.value),
+                  account_id_dest: Number(value),
                 })
               }
             />
@@ -175,24 +175,24 @@ export const OperationNew = () => {
           <OpeStatusSelect
             value={operation.status_id}
             label={<Trans>operation.status</Trans>}
-            onChange={(e) =>
-              setOperation({ ...operation, status_id: Number(e.target.value) })
+            onChange={(value) =>
+              setOperation({ ...operation, status_id: Number(value) })
             }
           />
           <ThirdsSelect
             value={operation.third_id}
             label={<Trans>operation.third</Trans>}
-            onChange={(e) =>
-              setOperation({ ...operation, third_id: Number(e.target.value) })
+            onChange={(value) =>
+              setOperation({ ...operation, third_id: Number(value) })
             }
           />
           <OpeCategoriesSelect
             value={operation.category_id}
             label={<Trans>operation.category</Trans>}
-            onChange={(e) =>
+            onChange={(value) =>
               setOperation({
                 ...operation,
-                category_id: Number(e.target.value),
+                category_id: Number(value),
               })
             }
           />

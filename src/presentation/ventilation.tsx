@@ -173,12 +173,12 @@ export const Ventilation = () => {
             <OpeStatusSelect
               value={currentStatus}
               label={<Trans>operation.status</Trans>}
-              onChange={(e) => setCurrentStatus(e.target.value)}
+              onChange={setCurrentStatus}
             />
             <OpeCategoriesSelect
               value={categoryId}
               label={<Trans>operation.category</Trans>}
-              onChange={(e) => setCategoryId(e.target.value)}
+              onChange={setCategoryId}
             />
           </FormSection>
 
@@ -186,7 +186,7 @@ export const Ventilation = () => {
             <AccountsSelect
               value={originAccount}
               label={<Trans>operation.account</Trans>}
-              onChange={(e) => setOriginAccount(e.target.value)}
+              onChange={setOriginAccount}
             />
             <Input
               label={<Trans>ventilation.total_amount</Trans>}
@@ -230,8 +230,8 @@ export const Ventilation = () => {
                 <AccountsSelect
                   value={dest.accountId}
                   label={<Trans>ventilation.dest_account</Trans>}
-                  onChange={(e) =>
-                    updateDestination(dest.id, 'accountId', e.target.value)
+                  onChange={(value) =>
+                    updateDestination(dest.id, 'accountId', value)
                   }
                 />
                 <FormControlLabel
@@ -239,11 +239,11 @@ export const Ventilation = () => {
                     <Switch
                       size="small"
                       checked={dest.isPercentage}
-                      onChange={(e) =>
+                      onChange={(event) =>
                         updateDestination(
                           dest.id,
                           'isPercentage',
-                          e.target.checked,
+                          event.target.checked,
                         )
                       }
                     />

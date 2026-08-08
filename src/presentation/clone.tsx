@@ -69,12 +69,12 @@ export const Clone = () => {
             value={currentTemplate}
             type={2}
             label={<Trans>clone.template</Trans>}
-            onChange={(e) => setCurrentTemplate(e.target.value)}
+            onChange={setCurrentTemplate}
           />
           <AccountsSelect
             value={currentAccount}
             label={<Trans>operation.account</Trans>}
-            onChange={(e) => setCurrentAccount(e.target.value)}
+            onChange={setCurrentAccount}
           />
           <FormRow>
             <DatePicker

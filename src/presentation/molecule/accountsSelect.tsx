@@ -1,6 +1,5 @@
 // src\presentation\molecule\accountsSelect.tsx
 import * as React from 'react';
-import { SelectChangeEvent } from '@mui/material';
 
 import inversify from '@src/common/inversify';
 import { RefSelect, type RefItem } from '@presentation/molecule/refSelect';
@@ -8,7 +7,7 @@ import { RefSelect, type RefItem } from '@presentation/molecule/refSelect';
 type AccountsSelectProps = {
   value: string | number;
   label: React.ReactNode;
-  onChange: (event: SelectChangeEvent) => void;
+  onChange: (value: string) => void;
   /** 0 = tous, 1 = compte, 2 = modèle. */
   type?: number;
 };

@@ -1,6 +1,5 @@
 // src\presentation\molecule\opeCategoriesSelect.tsx
 import * as React from 'react';
-import { SelectChangeEvent } from '@mui/material';
 
 import inversify from '@src/common/inversify';
 import { RefSelect } from '@presentation/molecule/refSelect';
@@ -9,7 +8,7 @@ import { getCategoryIcon } from '@presentation/molecule/operationDisplay';
 type OpeCategoriesSelectProps = {
   value: string | number;
   label: React.ReactNode;
-  onChange: (event: SelectChangeEvent) => void;
+  onChange: (value: string) => void;
 };
 
 /**

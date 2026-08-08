@@ -168,13 +168,13 @@ export const CreateVir = () => {
           <AccountsSelect
             value={currentAccount}
             label={<Trans>operation.account</Trans>}
-            onChange={(e) => setCurrentAccount(e.target.value)}
+            onChange={setCurrentAccount}
           />
           <AccountsSelect
             value={currentAccountDest}
             label={<Trans>operation.account_dest</Trans>}
-            onChange={(e) => {
-              setCurrentAccountDest(e.target.value);
+            onChange={(value) => {
+              setCurrentAccountDest(value);
               setOperations(null);
               setSelectedOperations([]);
             }}
@@ -182,17 +182,17 @@ export const CreateVir = () => {
           <OpeStatusSelect
             value={currentStatus}
             label={<Trans>operation.status</Trans>}
-            onChange={(e) => setCurrentStatus(e.target.value)}
+            onChange={setCurrentStatus}
           />
           <ThirdsSelect
             value={currentThird}
             label={<Trans>operation.third</Trans>}
-            onChange={(e) => setCurrentThird(e.target.value)}
+            onChange={setCurrentThird}
           />
           <OpeCategoriesSelect
             value={currentCategory}
             label={<Trans>operation.category</Trans>}
-            onChange={(e) => setCurrentCategory(e.target.value)}
+            onChange={setCurrentCategory}
           />
         </FormSection>
 
@@ -206,9 +206,9 @@ export const CreateVir = () => {
                 variant="standard"
                 size="small"
                 value=""
-                onChange={(e) => {
+                onChange={(event) => {
                   const picked = linkable.find(
-                    (operation) => String(operation.id) === e.target.value,
+                    (operation) => String(operation.id) === event.target.value,
                   );
                   if (picked)
                     setSelectedOperations((prev) => [...prev, picked]);

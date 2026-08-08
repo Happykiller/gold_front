@@ -1,6 +1,5 @@
 // src\presentation\molecule\opeRefSelects.tsx
 import * as React from 'react';
-import { SelectChangeEvent } from '@mui/material';
 
 import inversify from '@src/common/inversify';
 import { RefSelect } from '@presentation/molecule/refSelect';
@@ -8,7 +7,7 @@ import { RefSelect } from '@presentation/molecule/refSelect';
 type Props = {
   value: string | number;
   label: React.ReactNode;
-  onChange: (event: SelectChangeEvent) => void;
+  onChange: (value: string) => void;
 };
 
 /**

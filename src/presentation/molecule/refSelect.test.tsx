@@ -34,19 +34,18 @@ const setup = (props: Partial<Parameters<typeof RefSelect>[0]> = {}) => {
   return { onChange, user: userEvent.setup() };
 };
 
-const open = async (user: ReturnType<typeof userEvent.setup>) =>
-  user.click(screen.getByRole('combobox'));
+const field = () => screen.getByRole('combobox');
+
+/** Attend le référentiel, puis déroule la liste. */
+const open = async (user: ReturnType<typeof userEvent.setup>) => {
+  await waitFor(() => expect(field()).toBeEnabled());
+  await user.click(field());
+};
 
 describe('RefSelect', () => {
   it('propose les entrées du référentiel une fois chargées', async () => {
     const { user } = setup();
 
-    await waitFor(() =>
-      expect(screen.getByRole('combobox')).not.toHaveAttribute(
-        'aria-disabled',
-        'true',
-      ),
-    );
     await open(user);
 
     expect(await screen.findByText('Courant')).toBeInTheDocument();
@@ -58,51 +57,50 @@ describe('RefSelect', () => {
     // le formulaire se réorganisait sous le curseur à chaque chargement.
     setup({ load: () => new Promise(() => {}) });
 
-    expect(screen.getByRole('combobox')).toHaveAttribute(
-      'aria-disabled',
-      'true',
-    );
+    expect(field()).toBeDisabled();
   });
 
-  it('offre un choix vide, sauf pour un critère obligatoire', async () => {
+  it('filtre la liste à la frappe', async () => {
+    // C'est tout l'intérêt de la saisie semi-automatique : certains
+    // référentiels dépassent la vingtaine d'entrées.
     const { user } = setup();
-    await waitFor(() =>
-      expect(screen.getByRole('combobox')).not.toHaveAttribute(
-        'aria-disabled',
-        'true',
-      ),
-    );
     await open(user);
 
-    // Portée à la liste : le champ lui-même affiche déjà « Effacer », sa
-    // valeur courante étant la sentinelle de vide.
+    await user.type(field(), 'épa');
+
     const list = await screen.findByRole('listbox');
-    expect(within(list).getByText('Effacer')).toBeInTheDocument();
+    expect(within(list).getByText('Épargne')).toBeInTheDocument();
+    expect(within(list).queryByText('Courant')).not.toBeInTheDocument();
   });
 
-  it('masque le choix vide quand la valeur est obligatoire', async () => {
-    const { user } = setup({ required: true });
-    await waitFor(() =>
-      expect(screen.getByRole('combobox')).not.toHaveAttribute(
-        'aria-disabled',
-        'true',
-      ),
-    );
+  it('rend l’identifiant choisi, pas l’événement', async () => {
+    const { user, onChange } = setup();
     await open(user);
 
-    const list = await screen.findByRole('listbox');
-    expect(within(list).getByText('Courant')).toBeInTheDocument();
-    expect(within(list).queryByText('Effacer')).not.toBeInTheDocument();
+    await user.click(await screen.findByText('Épargne'));
+
+    expect(onChange).toHaveBeenCalledWith('2');
+  });
+
+  it('permet de vider le champ, et rend la sentinelle de vide', async () => {
+    const { user, onChange } = setup({ value: 1, emptyValue: 0 });
+    await waitFor(() => expect(field()).toBeEnabled());
+
+    await user.click(screen.getByTitle('Clear'));
+
+    expect(onChange).toHaveBeenCalledWith('0');
+  });
+
+  it('interdit de vider un critère obligatoire', async () => {
+    const { user } = setup({ value: 1, required: true });
+    await waitFor(() => expect(field()).toBeEnabled());
+    await user.hover(field());
+
+    expect(screen.queryByTitle('Clear')).not.toBeInTheDocument();
   });
 
   it('restreint la liste au filtre reçu', async () => {
     const { user } = setup({ filter: (item) => item.id === 2 });
-    await waitFor(() =>
-      expect(screen.getByRole('combobox')).not.toHaveAttribute(
-        'aria-disabled',
-        'true',
-      ),
-    );
     await open(user);
 
     expect(await screen.findByText('Épargne')).toBeInTheDocument();
@@ -122,12 +120,6 @@ describe('RefSelect', () => {
           { id: 2, label: 'operation.category-other' },
         ]),
     });
-    await waitFor(() =>
-      expect(screen.getByRole('combobox')).not.toHaveAttribute(
-        'aria-disabled',
-        'true',
-      ),
-    );
     await open(user);
     const list = await screen.findByRole('listbox');
 

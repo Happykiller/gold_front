@@ -30,6 +30,7 @@
     "clear": "Clear",
     "create": "Create",
     "done": "Submit",
+    "no_result": "No result",
     "loading": "Loading..."
   },
   "createVir": {

@@ -1,15 +1,7 @@
 // src\presentation\molecule\refSelect.tsx
 import * as React from 'react';
-import { Trans } from 'react-i18next';
-import {
-  Box,
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
-  Typography,
-  SelectChangeEvent,
-} from '@mui/material';
+import { useTranslation } from 'react-i18next';
+import { Autocomplete, Box, TextField, Typography } from '@mui/material';
 import type { SxProps, Theme } from '@mui/material/styles';
 
 import { CODES } from '@src/common/codes';
@@ -28,7 +20,8 @@ type RefResponse = {
 export type RefSelectProps = {
   value: string | number;
   label: React.ReactNode;
-  onChange: (event: SelectChangeEvent) => void;
+  /** Reçoit l'identifiant choisi, ou la sentinelle de vide. */
+  onChange: (value: string) => void;
   /** Charge le référentiel. Passé plutôt que déduit : c'est la seule chose qui
    *  distinguait les trois copies de ce composant. */
   load: () => Promise<RefResponse>;
@@ -45,7 +38,7 @@ export type RefSelectProps = {
    */
   translateLabels?: boolean;
   /**
-   * Valeur du choix vide.
+   * Valeur rendue quand le champ est vidé.
    *
    * Les appelants divergent — `0` pour les comptes, `''` pour les autres — et
    * cette divergence n'est pas cosmétique : elle décide de ce que le
@@ -53,7 +46,7 @@ export type RefSelectProps = {
    * à l'aveugle.
    */
   emptyValue?: string | number;
-  /** Masque le choix vide, pour un critère obligatoire. */
+  /** Interdit de vider le champ, pour un critère obligatoire. */
   required?: boolean;
   /** Restreint la liste — le type de compte, par exemple. */
   filter?: (item: RefItem) => boolean;
@@ -70,13 +63,19 @@ export type RefSelectProps = {
 };
 
 /**
- * Un sélecteur de référentiel, chargé à la volée.
+ * Un sélecteur de référentiel, à saisie semi-automatique.
  *
  * Il remplace trois composants qui ne différaient que par leur usecase, leur
  * sentinelle de vide et la traduction ou non des libellés — soit une
  * quarantaine de lignes recopiées trois fois, effet de bord compris : chacun
  * rendait son propre message de chargement et sa propre erreur, tous
  * légèrement différents.
+ *
+ * Construit sur `Autocomplete` plutôt que sur `Select` : plusieurs
+ * référentiels dépassent la vingtaine d'entrées — les comptes, les catégories
+ * — et les parcourir à la souris coûte plus cher que d'en taper trois lettres.
+ * Le filtrage se fait en mémoire, sur une liste déjà chargée : il n'y a rien à
+ * débouncer, et la requête ne part jamais à la frappe.
  */
 export const RefSelect: React.FC<RefSelectProps> = ({
   value,
@@ -90,6 +89,7 @@ export const RefSelect: React.FC<RefSelectProps> = ({
   renderIcon,
   sx,
 }) => {
+  const { t } = useTranslation();
   const [items, setItems] = React.useState<RefItem[] | null>(null);
   const [error, setError] = React.useState<string | null>(null);
 
@@ -121,42 +121,48 @@ export const RefSelect: React.FC<RefSelectProps> = ({
     };
   }, []);
 
+  const labelOf = React.useCallback(
+    (item: RefItem) => (translateLabels ? t(item.label) : item.label),
+    [t, translateLabels],
+  );
+
   if (error)
     return (
       <Typography sx={{ color: 'error.main', fontSize: 13 }}>
-        <Trans>common.{error}</Trans>
+        {t(`common.${error}`)}
       </Typography>
     );
 
-  const visible = filter ? (items ?? []).filter(filter) : (items ?? []);
+  const options = filter ? (items ?? []).filter(filter) : (items ?? []);
+  const selected =
+    options.find((item) => String(item.id) === String(value)) ?? null;
 
   return (
-    <FormControl variant="standard" fullWidth sx={sx}>
-      <InputLabel>{label}</InputLabel>
-      <Select
-        variant="standard"
-        size="small"
-        displayEmpty
-        value={value.toString()}
-        onChange={onChange}
-        // La liste peut n'être pas encore là : le composant garde sa place au
-        // lieu de disparaître puis de réapparaître, ce que faisaient les trois
-        // copies en rendant un texte « Chargement… » à la place du champ.
-        disabled={items === null}
-      >
-        {!required && (
-          <MenuItem value={emptyValue}>
-            <Trans>common.clear</Trans>
-          </MenuItem>
-        )}
-        {visible.map((item) => (
-          <MenuItem key={item.id} value={item.id}>
-            {/*
-             * Un conteneur en ligne, et non deux enfants côte à côte : le
-             * champ fermé recopie les enfants de l'entrée choisie **hors du
-             * contexte flex** de `MenuItem`. Le `Typography`, qui est un bloc,
-             * passait alors sous l'icône au lieu de rester à côté.
-             */}
+    <Autocomplete
+      options={options}
+      value={selected}
+      // La liste peut n'être pas encore là : le champ garde sa place au lieu de
+      // disparaître puis de réapparaître, ce que faisaient les trois copies en
+      // rendant un texte « Chargement… » à sa place.
+      disabled={items === null}
+      disableClearable={required}
+      autoHighlight
+      handleHomeEndKeys
+      getOptionLabel={labelOf}
+      isOptionEqualToValue={(option, current) => option.id === current.id}
+      noOptionsText={t('common.no_result')}
+      onChange={(_event, option) =>
+        onChange(option ? String(option.id) : String(emptyValue))
+      }
+      renderOption={(props, option) => {
+        // `key` est fourni dans les props depuis MUI 9 : le laisser dans le
+        // spread déclenche un avertissement React à chaque rendu.
+        const { key, ...rest } =
+          props as React.HTMLAttributes<HTMLLIElement> & {
+            key: string;
+          };
+        return (
+          <Box component="li" key={key} {...rest}>
             <Box
               component="span"
               sx={{
@@ -175,16 +181,46 @@ export const RefSelect: React.FC<RefSelectProps> = ({
                     '& .MuiSvgIcon-root': { fontSize: 16 },
                   }}
                 >
-                  {renderIcon(item)}
+                  {renderIcon(option)}
                 </Box>
               )}
               <Typography component="span" noWrap sx={{ fontSize: 13.5 }}>
-                {translateLabels ? <Trans>{item.label}</Trans> : item.label}
+                {labelOf(option)}
               </Typography>
             </Box>
-          </MenuItem>
-        ))}
-      </Select>
-    </FormControl>
+          </Box>
+        );
+      }}
+      renderInput={(params) => (
+        <TextField
+          {...params}
+          variant="standard"
+          label={label}
+          slotProps={{
+            ...params.slotProps,
+            input: {
+              ...params.slotProps.input,
+              // Le pictogramme de la valeur choisie, devant la saisie : sans
+              // lui, le champ perdrait au repos ce que la liste montre.
+              startAdornment:
+                renderIcon && selected ? (
+                  <Box
+                    component="span"
+                    sx={{
+                      display: 'inline-flex',
+                      lineHeight: 0,
+                      mr: '6px',
+                      '& .MuiSvgIcon-root': { fontSize: 16 },
+                    }}
+                  >
+                    {renderIcon(selected)}
+                  </Box>
+                ) : undefined,
+            },
+          }}
+        />
+      )}
+      sx={sx}
+    />
   );
 };

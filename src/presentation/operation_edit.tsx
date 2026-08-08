@@ -127,10 +127,10 @@ export const EditOperation = () => {
                 fullWidth
                 type="number"
                 value={operation.amount}
-                onChange={(e) =>
+                onChange={(event) =>
                   setOperation({
                     ...operation,
-                    amount: parseFloat(e.target.value),
+                    amount: parseFloat(event.target.value),
                   })
                 }
               />
@@ -159,8 +159,11 @@ export const EditOperation = () => {
                   variant="standard"
                   fullWidth
                   value={operation.description}
-                  onChange={(e) =>
-                    setOperation({ ...operation, description: e.target.value })
+                  onChange={(event) =>
+                    setOperation({
+                      ...operation,
+                      description: event.target.value,
+                    })
                   }
                 />
               </FormRow>
@@ -168,20 +171,20 @@ export const EditOperation = () => {
               <OpeTypesSelect
                 value={operation.type_id}
                 label={<Trans>operation.type</Trans>}
-                onChange={(e) =>
+                onChange={(value) =>
                   setOperation({
                     ...operation,
-                    type_id: Number(e.target.value),
+                    type_id: Number(value),
                   })
                 }
               />
               <AccountsSelect
                 value={operation.account_id}
                 label={<Trans>operation.account</Trans>}
-                onChange={(e) =>
+                onChange={(value) =>
                   setOperation({
                     ...operation,
-                    account_id: Number(e.target.value),
+                    account_id: Number(value),
                   })
                 }
               />
@@ -189,10 +192,10 @@ export const EditOperation = () => {
                 <AccountsSelect
                   value={operation.account_id_dest ?? ''}
                   label={<Trans>operation.account_dest</Trans>}
-                  onChange={(e) =>
+                  onChange={(value) =>
                     setOperation({
                       ...operation,
-                      account_id_dest: Number(e.target.value),
+                      account_id_dest: Number(value),
                     })
                   }
                 />
@@ -200,30 +203,30 @@ export const EditOperation = () => {
               <OpeStatusSelect
                 value={operation.status_id}
                 label={<Trans>operation.status</Trans>}
-                onChange={(e) =>
+                onChange={(value) =>
                   setOperation({
                     ...operation,
-                    status_id: Number(e.target.value),
+                    status_id: Number(value),
                   })
                 }
               />
               <ThirdsSelect
                 value={operation.third_id ?? ''}
                 label={<Trans>operation.third</Trans>}
-                onChange={(e) =>
+                onChange={(value) =>
                   setOperation({
                     ...operation,
-                    third_id: Number(e.target.value),
+                    third_id: Number(value),
                   })
                 }
               />
               <OpeCategoriesSelect
                 value={operation.category_id ?? ''}
                 label={<Trans>operation.category</Trans>}
-                onChange={(e) =>
+                onChange={(value) =>
                   setOperation({
                     ...operation,
-                    category_id: Number(e.target.value),
+                    category_id: Number(value),
                   })
                 }
               />

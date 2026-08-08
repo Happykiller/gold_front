@@ -37,12 +37,7 @@ describe('OpeCategoriesSelect', () => {
     );
     const user = userEvent.setup();
 
-    await waitFor(() =>
-      expect(screen.getByRole('combobox')).not.toHaveAttribute(
-        'aria-disabled',
-        'true',
-      ),
-    );
+    await waitFor(() => expect(screen.getByRole('combobox')).toBeEnabled());
     await user.click(screen.getByRole('combobox'));
     const list = await screen.findByRole('listbox');
 
@@ -65,12 +60,7 @@ describe('OpeCategoriesSelect', () => {
     );
     const user = userEvent.setup();
 
-    await waitFor(() =>
-      expect(screen.getByRole('combobox')).not.toHaveAttribute(
-        'aria-disabled',
-        'true',
-      ),
-    );
+    await waitFor(() => expect(screen.getByRole('combobox')).toBeEnabled());
     await user.click(screen.getByRole('combobox'));
     const item = within(await screen.findByRole('listbox')).getByRole(
       'option',
@@ -93,17 +83,13 @@ describe('OpeCategoriesSelect', () => {
       <OpeCategoriesSelect value={1} label="Catégorie" onChange={vi.fn()} />,
     );
 
-    const field = screen.getByRole('combobox');
-    await waitFor(() =>
-      expect(within(field).getByText('Alimentation')).toBeInTheDocument(),
-    );
-    const labelNode = within(field).getByText('Alimentation');
+    // Avec la saisie semi-automatique, la valeur choisie vit dans un champ de
+    // texte : le libellé y est la valeur de l'input, et l'icône son ornement.
+    const input = screen.getByRole('combobox') as HTMLInputElement;
+    await waitFor(() => expect(input.value).toBe('Alimentation'));
 
-    // Le libellé est en ligne...
-    expect(labelNode.tagName).toBe('SPAN');
-    // ...et partage avec l'icône un conteneur qui les met sur une rangée.
-    const row = labelNode.parentElement!;
-    expect(row.querySelector('svg')).toBeInTheDocument();
-    expect(row).toHaveStyle({ display: 'flex', alignItems: 'center' });
+    expect(
+      input.closest('.MuiInputBase-root')?.querySelector('svg'),
+    ).toBeInTheDocument();
   });
 });
