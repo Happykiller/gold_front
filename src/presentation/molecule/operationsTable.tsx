@@ -154,13 +154,18 @@ type RowProps = {
   onRecoOperation?: (op: Operation) => void;
 };
 
-/** Un bouton d'action, avec son raccourci — c'est ainsi qu'on l'apprend. */
+/**
+ * Un bouton d'action.
+ *
+ * Sans badge de raccourci : le `E` accolé au crayon n'apprenait rien que
+ * l'infobulle ne dise mieux, et doublait la largeur du bouton. Le seul
+ * raccourci qui vaut d'être affiché est rappelé une fois, dans la légende.
+ */
 const RowAction: React.FC<{
   label: string;
-  shortcut?: string;
   icon: React.ReactNode;
   onClick: (event: React.MouseEvent) => void;
-}> = ({ label, shortcut, icon, onClick }) => (
+}> = ({ label, icon, onClick }) => (
   <Tooltip title={label} placement="top">
     <Box
       component="button"
@@ -184,19 +189,6 @@ const RowAction: React.FC<{
       })}
     >
       {icon}
-      {shortcut && (
-        <Box
-          component="span"
-          sx={{
-            fontFamily: MONO_FONT,
-            fontWeight: 500,
-            fontSize: 9.5,
-            opacity: 0.7,
-          }}
-        >
-          {shortcut}
-        </Box>
-      )}
     </Box>
   </Tooltip>
 );
@@ -514,9 +506,14 @@ const OperationRow = React.memo(function OperationRow({
           right: '20px',
           top: 0,
           bottom: 0,
+          // Largeur de la colonne remplacée — tiers en `md`, destination en
+          // `sm` — pour que les boutons démarrent exactement là où démarrait
+          // son texte. Alignés à droite, ils flottaient sans repère.
+          width: { sm: '128px', md: '100px' },
           justifySelf: 'end',
           display: 'flex',
           alignItems: 'center',
+          justifyContent: 'flex-start',
           gap: '3px',
           opacity: { xs: 1, sm: 0 },
           pointerEvents: { xs: 'auto', sm: 'none' },
@@ -528,7 +525,6 @@ const OperationRow = React.memo(function OperationRow({
       >
         <RowAction
           label={t('operation.action-edit')}
-          shortcut="E"
           icon={<EditNoteIcon />}
           onClick={(e) => {
             e.stopPropagation();
