@@ -26,7 +26,11 @@ export function HeaderExt() {
   return (
     <Header
       contextStore={contextStore()}
-      routes={['accounts', 'createVir', 'ventilation', 'graphic', 'clone']}
+      // L'ordre suit l'usage, pas l'alphabet ni l'ordre d'écriture des écrans :
+      // les comptes d'abord puisqu'on y revient sans cesse, puis les trois
+      // gestes de saisie du plus courant au plus rare, et le graphique en
+      // dernier — on le consulte, on n'y travaille pas.
+      routes={['accounts', 'createVir', 'clone', 'ventilation', 'graphic']}
       settings={['profile', 'logout']}
       brandName="Gold"
       icons={{ menu: <MenuIcon /> }}
