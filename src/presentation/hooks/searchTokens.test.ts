@@ -323,9 +323,9 @@ describe('suggest', () => {
   it('propose les trois lectures possibles d’une saisie ambiguë', () => {
     // « alimentation » est une catégorie, une enveloppe et un mot de
     // description : on ne choisit pas à la place de l'utilisateur.
-    const fields = suggest('alimentation', refs, translate).map((s) =>
-      s.token.kind === 'ref' ? s.token.field : s.token.field,
-    );
+    const fields = suggest('alimentation', refs, translate)
+      .map((s) => s.token?.field)
+      .filter(Boolean);
     expect(fields).toContain('cat');
     expect(fields).toContain('enveloppe');
     expect(fields).toContain('any');
@@ -335,12 +335,39 @@ describe('suggest', () => {
     const out = suggest('cat:a', refs, translate);
     expect(out.length).toBeGreaterThan(0);
     expect(
-      out.every((s) => s.token.kind === 'ref' && s.token.field === 'cat'),
+      out.every((s) => s.token?.kind === 'ref' && s.token.field === 'cat'),
     ).toBe(true);
   });
 
-  it('ne propose rien sur une saisie vide', () => {
-    expect(suggest('', refs, translate)).toEqual([]);
+  it('présente les critères disponibles sur un champ vide', () => {
+    // C'est le seul moment où la barre peut dire ce qu'elle sait faire :
+    // sans cela, la grammaire reste invisible à qui ne la connaît pas.
+    const out = suggest('', refs, translate);
+    expect(out.length).toBeGreaterThan(0);
+    expect(out.every((s) => s.kind === 'prefix')).toBe(true);
+    expect(out.map((s) => s.input)).toContain('statut:');
+    expect(out.map((s) => s.input)).toContain('montant:');
+  });
+
+  it('propose le nom du critère pendant qu’on le tape', () => {
+    // Le cas qui manquait : « sta » ne menait qu'à des valeurs de tiers, et
+    // jamais à `statut:`.
+    const out = suggest('sta', refs, translate);
+    expect(out[0]).toMatchObject({ kind: 'prefix', input: 'statut:' });
+    expect(out[0].hint).toBeTruthy();
+  });
+
+  it('mène d’un alias au critère canonique', () => {
+    expect(suggest('eta', refs, translate)[0]).toMatchObject({
+      kind: 'prefix',
+      input: 'statut:',
+    });
+  });
+
+  it('ne propose pas de préfixe quand rien ne correspond', () => {
+    expect(
+      suggest('alimentation', refs, translate).every((s) => s.kind === 'token'),
+    ).toBe(true);
   });
 
   it('ne propose rien quand un jeton préfixé est invalide', () => {

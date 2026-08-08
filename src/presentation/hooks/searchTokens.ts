@@ -59,13 +59,40 @@ export type OperationFilters = {
   date_to?: string;
 };
 
+/**
+ * Une proposition affichée sous la barre.
+ *
+ * Deux natures, parce que la barre doit aussi **s'expliquer** : `token`
+ * valide un critère complet, `prefix` ne fait que compléter la saisie avec le
+ * nom d'un critère. Sans cette seconde, rien n'annonce que `statut:` existe —
+ * il faut le savoir d'avance.
+ */
 export type Suggestion = {
   /** Ce qui serait saisi si on retenait cette proposition. */
   input: string;
   /** Ce que l'utilisateur lit. */
   label: string;
-  token: Token;
+  kind: 'token' | 'prefix';
+  /** Absent pour une proposition de préfixe : il n'y a pas encore de valeur. */
+  token?: Token;
+  /** Exemple ou glose, affiché en retrait. */
+  hint?: string;
 };
+
+/** Ce que chaque préfixe filtre, en quelques mots. */
+const PREFIX_HINTS: Record<string, string> = {
+  'cat:': 'catégorie',
+  'tiers:': 'tiers',
+  'enveloppe:': 'compte de ventilation',
+  'type:': 'crédit, débit, virement',
+  'statut:': 'pointée, en attente',
+  'desc:': 'dans la description',
+  'montant:': '>50, 10..50',
+  'date:': '2026-06, 2026-01..2026-06',
+};
+
+/** Les préfixes proposés à la saisie, dans l'ordre d'utilité. */
+const PREFIXES = Object.keys(PREFIX_HINTS);
 
 const REF_FIELDS: Record<RefField, keyof Referentials> = {
   cat: 'categories',
@@ -470,9 +497,19 @@ export function suggest(
   limit = 8,
 ): Suggestion[] {
   const trimmed = input.trim();
-  if (!trimmed) return [];
-
   const out: Suggestion[] = [];
+
+  const prefixSuggestion = (prefix: string): Suggestion => ({
+    input: prefix,
+    label: prefix,
+    kind: 'prefix',
+    hint: PREFIX_HINTS[prefix],
+  });
+
+  // Champ vide : présenter les critères disponibles. C'est le seul moment où
+  // la barre peut dire ce qu'elle sait faire.
+  if (!trimmed) return PREFIXES.slice(0, limit).map(prefixSuggestion);
+
   const split = splitPrefix(trimmed);
 
   const prefixedField = split ? resolveField(split.prefix) : null;
@@ -494,6 +531,7 @@ export function suggest(
       out.push({
         input: `${field}:${label}`,
         label: `${field}: ${label}`,
+        kind: 'token',
         token: { kind: 'ref', field, id: item.id, label },
       });
       if (out.length >= limit) return out;
@@ -503,17 +541,36 @@ export function suggest(
 
   if (split) {
     const token = parseToken(trimmed, refs, translate);
-    return token ? [{ input: trimmed, label: tokenLabel(token), token }] : [];
+    return token
+      ? [{ input: trimmed, label: tokenLabel(token), kind: 'token', token }]
+      : [];
   }
 
-  // Saisie nue : on propose les référentiels qui correspondent, puis la
-  // recherche textuelle en dernier recours.
+  // Saisie nue. D'abord les **noms de critères** qui commencent par ce qu'on
+  // tape : sans eux, `sta` ne mènerait jamais à `statut:`, et la grammaire
+  // resterait invisible à qui ne la connaît pas déjà.
+  const needle = normalize(trimmed);
+  for (const prefix of PREFIXES) {
+    if (normalize(prefix).startsWith(needle))
+      out.push(prefixSuggestion(prefix));
+  }
+  // Les alias ne sont pas listés, mais taper `etat` doit mener quelque part.
+  for (const alias of Object.keys(FIELD_ALIASES)) {
+    if (!alias.startsWith(needle)) continue;
+    const canonical = `${FIELD_ALIASES[alias]}:`;
+    if (!out.some((s) => s.input === canonical)) {
+      out.push(prefixSuggestion(canonical));
+    }
+  }
+
+  // Puis les valeurs de référentiels qui correspondent.
   for (const field of ['cat', 'tiers', 'enveloppe'] as RefField[]) {
     for (const item of matchRef(refs[REF_FIELDS[field]], trimmed, translate)) {
       const label = translate(item.label);
       out.push({
         input: `${field}:${label}`,
         label: `${field}: ${label}`,
+        kind: 'token',
         token: { kind: 'ref', field, id: item.id, label },
       });
       if (out.length >= limit - 1) break;
@@ -522,7 +579,13 @@ export function suggest(
   }
 
   const free = parseToken(trimmed, refs, translate);
-  if (free) out.push({ input: trimmed, label: tokenLabel(free), token: free });
+  if (free)
+    out.push({
+      input: trimmed,
+      label: tokenLabel(free),
+      kind: 'token',
+      token: free,
+    });
 
   return out.slice(0, limit);
 }

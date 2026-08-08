@@ -32,6 +32,9 @@ type Props = {
   translate: (label: string) => string;
 };
 
+const MONO_FONT =
+  'ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace';
+
 /** Le statut se distingue à l'œil : c'est le filtre le plus consulté. */
 const chipColor = (token: Token) =>
   token.kind === 'ref' && token.field === 'statut' ? 'error' : 'info';
@@ -57,6 +60,7 @@ export const OperationsSearch: React.FC<Props> = ({
   const theme = useTheme();
   const { t } = useTranslation();
   const [input, setInput] = React.useState('');
+  const [focused, setFocused] = React.useState(false);
   const [highlight, setHighlight] = React.useState(0);
   const anchorRef = React.useRef<HTMLDivElement | null>(null);
   const inputRef = React.useRef<HTMLInputElement | null>(null);
@@ -65,7 +69,10 @@ export const OperationsSearch: React.FC<Props> = ({
     () => suggest(input, refs, translate),
     [input, refs, translate],
   );
-  const open = suggestions.length > 0;
+  // Ouvert dès que le champ a le focus : sur un champ vide, la liste présente
+  // les critères disponibles — c'est le seul moment où la barre peut dire ce
+  // qu'elle sait faire.
+  const open = focused && suggestions.length > 0;
 
   React.useEffect(() => setHighlight(0), [input]);
 
@@ -88,9 +95,9 @@ export const OperationsSearch: React.FC<Props> = ({
       event.preventDefault();
       // La suggestion mise en avant l'emporte : c'est elle que l'utilisateur
       // voit. Sans suggestion, on tente d'interpréter la saisie brute.
-      addToken(
-        suggestions[highlight]?.token ?? parseToken(input, refs, translate),
-      );
+      const chosen = suggestions[highlight];
+      if (chosen) pick(chosen);
+      else addToken(parseToken(input, refs, translate));
       return;
     }
     if (event.key === 'Backspace' && input === '' && tokens.length) {
@@ -113,7 +120,10 @@ export const OperationsSearch: React.FC<Props> = ({
   };
 
   const pick = (suggestion: Suggestion) => {
-    addToken(suggestion.token);
+    // Un préfixe ne valide rien : il complète la saisie et rend la main, pour
+    // que la liste se rabatte aussitôt sur les valeurs de ce critère.
+    if (suggestion.kind === 'prefix') setInput(suggestion.input);
+    else addToken(suggestion.token ?? null);
     inputRef.current?.focus();
   };
 
@@ -152,6 +162,7 @@ export const OperationsSearch: React.FC<Props> = ({
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
+          onFocus={() => setFocused(true)}
           placeholder={tokens.length ? '' : t('operations.search.placeholder')}
           sx={{ flex: 1, minWidth: 140, color: '#e8eaf0', fontSize: 14 }}
         />
@@ -166,7 +177,16 @@ export const OperationsSearch: React.FC<Props> = ({
           width: anchorRef.current?.clientWidth,
         }}
       >
-        <ClickAwayListener onClickAway={() => setInput('')}>
+        <ClickAwayListener
+          onClickAway={(event) => {
+            // La barre elle-même n'est pas « ailleurs ». Sans cette garde, le
+            // clic qui donne le focus au champ est aussitôt vu comme un clic
+            // hors du Popper, et referme la liste qu'il vient d'ouvrir.
+            if (anchorRef.current?.contains(event.target as Node)) return;
+            setFocused(false);
+            setInput('');
+          }}
+        >
           <Paper
             sx={{
               mt: 0.5,
@@ -194,9 +214,25 @@ export const OperationsSearch: React.FC<Props> = ({
                   onMouseEnter={() => setHighlight(index)}
                   onClick={() => pick(suggestion)}
                 >
-                  <Typography sx={{ fontSize: 14, color: '#e8eaf0' }}>
+                  <Typography
+                    sx={{
+                      fontSize: 14,
+                      color: '#e8eaf0',
+                      // Un nom de critère se reconnaît à sa chasse fixe : il
+                      // se tape, là où une valeur se choisit.
+                      fontFamily:
+                        suggestion.kind === 'prefix' ? MONO_FONT : undefined,
+                    }}
+                  >
                     {suggestion.label}
                   </Typography>
+                  {suggestion.hint && (
+                    <Typography
+                      sx={{ fontSize: 12, color: '#7b8496', ml: 1.5 }}
+                    >
+                      {suggestion.hint}
+                    </Typography>
+                  )}
                 </MenuItem>
               ))}
             </MenuList>
