@@ -60,6 +60,7 @@
   "graphic": {
     "title": "Trésorerie",
     "accounts": "Comptes",
+    "empty": "Choisissez des comptes et une période, puis générez",
     "startDate": "Date de début",
     "endDate": "Date de fin",
     "generate": "Générer",

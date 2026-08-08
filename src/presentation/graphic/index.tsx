@@ -1,20 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import {
   Box,
-  Typography,
   Button,
   FormControl,
   InputLabel,
   Select,
   MenuItem,
-  OutlinedInput,
   Checkbox,
   ListItemText,
-  Alert,
 } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs, { Dayjs } from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import Highcharts from 'highcharts';
@@ -26,6 +21,10 @@ import Highcharts from 'highcharts';
 import { HighchartsReact } from 'highcharts-react-official';
 import inversify from '@src/common/inversify';
 import { GetAccountsUsecaseModel } from '@usecase/getAccounts/getAccounts.usecase.model';
+import { PageShell } from '@presentation/molecule/pageShell';
+import { AsyncState } from '@presentation/molecule/asyncState';
+import { chartTheme, chartSumSeriesStyle } from '@src/theme/highcharts';
+import { LINE } from '@src/theme/tokens';
 
 export const Graphic: React.FC = () => {
   const { t } = useTranslation();
@@ -102,10 +101,11 @@ export const Graphic: React.FC = () => {
       if (response.data) {
         setChartData(response.data);
       } else {
-        setError(response.error || 'Failed to fetch cashflow data');
+        inversify.loggerService.debug(response.error);
+        setError(response.message);
       }
-    } catch (err: any) {
-      setError(err.message || 'Error fetching data');
+    } catch (err) {
+      setError((err as Error).message);
     } finally {
       setLoading(false);
     }
@@ -114,9 +114,11 @@ export const Graphic: React.FC = () => {
   const uniqueDates = Array.from(new Set(chartData.map((d) => d.date))).sort();
 
   const options = {
-    chart: { type: 'area' },
-    title: { text: t('graphic.title') },
+    ...chartTheme,
+    chart: { ...chartTheme.chart, type: 'area' },
+    title: { text: undefined },
     xAxis: {
+      ...chartTheme.xAxis,
       categories: uniqueDates.map((d) =>
         dayjs(d as string, 'YYYY-MM-DD').format('DD/MM/YYYY'),
       ),
@@ -124,7 +126,8 @@ export const Graphic: React.FC = () => {
       title: { enabled: false },
     },
     yAxis: {
-      title: { text: 'Amount' },
+      ...chartTheme.yAxis,
+      title: { text: t('operation.amount') },
       labels: {
         formatter: function (this: any) {
           return this.value;
@@ -132,6 +135,7 @@ export const Graphic: React.FC = () => {
       },
     },
     tooltip: {
+      ...chartTheme.tooltip,
       split: true,
       valueSuffix: ' €',
     },
@@ -153,7 +157,7 @@ export const Graphic: React.FC = () => {
   Object.keys(groupedData).forEach((accountIdStr) => {
     const accId = parseInt(accountIdStr, 10);
     const accountLabel =
-      accounts?.data?.find((a) => a.id === accId)?.label || `Account ${accId}`;
+      accounts?.data?.find((a) => a.id === accId)?.label ?? String(accId);
     const accData = groupedData[accId];
 
     const dataMap = new Map<string, any>(accData.map((d: any) => [d.date, d]));
@@ -186,7 +190,8 @@ export const Graphic: React.FC = () => {
   if (options.series.length > 0) {
     const sumData = uniqueDates.map((_, index) => {
       return options.series.reduce(
-        (sum, seriesEntry) => sum + (seriesEntry.data[index] || 0),
+        (sum: number, seriesEntry: { data: number[] }) =>
+          sum + (seriesEntry.data[index] || 0),
         0,
       );
     });
@@ -199,113 +204,111 @@ export const Graphic: React.FC = () => {
       type: 'spline',
       name: t('graphic.sumSeries'),
       data: sumData,
-      marker: { lineWidth: 2, lineColor: '#000000', fillColor: '#ffffff' },
-      color: '#000000',
-      lineWidth: 2,
-      zIndex: 10,
+      ...chartSumSeriesStyle,
     });
   }
 
   return (
-    <LocalizationProvider dateAdapter={AdapterDayjs}>
-      <Box sx={{ p: 3 }}>
-        <Typography variant="h4" gutterBottom>
-          {t('graphic.title')}
-        </Typography>
-
-        <Box
-          sx={{
-            mb: 3,
-            display: 'flex',
-            gap: 2,
-            flexWrap: 'wrap',
-            alignItems: 'center',
-          }}
+    <PageShell
+      title={t('graphic.title')}
+      width="full"
+      actions={
+        <Button
+          variant="contained"
+          size="small"
+          onClick={handleGenerate}
+          disabled={loading}
         >
-          <FormControl sx={{ m: 1, width: 300 }}>
-            <InputLabel id="accounts-label">{t('graphic.accounts')}</InputLabel>
-            <Select
-              labelId="accounts-label"
-              id="accounts-select"
-              multiple
-              value={selectedAccounts}
-              onChange={handleAccountChange}
-              input={<OutlinedInput label={t('graphic.accounts')} />}
-              renderValue={(selected) =>
-                selected
-                  .map(
-                    (id) =>
-                      accounts?.data?.find((a) => a.id === id)?.label || id,
-                  )
-                  .join(', ')
-              }
-              MenuProps={MenuProps}
-            >
-              {accounts?.data?.map((account) => (
-                <MenuItem key={account.id} value={account.id}>
-                  <Checkbox
-                    checked={selectedAccounts.indexOf(account.id) > -1}
-                  />
-                  <ListItemText primary={account.label} />
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-
-          <DatePicker
-            label={t('graphic.startDate')}
-            value={startDate}
-            onChange={(newValue) => setStartDate(newValue)}
-            format="DD/MM/YYYY"
-          />
-
-          <DatePicker
-            label={t('graphic.endDate')}
-            value={endDate}
-            onChange={(newValue) => setEndDate(newValue)}
-            format="DD/MM/YYYY"
-          />
-
-          <FormControl sx={{ m: 1, minWidth: 200 }}>
-            <InputLabel id="display-mode-label">
-              {t('graphic.filterMode')}
-            </InputLabel>
-            <Select
-              labelId="display-mode-label"
-              value={displayMode}
-              label={t('graphic.filterMode')}
-              onChange={(e) =>
-                setDisplayMode(e.target.value as 'reconciled' | 'all')
-              }
-            >
-              <MenuItem value="all">{t('graphic.filterAll')}</MenuItem>
-              <MenuItem value="reconciled">
-                {t('graphic.filterReconciled')}
-              </MenuItem>
-            </Select>
-          </FormControl>
-
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleGenerate}
-            disabled={loading}
+          {t('graphic.generate')}
+        </Button>
+      }
+    >
+      <Box
+        sx={{
+          display: 'flex',
+          gap: '14px',
+          flexWrap: 'wrap',
+          alignItems: 'flex-end',
+          pb: '14px',
+          mb: '14px',
+          borderBottom: LINE.block,
+        }}
+      >
+        <FormControl variant="standard" sx={{ minWidth: 260, flex: 1 }}>
+          <InputLabel id="accounts-label">{t('graphic.accounts')}</InputLabel>
+          <Select
+            labelId="accounts-label"
+            id="accounts-select"
+            multiple
+            variant="standard"
+            value={selectedAccounts}
+            onChange={handleAccountChange}
+            renderValue={(selected) =>
+              selected
+                .map(
+                  (id) => accounts?.data?.find((a) => a.id === id)?.label ?? id,
+                )
+                .join(', ')
+            }
+            MenuProps={MenuProps}
           >
-            {loading ? t('common.loading') : t('graphic.generate')}
-          </Button>
-        </Box>
+            {accounts?.data?.map((account) => (
+              <MenuItem key={account.id} value={account.id}>
+                <Checkbox
+                  size="small"
+                  checked={selectedAccounts.indexOf(account.id) > -1}
+                />
+                <ListItemText primary={account.label} />
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
 
-        {error && (
-          <Alert severity="error" sx={{ mb: 3 }}>
-            {error}
-          </Alert>
-        )}
+        <DatePicker
+          label={t('graphic.startDate')}
+          value={startDate}
+          onChange={(newValue) => setStartDate(newValue)}
+          format="DD/MM/YYYY"
+          slotProps={{ textField: { variant: 'standard' } }}
+        />
+        <DatePicker
+          label={t('graphic.endDate')}
+          value={endDate}
+          onChange={(newValue) => setEndDate(newValue)}
+          format="DD/MM/YYYY"
+          slotProps={{ textField: { variant: 'standard' } }}
+        />
 
-        <Box>
-          <HighchartsReact highcharts={Highcharts} options={options} />
-        </Box>
+        <FormControl variant="standard" sx={{ minWidth: 190 }}>
+          <InputLabel id="display-mode-label">
+            {t('graphic.filterMode')}
+          </InputLabel>
+          <Select
+            labelId="display-mode-label"
+            variant="standard"
+            value={displayMode}
+            onChange={(e) =>
+              setDisplayMode(e.target.value as 'reconciled' | 'all')
+            }
+          >
+            <MenuItem value="all">{t('graphic.filterAll')}</MenuItem>
+            <MenuItem value="reconciled">
+              {t('graphic.filterReconciled')}
+            </MenuItem>
+          </Select>
+        </FormControl>
       </Box>
-    </LocalizationProvider>
+
+      <AsyncState
+        loading={loading}
+        error={error}
+        namespace="graphic"
+        isEmpty={chartData.length === 0}
+        empty={t('graphic.empty')}
+      >
+        <HighchartsReact highcharts={Highcharts} options={options} />
+      </AsyncState>
+    </PageShell>
   );
 };
 

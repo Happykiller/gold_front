@@ -60,6 +60,7 @@
   "graphic": {
     "title": "Cashflow",
     "accounts": "Accounts",
+    "empty": "Pick accounts and a period, then generate",
     "startDate": "Start Date",
     "endDate": "End Date",
     "generate": "Generate",
