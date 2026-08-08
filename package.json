@@ -19,7 +19,8 @@
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "codegen": "graphql-codegen --config codegen.ts",
-    "codegen:check": "npm run codegen && git diff --exit-code -- src/gql"
+    "codegen:check": "npm run codegen && git diff --exit-code -- src/gql",
+    "check": "npm run lint && npm run build && npm test"
   },
   "author": "Fabrice Rosito<fabrice.rosito@gmail.com>",
   "license": "MIT",

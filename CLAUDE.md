@@ -2,7 +2,7 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-Interface de **Gold** (gestion bancaire et budgétaire) : React 19 + MUI v7 + Webpack. L'API
+Interface de **Gold** (gestion bancaire et budgétaire) : React 19 + MUI 9 + Vite. L'API
 GraphQL qu'elle consomme vit dans le dépôt voisin `gold_server` — voir `../CLAUDE.md` pour le
 contrat entre les deux.
 
@@ -24,15 +24,19 @@ historique ([`HISTORY.md`](../docs/KB/HISTORY.md)).
 
 ```bash
 npm install
-npm start          # webpack-dev-server → http://localhost:8083
-npm run build      # bundle de production dans dist/
+npm start          # vite → http://localhost:8083 (lire le port réellement annoncé)
+npm run check      # lint + build + test : les trois barrières, dans l'ordre de la CI
+npm run codegen    # régénère src/gql/graphql.ts depuis le schéma
 npm run release:patch | release:minor | release:major
 ```
 
-**Ni lint ni suite de tests** : la validation passe par `npm run build` (TypeScript `strict`,
-`skipLibCheck: false`) puis un smoke test manuel — routage, appels GraphQL, chaînes i18n.
-En ajoutant des tests, les placer près de la feature ou sous `src/**/__tests__/`, en
-`*.test.ts(x)`.
+Quatre barrières, toutes en CI : `lint` (ESLint + Prettier), `codegen:check`, `test` (Vitest +
+Testing Library, `*.test.ts(x)` à côté du code couvert) et `build` (`tsc --noEmit` puis
+`vite build`). `npm run check` enchaîne les trois qu'on lance à la main.
+
+**Aucune ne voit le rendu.** jsdom ne calcule pas de géométrie : un test de mise en page passe au
+vert sur du CSS cassé. Le passage à l'œil, écran par écran, reste la seule barrière pour cette
+classe de défaut — voir [`../docs/KB/DAT/interface-mui.md`](../docs/KB/DAT/interface-mui.md).
 
 Docker : `make start` / `make startall` / `make down` (conteneur `gold_front`, 8083→80, nginx).
 
@@ -105,13 +109,13 @@ seed SQL du serveur et résolues ici : ne pas les renommer d'un seul côté.
 
 ## Configuration et build
 
-Webpack (ni CRA ni Vite), `webpack.config.js`. Deux points de vigilance :
+Vite (`vite.config.ts`). Deux points de vigilance :
 
-- les **alias de chemins sont déclarés en double**, dans `tsconfig.json` et dans le
-  `resolve.alias` de `webpack.config.js` — en ajouter un impose de toucher les deux (`@src`,
-  `@presentation`, `@usecase`, `@service`, `@stores`) ;
+- les **alias de chemins sont déclarés dans `tsconfig.json` seulement** : Vite les lit de là.
+  La duplication qu'imposait Webpack a disparu (`@src`, `@presentation`, `@usecase`,
+  `@service`, `@stores`, plus les doublons historiques `@components`, `@usecases`, `@services`) ;
 - les variables d'environnement viennent de `.env` (copié de `.env.template`) puis
-  `.env.local` (override, gitignoré), exposées au bundle par `dotenv-webpack` et lues dans
+  `.env.local` (override, gitignoré), exposées au bundle par Vite et lues dans
   `src/config/index.ts` : `APP_MODE` (`dev` | `prod` | autre → service GraphQL factice),
   `APP_PORT`, `API_URL` (défaut `http://localhost:3000/graphql`).
 
@@ -121,9 +125,15 @@ TypeScript `strict`, 2 espaces, point-virgules. Composants React en PascalCase
 (`LayoutProtectedExt.tsx`), hooks en camelCase (`useAccounts.ts`), usecases en
 `feature.action.usecase.ts`. Préférer les alias aux imports relatifs longs.
 
-UI : MUI v7 + Emotion, icônes `@mui/icons-material`, graphiques Highcharts, dates
+UI : MUI 9 + Emotion, icônes `@mui/icons-material`, graphiques Highcharts, dates
 `@mui/x-date-pickers` (dayjs). Assets statiques et fichiers PWA dans `src/public/` ; `dist/`
 n'est jamais édité à la main.
+
+**Un seul thème, sombre.** Les couleurs viennent de `src/theme/tokens.ts` et s'écrivent
+**toujours dans `sx`** — la prop `color` de MUI n'accepte que des clés de palette et n'applique
+rien, en silence, sur une valeur hexadécimale. Les écrans se composent avec les briques de
+`src/presentation/molecule/` (`PageShell`, `FormSection`, `SubmitBar`, `AsyncState`,
+`RefSelect`) plutôt qu'en réinventant leur cadre.
 
 ## Commits & PR
 
