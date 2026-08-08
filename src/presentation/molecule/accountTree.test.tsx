@@ -94,6 +94,48 @@ describe('AccountTree', () => {
     expect(screen.getByRole('button', { name: 'Enfant' })).toBeInTheDocument();
   });
 
+  it('creuse un niveau de retrait par étage, au-delà du premier', () => {
+    // La régression exacte : le retrait s'écrivait `depth ? '10px' : 0`, un
+    // test booléen. Le niveau 2 recevait donc le même retrait que le niveau 1
+    // et l'arbre s'aplatissait dès le deuxième étage.
+    setup([
+      account({
+        id: 1,
+        label: 'Racine',
+        children: [
+          account({
+            id: 2,
+            label: 'Branche',
+            children: [account({ id: 3, label: 'Feuille' })],
+          }),
+        ],
+      }),
+    ]);
+
+    const rowOf = (name: string) =>
+      screen.getByRole('button', { name }).closest('[data-depth]')!;
+
+    expect(rowOf('Racine')).toHaveAttribute('data-depth', '0');
+    expect(rowOf('Branche')).toHaveAttribute('data-depth', '1');
+    expect(rowOf('Feuille')).toHaveAttribute('data-depth', '2');
+
+    // Et le retrait vient de l'imbrication, pas d'un calcul : chaque étage
+    // ajoute un conteneur de branche entre la ligne et la racine. C'est ce qui
+    // le rend cumulatif par construction.
+    const branchesAbove = (name: string) => {
+      let node = rowOf(name).parentElement;
+      let levels = 0;
+      while (node) {
+        if (node.hasAttribute('data-branch')) levels += 1;
+        node = node.parentElement;
+      }
+      return levels;
+    };
+    expect(branchesAbove('Racine')).toBe(0);
+    expect(branchesAbove('Branche')).toBe(1);
+    expect(branchesAbove('Feuille')).toBe(2);
+  });
+
   it('nomme le bouton d’édition avec le compte visé', () => {
     // Sans le libellé, l'arbre présente autant de boutons « Éditer » que de
     // comptes, indiscernables au clavier comme au lecteur d'écran.

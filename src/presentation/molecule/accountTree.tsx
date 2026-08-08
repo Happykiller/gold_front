@@ -64,15 +64,13 @@ export const AccountTree: React.FC<{ accounts: FormattedAccount[] }> = ({
     return (
       <Box key={account.id}>
         <Box
+          data-depth={depth}
           sx={{
             display: 'flex',
             alignItems: 'center',
             gap: '10px',
             height: 30,
-            pl: depth ? '14px' : 0,
             pr: '12px',
-            ml: depth ? '10px' : 0,
-            borderLeft: depth ? LINE.block : 'none',
             borderBottom: LINE.row,
             '&:hover': { background: SURFACE.rowHover },
             [`&:hover .${ROW_ACTIONS}, &:focus-within .${ROW_ACTIONS}`]: {
@@ -173,8 +171,22 @@ export const AccountTree: React.FC<{ accounts: FormattedAccount[] }> = ({
           </Tooltip>
         </Box>
 
-        {hasChildren &&
-          account.children.map((child) => renderAccount(child, depth + 1))}
+        {hasChildren && (
+          // Le retrait est porté par le conteneur de la branche, et non par la
+          // ligne : il s'accumule alors de lui-même à chaque niveau. La version
+          // précédente écrivait `depth ? '10px' : 0` — un test booléen, donc le
+          // même retrait pour le niveau 2 que pour le niveau 1, et une
+          // hiérarchie à plat au-delà du premier étage.
+          //
+          // Le filet vertical court sur toute la hauteur de la branche, ce qui
+          // rattache visiblement les enfants à leur parent.
+          <Box
+            data-branch=""
+            sx={{ ml: '10px', pl: '14px', borderLeft: LINE.block }}
+          >
+            {account.children.map((child) => renderAccount(child, depth + 1))}
+          </Box>
+        )}
       </Box>
     );
   };
