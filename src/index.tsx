@@ -13,6 +13,8 @@ import React, { useMemo } from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { ThemeProvider, CssBaseline } from '@mui/material';
+import { LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 
 import App from '@src/app';
 import initI18n from '@src/i18n';
@@ -29,7 +31,11 @@ const Index: React.FC = () => {
       <ThemeProvider theme={theme}>
         {/* Apply CSS baseline to ensure consistent styling across browsers */}
         <CssBaseline />
-        <App />
+        {/* Un seul fournisseur de dates pour toute l'application : chaque
+            champ de date en montait un, jusqu'à quatre écrans. */}
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <App />
+        </LocalizationProvider>
       </ThemeProvider>
     </Router>
   );

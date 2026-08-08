@@ -4,19 +4,21 @@ import { Trans, useTranslation } from 'react-i18next';
 import SaveAltIcon from '@mui/icons-material/SaveAlt';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
-  Alert,
-  Box,
   Button,
-  CircularProgress,
   FormControl,
-  Grid,
   InputLabel,
   MenuItem,
   Select,
   TextField,
-  Typography,
-  useTheme,
 } from '@mui/material';
+
+import { PageShell } from '@presentation/molecule/pageShell';
+import { AsyncState } from '@presentation/molecule/asyncState';
+import {
+  FormSection,
+  FormRow,
+  SubmitBar,
+} from '@presentation/molecule/formLayout';
 
 import { CODES } from '@src/common/codes';
 import inversify from '@src/common/inversify';
@@ -25,7 +27,6 @@ import { AccountUsecaseModel } from '@usecase/model/account.usecase.model';
 import { AccountTypeUsecaseModel } from '@usecase/getAccountTypes/getAccountTypes.usecase.model';
 
 export const EditAccount = () => {
-  const theme = useTheme();
   const navigate = useNavigate();
   const { t } = useTranslation();
   const flash = useFlashStore();
@@ -114,57 +115,19 @@ export const EditAccount = () => {
     navigate('/accounts');
   };
 
-  if (loading) {
-    return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
-        <CircularProgress />
-      </Box>
-    );
-  }
-
-  if (!account) {
-    return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4, px: 2 }}>
-        <Alert severity="error">{error ?? t('error.unknown')}</Alert>
-      </Box>
-    );
-  }
-
   return (
-    <Box
-      sx={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        px: 2,
-        py: 4,
-      }}
-    >
-      <Box
-        sx={{
-          borderRadius: { xs: 0, sm: '16px' },
-          boxShadow: {
-            xs: 'none',
-            sm: `0 0 32px 0 ${theme.palette.primary.main}55`,
-          },
-          border: { xs: 'none', sm: `2px solid ${theme.palette.primary.main}` },
-          maxWidth: 560,
-          width: '100%',
-          background: { xs: 0, sm: theme.palette.background.default },
-          p: 3,
-        }}
+    <PageShell title={t('editAccount.title')}>
+      <AsyncState
+        loading={loading}
+        // `error.unknown` n'existait dans aucun des deux fichiers de
+        // traduction : l'écran affichait la clé brute. Le code d'échec du
+        // usecase, lui, a bien sa clé.
+        error={!account && !loading ? (error ?? 'FAIL') : null}
+        namespace="editAccount"
       >
-        <Typography
-          variant="h6"
-          color="text.primary"
-          sx={{ fontWeight: 700, textAlign: 'center', mb: 2 }}
-        >
-          <Trans>editAccount.title</Trans>
-        </Typography>
-
         <form onSubmit={handleSubmit}>
-          <Grid container spacing={2}>
-            <Grid size={12}>
+          <FormSection columns={1}>
+            <FormRow>
               <TextField
                 fullWidth
                 autoFocus
@@ -174,9 +137,8 @@ export const EditAccount = () => {
                 error={!labelIsValid}
                 onChange={(e) => setLabel(e.target.value)}
               />
-            </Grid>
-
-            <Grid size={12}>
+            </FormRow>
+            <FormRow>
               <FormControl variant="standard" fullWidth>
                 <InputLabel id="account-type-label">
                   <Trans>editAccount.type</Trans>
@@ -195,34 +157,27 @@ export const EditAccount = () => {
                   ))}
                 </Select>
               </FormControl>
-            </Grid>
+            </FormRow>
+          </FormSection>
 
-            {error && (
-              <Grid size={12}>
-                <Alert severity="error">{error}</Alert>
-              </Grid>
-            )}
-
-            <Grid size={12} sx={{ textAlign: 'center' }}>
+          <SubmitBar
+            label={<Trans>editAccount.send</Trans>}
+            icon={<SaveAltIcon />}
+            disabled={!canSubmit}
+            error={account ? error : null}
+            errorNamespace="editAccount"
+            secondary={
               <Button
-                type="submit"
-                variant="contained"
-                disabled={!canSubmit}
-                startIcon={<SaveAltIcon />}
-              >
-                <Trans>editAccount.send</Trans>
-              </Button>
-              <Button
-                sx={{ ml: 1 }}
+                size="small"
                 onClick={() => navigate('/accounts')}
                 disabled={saving}
               >
                 <Trans>common.cancel</Trans>
               </Button>
-            </Grid>
-          </Grid>
+            }
+          />
         </form>
-      </Box>
-    </Box>
+      </AsyncState>
+    </PageShell>
   );
 };
