@@ -9,6 +9,20 @@ afterEach(() => {
 });
 
 /**
+ * jsdom n'implémente pas non plus `ResizeObserver`, dont l'en-tête du compte se
+ * sert pour publier sa hauteur réelle. Il ne calcule aucune géométrie : le
+ * doublet ne sert qu'à laisser le composant se monter.
+ */
+class ResizeObserverStub implements ResizeObserver {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+}
+
+globalThis.ResizeObserver =
+  ResizeObserverStub as unknown as typeof ResizeObserver;
+
+/**
  * jsdom n'implémente pas `IntersectionObserver` : sans ce doublet, tout test
  * rendant la table des opérations échouerait sur un `ReferenceError`.
  *

@@ -23,7 +23,47 @@ import {
   ACCOUNT_HEADER_HEIGHT,
   ACCOUNT_MAX_WIDTH,
   APP_BAR_HEIGHT,
+  STICKY_TOP_VAR,
 } from '@presentation/molecule/accountLayout';
+
+/**
+ * Publie le bas réel de la barre, pour que la table y cale ses propres
+ * éléments collants.
+ *
+ * Mesuré et non calculé : la barre du socle se dimensionne sur son contenu, et
+ * celle-ci grandit dès qu'une puce de recherche est posée. Un `ResizeObserver`
+ * suit les deux cas sans que personne n'ait à prévenir.
+ */
+function useStickyBottom() {
+  const ref = React.useRef<HTMLDivElement | null>(null);
+
+  React.useEffect(() => {
+    const node = ref.current;
+    if (!node) return;
+
+    const publish = () => {
+      const { bottom } = node.getBoundingClientRect();
+      // `bottom` est relatif au viewport : la barre étant collante, c'est
+      // exactement l'offset auquel la suite doit se caler.
+      document.documentElement.style.setProperty(
+        STICKY_TOP_VAR,
+        `${Math.round(bottom)}px`,
+      );
+    };
+
+    publish();
+    const observer = new ResizeObserver(publish);
+    observer.observe(node);
+    window.addEventListener('resize', publish);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('resize', publish);
+      document.documentElement.style.removeProperty(STICKY_TOP_VAR);
+    };
+  }, []);
+
+  return ref;
+}
 
 type Props = {
   account: Account | null;
@@ -93,6 +133,7 @@ export const AccountHeader: React.FC<Props> = ({
   const { t } = useTranslation();
   const { toggle } = useCalculatorStore();
   const isDesktop = useMediaQuery(theme.breakpoints.up('md'));
+  const stickyRef = useStickyBottom();
 
   if (loading)
     return (
@@ -113,6 +154,7 @@ export const AccountHeader: React.FC<Props> = ({
 
   return (
     <Box
+      ref={stickyRef}
       sx={{
         width: '100%',
         maxWidth: ACCOUNT_MAX_WIDTH,

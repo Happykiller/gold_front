@@ -23,9 +23,8 @@ import { useCalculatorStore } from '@stores/useCalculatorStore';
 import { useInfiniteScroll } from '@presentation/hooks/useInfiniteScroll';
 import { groupOperationsByDay } from '@presentation/hooks/groupOperationsByDay';
 import {
-  ACCOUNT_HEADER_HEIGHT,
   ACCOUNT_MAX_WIDTH,
-  APP_BAR_HEIGHT,
+  STICKY_TOP,
 } from '@presentation/molecule/accountLayout';
 import { AMOUNT, LINE, MONO_FONT, SURFACE, TEXT } from '@src/theme/tokens';
 
@@ -127,13 +126,10 @@ const ACTIONS_CLASS = 'op-row-actions';
  * hauteur n'est plus connue — on renonce simplement au collant plutôt que de
  * deviner une valeur.
  */
-const HEADER_STICKY_TOP = {
-  xs: 'auto',
-  md: APP_BAR_HEIGHT.sm + ACCOUNT_HEADER_HEIGHT,
-};
+const HEADER_STICKY_TOP = { xs: 'auto', md: STICKY_TOP };
 const BAND_STICKY_TOP = {
   xs: 'auto',
-  md: APP_BAR_HEIGHT.sm + ACCOUNT_HEADER_HEIGHT + BAND_HEIGHT,
+  md: `calc(${STICKY_TOP} + ${BAND_HEIGHT}px)`,
 };
 
 type RowProps = {
@@ -472,7 +468,13 @@ const OperationRow = React.memo(function OperationRow({
         className={ACTIONS_CLASS}
         sx={{
           gridColumn: { xs: 'auto', sm: '5 / span 1', md: '6 / span 2' },
+          // `gridRow` explicite, sans quoi le placement automatique renonce à
+          // la rangée 1 — ses colonnes 6 et 7 sont déjà prises par destination
+          // et tiers — et crée une **seconde rangée** : les boutons tombaient
+          // alors sous leur ligne, à cheval sur la suivante.
+          gridRow: 1,
           justifySelf: 'end',
+          alignSelf: 'center',
           display: 'flex',
           alignItems: 'center',
           gap: '3px',
@@ -673,10 +675,16 @@ export const OperationsTable: React.FC<Props> = ({
         // un filet de 1 px. Le rayon plafonne à 6 px.
         border: { xs: 'none', sm: LINE.block },
         borderRadius: { xs: 0, sm: `${theme.radius.lg}px` },
-        overflow: 'hidden',
+        // Surtout **pas** d'`overflow: hidden` ici, malgré l'envie de rogner
+        // les coins : il ferait de ce conteneur le bloc de défilement de
+        // référence, et les trois niveaux d'éléments collants s'y ancreraient
+        // au lieu de la fenêtre. Le symptôme est trompeur — l'en-tête de
+        // colonnes se retrouve au milieu de la liste — et aucune barrière ne le
+        // voit. Les coins sont arrondis élément par élément à la place.
+        //
         // Contexte d'empilement propre : aucun élément collant de la table ne
-        // peut ainsi passer par-dessus l'en-tête du compte ni la barre de
-        // navigation, quels que soient les z-index internes.
+        // peut passer par-dessus l'en-tête du compte ni la barre de navigation,
+        // quels que soient les z-index internes.
         position: 'relative',
         zIndex: 0,
       }}
@@ -687,6 +695,11 @@ export const OperationsTable: React.FC<Props> = ({
           height: BAND_HEIGHT,
           background: SURFACE.header,
           borderBottom: LINE.block,
+          // Le conteneur ne rogne plus : chaque extrémité porte son rayon.
+          borderRadius: {
+            xs: 0,
+            sm: `${theme.radius.lg}px ${theme.radius.lg}px 0 0`,
+          },
           position: { xs: 'static', md: 'sticky' },
           top: HEADER_STICKY_TOP,
           zIndex: 3,
@@ -820,6 +833,10 @@ export const OperationsTable: React.FC<Props> = ({
           px: '20px',
           py: '9px',
           borderTop: LINE.block,
+          borderRadius: {
+            xs: 0,
+            sm: `0 0 ${theme.radius.lg}px ${theme.radius.lg}px`,
+          },
           fontSize: 11.5,
           color: TEXT.meta,
         }}
