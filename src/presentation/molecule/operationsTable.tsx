@@ -22,10 +22,7 @@ import {
 import { useCalculatorStore } from '@stores/useCalculatorStore';
 import { useInfiniteScroll } from '@presentation/hooks/useInfiniteScroll';
 import { groupOperationsByDay } from '@presentation/hooks/groupOperationsByDay';
-import {
-  ACCOUNT_MAX_WIDTH,
-  STICKY_TOP,
-} from '@presentation/molecule/accountLayout';
+import { APP_MAX_WIDTH, STICKY_TOP } from '@presentation/molecule/appLayout';
 import { AMOUNT, LINE, MONO_FONT, SURFACE, TEXT } from '@src/theme/tokens';
 
 /**
@@ -699,7 +696,7 @@ export const OperationsTable: React.FC<Props> = ({
       onKeyDown={handleKeyDown}
       sx={{
         width: '100%',
-        maxWidth: ACCOUNT_MAX_WIDTH,
+        maxWidth: APP_MAX_WIDTH,
         mx: 'auto',
         background: SURFACE.page,
         // Plus de bordure dorée ni de halo de 32 px : un bloc se délimite par

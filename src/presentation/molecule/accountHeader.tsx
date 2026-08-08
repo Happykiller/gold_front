@@ -16,53 +16,14 @@ import {
 
 import { useCalculatorStore } from '../../stores/useCalculatorStore';
 import { Account } from '@presentation/hooks/useAccountOperations';
-import { formatEuroAmount } from '@presentation/molecule/operationDisplay';
-import { AMOUNT, LINE, MONO_FONT, SURFACE, TEXT } from '@src/theme/tokens';
+import { LINE, SURFACE, TEXT } from '@src/theme/tokens';
+import { ValueChip } from '@presentation/molecule/valueChip';
+import { useStickyBottom } from '@presentation/hooks/useStickyBottom';
 import {
-  ACCOUNT_HEADER_HEIGHT,
-  ACCOUNT_MAX_WIDTH,
+  SCREEN_BAR_HEIGHT,
+  APP_MAX_WIDTH,
   APP_BAR_HEIGHT,
-  STICKY_TOP_VAR,
-} from '@presentation/molecule/accountLayout';
-
-/**
- * Publie le bas réel de la barre, pour que la table y cale ses propres
- * éléments collants.
- *
- * Mesuré et non calculé : la barre du socle se dimensionne sur son contenu, et
- * celle-ci grandit dès qu'une puce de recherche est posée. Un `ResizeObserver`
- * suit les deux cas sans que personne n'ait à prévenir.
- */
-function useStickyBottom() {
-  const ref = React.useRef<HTMLDivElement | null>(null);
-
-  React.useEffect(() => {
-    const node = ref.current;
-    if (!node) return;
-
-    const publish = () => {
-      const { bottom } = node.getBoundingClientRect();
-      // `bottom` est relatif au viewport : la barre étant collante, c'est
-      // exactement l'offset auquel la suite doit se caler.
-      document.documentElement.style.setProperty(
-        STICKY_TOP_VAR,
-        `${Math.round(bottom)}px`,
-      );
-    };
-
-    publish();
-    const observer = new ResizeObserver(publish);
-    observer.observe(node);
-    window.addEventListener('resize', publish);
-    return () => {
-      observer.disconnect();
-      window.removeEventListener('resize', publish);
-      document.documentElement.style.removeProperty(STICKY_TOP_VAR);
-    };
-  }, []);
-
-  return ref;
-}
+} from '@presentation/molecule/appLayout';
 
 type Props = {
   account: Account | null;
@@ -79,48 +40,6 @@ type Props = {
    */
   search?: React.ReactNode;
 };
-
-/** Un chiffre qualifié : le montant d'abord, son libellé en petit ensuite. */
-const BalanceChip: React.FC<{
-  amount: number;
-  label: string;
-}> = ({ amount, label }) => (
-  <Box
-    sx={(theme) => ({
-      display: 'flex',
-      alignItems: 'baseline',
-      gap: '7px',
-      padding: '3px 9px',
-      borderRadius: `${theme.radius.sm}px`,
-      background: SURFACE.chip,
-      whiteSpace: 'nowrap',
-    })}
-  >
-    <Typography
-      component="span"
-      sx={{
-        fontFamily: MONO_FONT,
-        fontWeight: 500,
-        fontSize: 13,
-        lineHeight: 1,
-        // Toute couleur passe par `sx` : la prop `color` de MUI n'accepte que
-        // des clés de palette et n'applique rien, en silence, sur un hexa.
-        //
-        // Un solde négatif se signale ; l'or reste réservé à l'action et à
-        // l'état « en attente », il n'a rien à faire sur un solde.
-        color: amount < 0 ? AMOUNT.debit : TEXT.title,
-      }}
-    >
-      {formatEuroAmount(amount)}
-    </Typography>
-    <Typography
-      component="span"
-      sx={{ fontSize: 10.5, lineHeight: 1, color: TEXT.meta }}
-    >
-      {label}
-    </Typography>
-  </Box>
-);
 
 export const AccountHeader: React.FC<Props> = ({
   account,
@@ -158,7 +77,7 @@ export const AccountHeader: React.FC<Props> = ({
       ref={stickyRef}
       sx={{
         width: '100%',
-        maxWidth: ACCOUNT_MAX_WIDTH,
+        maxWidth: APP_MAX_WIDTH,
         mx: 'auto',
         position: 'sticky',
         // Sous la barre de navigation du socle, jamais à 0 : elle est déjà
@@ -177,7 +96,7 @@ export const AccountHeader: React.FC<Props> = ({
         py: { xs: '10px', md: 0 },
         // `minHeight` et non `height` : la barre fait 52 px tant qu'aucun
         // critère n'est posé, et grandit si les puces de recherche débordent.
-        minHeight: { xs: 'auto', md: ACCOUNT_HEADER_HEIGHT },
+        minHeight: { xs: 'auto', md: SCREEN_BAR_HEIGHT },
       }}
     >
       <Typography
@@ -202,12 +121,12 @@ export const AccountHeader: React.FC<Props> = ({
        * `getBalance` l'agrège sur les statuts 1 **et** 2, c'est donc le solde
        * total projeté, pas le reste à pointer.
        */}
-      <BalanceChip
-        amount={account.balance_not_reconcilied ?? 0}
+      <ValueChip
+        value={account.balance_not_reconcilied ?? 0}
         label={t('account.balance.total')}
       />
-      <BalanceChip
-        amount={account.balance_reconcilied ?? 0}
+      <ValueChip
+        value={account.balance_reconcilied ?? 0}
         label={t('account.balance.reconciled')}
       />
 

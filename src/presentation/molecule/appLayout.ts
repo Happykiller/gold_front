@@ -1,7 +1,7 @@
-// src\presentation\molecule\accountLayout.ts
+// src\presentation\molecule\appLayout.ts
 
 /**
- * Géométrie partagée de l'écran compte.
+ * Géométrie partagée de l'application.
  *
  * Dans son propre module plutôt qu'exportée par l'en-tête : la table n'a pas à
  * importer un composant pour lire une largeur, et un fichier qui exporte
@@ -9,7 +9,7 @@
  */
 
 /**
- * Largeur utile de l'écran, partagée par l'en-tête et la table.
+ * Largeur utile d'un écran de liste, partagée par sa barre et son tableau.
  *
  * Les sept colonnes de la table consomment 432 px fixes, 72 px de gouttières
  * et 40 px de marge interne : 544 px incompressibles. Aux 950 px d'origine, la
@@ -19,10 +19,10 @@
  * Surtout, la constante est **unique** : l'en-tête était à 950 et la table en
  * pleine largeur, et le décalage se voyait.
  */
-export const ACCOUNT_MAX_WIDTH = 1100;
+export const APP_MAX_WIDTH = 1100;
 
 /** Hauteur de la barre du compte quand aucun critère n'est posé. */
-export const ACCOUNT_HEADER_HEIGHT = 52;
+export const SCREEN_BAR_HEIGHT = 52;
 
 /**
  * Hauteur de la barre de navigation du socle, qui est elle-même `sticky` en
@@ -45,5 +45,5 @@ export const STICKY_TOP_VAR = '--gold-account-sticky-top';
 
 /** Repli tant que la mesure n'a pas eu lieu (premier rendu). */
 export const STICKY_TOP = `var(${STICKY_TOP_VAR}, ${
-  APP_BAR_HEIGHT.sm + ACCOUNT_HEADER_HEIGHT
+  APP_BAR_HEIGHT.sm + SCREEN_BAR_HEIGHT
 }px)`;
