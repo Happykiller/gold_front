@@ -79,4 +79,31 @@ describe('OpeCategoriesSelect', () => {
 
     expect(item.querySelector('svg')).toBeInTheDocument();
   });
+
+  it('garde l’icône sur la ligne du libellé une fois le choix fait', async () => {
+    // Le champ fermé recopie les enfants de l'entrée choisie hors du contexte
+    // flex du menu. Tant que le libellé était rendu dans un bloc, il passait
+    // sous l'icône. On assertt donc la cause — un conteneur commun et un
+    // libellé en ligne — puisque jsdom ne calcule aucune géométrie.
+    mocks.execute.mockResolvedValue({
+      message: CODES.SUCCESS,
+      data: [{ id: 1, label: 'Alimentation' }],
+    });
+    renderWithApp(
+      <OpeCategoriesSelect value={1} label="Catégorie" onChange={vi.fn()} />,
+    );
+
+    const field = screen.getByRole('combobox');
+    await waitFor(() =>
+      expect(within(field).getByText('Alimentation')).toBeInTheDocument(),
+    );
+    const labelNode = within(field).getByText('Alimentation');
+
+    // Le libellé est en ligne...
+    expect(labelNode.tagName).toBe('SPAN');
+    // ...et partage avec l'icône un conteneur qui les met sur une rangée.
+    const row = labelNode.parentElement!;
+    expect(row.querySelector('svg')).toBeInTheDocument();
+    expect(row).toHaveStyle({ display: 'flex', alignItems: 'center' });
+  });
 });

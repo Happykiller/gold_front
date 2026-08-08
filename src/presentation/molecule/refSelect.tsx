@@ -151,23 +151,37 @@ export const RefSelect: React.FC<RefSelectProps> = ({
         )}
         {visible.map((item) => (
           <MenuItem key={item.id} value={item.id}>
-            {renderIcon && (
-              <Box
-                component="span"
-                sx={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  mr: '8px',
-                  lineHeight: 0,
-                  '& .MuiSvgIcon-root': { fontSize: 16 },
-                }}
-              >
-                {renderIcon(item)}
-              </Box>
-            )}
-            <Typography noWrap sx={{ fontSize: 13.5 }}>
-              {translateLabels ? <Trans>{item.label}</Trans> : item.label}
-            </Typography>
+            {/*
+             * Un conteneur en ligne, et non deux enfants côte à côte : le
+             * champ fermé recopie les enfants de l'entrée choisie **hors du
+             * contexte flex** de `MenuItem`. Le `Typography`, qui est un bloc,
+             * passait alors sous l'icône au lieu de rester à côté.
+             */}
+            <Box
+              component="span"
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                minWidth: 0,
+              }}
+            >
+              {renderIcon && (
+                <Box
+                  component="span"
+                  sx={{
+                    display: 'inline-flex',
+                    lineHeight: 0,
+                    '& .MuiSvgIcon-root': { fontSize: 16 },
+                  }}
+                >
+                  {renderIcon(item)}
+                </Box>
+              )}
+              <Typography component="span" noWrap sx={{ fontSize: 13.5 }}>
+                {translateLabels ? <Trans>{item.label}</Trans> : item.label}
+              </Typography>
+            </Box>
           </MenuItem>
         ))}
       </Select>
