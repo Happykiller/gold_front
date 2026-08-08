@@ -8,6 +8,7 @@
       "total": "total",
       "reconciled": "reconciled"
     },
+    "empty": "No account",
     "calculator": "Open the calculator",
     "refresh": "Refresh",
     "type-regular": "Account",

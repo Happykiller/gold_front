@@ -1,4 +1,4 @@
-// src\presentation\molecule\accouts\accounts.ts
+// src\presentation\hooks\accounts.ts
 import { AccountUsecaseModel } from '@usecase/model/account.usecase.model';
 
 export type FormattedAccount = AccountUsecaseModel & {

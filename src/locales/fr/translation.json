@@ -8,6 +8,7 @@
       "total": "total",
       "reconciled": "pointé"
     },
+    "empty": "Aucun compte",
     "calculator": "Ouvrir la calculatrice",
     "refresh": "Rafraîchir",
     "type-regular": "Compte",

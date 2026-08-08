@@ -3,10 +3,7 @@ import * as React from 'react';
 import { GetAccountsUsecaseModel } from '@usecase/getAccounts/getAccounts.usecase.model';
 import inversify from '@src/common/inversify';
 import { CODES } from '@src/common/codes';
-import {
-  formatAccounts,
-  FormattedAccount,
-} from '@src/presentation/molecule/accounts';
+import { formatAccounts, FormattedAccount } from '@presentation/hooks/accounts';
 
 export function useAccounts() {
   const [data, setData] = React.useState<FormattedAccount[] | null>(null);
