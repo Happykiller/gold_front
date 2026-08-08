@@ -24,6 +24,7 @@ import { useInfiniteScroll } from '@presentation/hooks/useInfiniteScroll';
 import { groupOperationsByDay } from '@presentation/hooks/groupOperationsByDay';
 import { APP_MAX_WIDTH, STICKY_TOP } from '@presentation/molecule/appLayout';
 import { AMOUNT, LINE, MONO_FONT, SURFACE, TEXT } from '@src/theme/tokens';
+import { RowAction } from '@presentation/molecule/rowAction';
 
 /**
  * Géométrie de la table, en grille CSS.
@@ -150,45 +151,6 @@ type RowProps = {
   onDeleteOperation?: (op: Operation) => void;
   onRecoOperation?: (op: Operation) => void;
 };
-
-/**
- * Un bouton d'action.
- *
- * Sans badge de raccourci : le `E` accolé au crayon n'apprenait rien que
- * l'infobulle ne dise mieux, et doublait la largeur du bouton. Le seul
- * raccourci qui vaut d'être affiché est rappelé une fois, dans la légende.
- */
-const RowAction: React.FC<{
-  label: string;
-  icon: React.ReactNode;
-  onClick: (event: React.MouseEvent) => void;
-}> = ({ label, icon, onClick }) => (
-  <Tooltip title={label} placement="top">
-    <Box
-      component="button"
-      type="button"
-      aria-label={label}
-      onClick={onClick}
-      sx={(theme) => ({
-        height: 20,
-        px: '7px',
-        border: 'none',
-        cursor: 'pointer',
-        display: 'flex',
-        alignItems: 'center',
-        gap: '5px',
-        fontSize: 11,
-        fontFamily: 'inherit',
-        borderRadius: `${theme.radius.sm}px`,
-        background: SURFACE.action,
-        color: TEXT.label,
-        '& .MuiSvgIcon-root': { fontSize: 13 },
-      })}
-    >
-      {icon}
-    </Box>
-  </Tooltip>
-);
 
 /**
  * Une ligne du tableau.

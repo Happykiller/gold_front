@@ -3,19 +3,15 @@ import dayjs from 'dayjs';
 import * as React from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { Delete, Info, Send } from '@mui/icons-material';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { createSearchParams, useNavigate } from 'react-router-dom';
-import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
+import { DatePicker } from '@mui/x-date-pickers';
 import {
   Box,
-  Button,
-  Typography,
   FormControl,
   InputLabel,
   MenuItem,
   Select,
-  useTheme,
-  Grid,
+  Typography,
 } from '@mui/material';
 import EuroIcon from '@mui/icons-material/Euro';
 import DescriptionIcon from '@mui/icons-material/Description';
@@ -25,31 +21,36 @@ import inversify from '@src/common/inversify';
 import { useFlashStore, Input } from '@happykiller/sunny-ui';
 import { ThirdsSelect } from '@presentation/molecule/thirdsSelect';
 import { AccountsSelect } from '@presentation/molecule/accountsSelect';
+import { OpeStatusSelect } from '@presentation/molecule/opeRefSelects';
 import { OpeCategoriesSelect } from '@presentation/molecule/opeCategoriesSelect';
+import { PageShell } from '@presentation/molecule/pageShell';
+import {
+  FormSection,
+  FormRow,
+  SubmitBar,
+} from '@presentation/molecule/formLayout';
+import { RowAction } from '@presentation/molecule/rowAction';
+import { formatEuroAmount } from '@presentation/molecule/operationDisplay';
+import { TEXT } from '@src/theme/tokens';
+import {
+  Operation,
+  OPERATIONS_PAGE_SIZE,
+} from '@presentation/hooks/useAccountOperations';
 import { GetOperationsUsecaseModel } from '@usecase/getOperations/getOperations.usecase.model';
-import { OPERATIONS_PAGE_SIZE } from '@presentation/hooks/useAccountOperations';
 import { CreateOperationUsecaseModel } from '@usecase/createOperation/createOperation.usecase.model';
 
 export const CreateVir = () => {
-  const theme = useTheme();
   const navigate = useNavigate();
   const { t } = useTranslation();
   const flash = useFlashStore();
 
-  const [qry, setQry] = React.useState<{
-    loading: boolean | null;
-    data: any;
-    error: string | null;
-  }>({ loading: null, data: null, error: null });
-  const [qryOps, setQryLOps] = React.useState<{
-    loading: boolean | null;
-    data: any;
-    error: string | null;
-  }>({ loading: null, data: null, error: null });
+  const [sending, setSending] = React.useState(false);
+  const [error, setError] = React.useState<string | null>(null);
 
-  const [operations, setOperations] = React.useState<any[] | null>(null);
-  const [selectedOperations, setSelectedOperations] = React.useState<any[]>([]);
-  const [opeSelected, setOpeSelected] = React.useState('');
+  const [operations, setOperations] = React.useState<Operation[] | null>(null);
+  const [selectedOperations, setSelectedOperations] = React.useState<
+    Operation[]
+  >([]);
   const [currentThird, setCurrentThird] = React.useState('2');
   const [currentCategory, setCurrentCategory] = React.useState('1');
   const [currentAccount, setCurrentAccount] = React.useState('2');
@@ -64,9 +65,10 @@ export const CreateVir = () => {
       selectedOperations.reduce((n, { amount }) => n + amount, 0) * 100,
     ) / 100;
 
-  const handleClick = async (event: React.SyntheticEvent) => {
+  const handleSubmit = (event: React.SyntheticEvent) => {
     event.preventDefault();
-    setQry({ ...qry, loading: true });
+    setSending(true);
+    setError(null);
 
     inversify.createOperationUsecase
       .execute({
@@ -92,253 +94,188 @@ export const CreateVir = () => {
             }).toString(),
           });
         } else {
-          setQry({ ...qry, error: response.message });
+          inversify.loggerService.debug(response.error);
+          setError(response.message);
         }
       })
-      .catch((error) => {
-        setQry({ ...qry, error: error.message });
-      })
-      .finally(() => {
-        setQry({ ...qry, loading: false });
-      });
+      .catch((err: Error) => setError(err.message))
+      .finally(() => setSending(false));
   };
 
+  // Les opérations du compte de destination, proposées à la liaison. Rechargées
+  // dès que ce compte change.
   React.useEffect(() => {
-    if (operations === null) {
-      setQryLOps({ ...qryOps, loading: true });
-      inversify.getOperationsUsecase
-        .execute({
-          account_id: parseInt(currentAccountDest),
-          limit: OPERATIONS_PAGE_SIZE,
-          offset: 0,
-        })
-        .then((response: GetOperationsUsecaseModel) => {
-          if (response.message === CODES.SUCCESS && response.data) {
-            setOperations(response.data);
-          } else {
-            setQryLOps({ ...qryOps, error: response.message });
-          }
-        })
-        .catch((error) => {
-          setQryLOps({ ...qryOps, error: error.message });
-        })
-        .finally(() => {
-          setQryLOps({ ...qryOps, loading: false });
-        });
-    }
-  }, [currentAccountDest]);
+    if (operations !== null) return;
 
-  const renderLinkedOperations = (
-    <Grid size={12} container spacing={1} sx={{ justifyContent: 'center' }}>
-      {selectedOperations.map((operation) => (
-        <Grid key={operation.id}>
-          <Button
-            variant="contained"
-            size="small"
-            startIcon={<Delete />}
-            sx={{ borderRadius: 2 }}
-          >
-            <Typography noWrap>
-              {operation.amount}€ {operation.description}
-            </Typography>
-          </Button>
-        </Grid>
-      ))}
-    </Grid>
-  );
+    inversify.getOperationsUsecase
+      .execute({
+        account_id: parseInt(currentAccountDest),
+        limit: OPERATIONS_PAGE_SIZE,
+        offset: 0,
+      })
+      .then((response: GetOperationsUsecaseModel) => {
+        if (response.message === CODES.SUCCESS && response.data)
+          setOperations(response.data);
+        else inversify.loggerService.debug(response.error);
+      })
+      .catch((err: Error) => inversify.loggerService.debug(err.message));
+  }, [currentAccountDest, operations]);
 
-  const listOperations = qryOps.loading ? (
-    <Trans>common.loading</Trans>
-  ) : qryOps.error ? (
-    <Trans>createVir.{qryOps.error}</Trans>
-  ) : (
-    <FormControl variant="standard" fullWidth>
-      <InputLabel>
-        <Trans>createVir.operations</Trans>
-      </InputLabel>
-      <Select
-        variant="standard"
-        size="small"
-        value={opeSelected}
-        onChange={(e) => {
-          const val = e.target.value;
-          setOpeSelected(val);
-          setSelectedOperations((prev) => [...prev, val]);
-        }}
-      >
-        <MenuItem value="">Aucune</MenuItem>
-        {operations?.map(
-          (operation) =>
-            operation.type_id === 2 && (
-              <MenuItem key={operation.id} value={operation}>
-                <Typography noWrap>
-                  {operation.amount}€ {operation.description}
-                </Typography>
-              </MenuItem>
-            ),
-        )}
-      </Select>
-    </FormControl>
+  const linkable = (operations ?? []).filter(
+    (operation) =>
+      operation.type_id === 2 &&
+      !selectedOperations.some((selected) => selected.id === operation.id),
   );
 
   return (
-    <Box
-      sx={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        px: 2,
-      }}
-    >
-      <Box
-        sx={{
-          borderRadius: { xs: 0, sm: '16px' },
-          boxShadow: {
-            xs: 'none',
-            sm: `0 0 32px 0 ${theme.palette.primary.main}55`,
-          },
-          border: { xs: 'none', sm: `2px solid ${theme.palette.primary.main}` },
-          maxWidth: 600,
-          background: {
-            xs: 0,
-            sm: theme.palette.background.default,
-          },
-          p: 3,
-        }}
-      >
-        <Typography
-          variant="h6"
-          color="text.primary"
-          sx={{ fontWeight: 700, textAlign: 'center', mb: 2 }}
-        >
-          <Trans>createVir.title</Trans>
-        </Typography>
+    <PageShell title={t('createVir.title')}>
+      <form onSubmit={handleSubmit}>
+        <FormSection>
+          <Input
+            label={<Trans>operation.amount</Trans>}
+            tooltip={t('operation.amount-hint')}
+            regex="^[0-9]+([.,][0-9]{1,2})?$"
+            require
+            virgin
+            entity={amount}
+            onChange={setAmount}
+            startIcon={<EuroIcon fontSize="small" />}
+            icons={{ help: <Info fontSize="small" /> }}
+          />
+          <DatePicker
+            format="DD/MM/YYYY"
+            label={<Trans>operation.date</Trans>}
+            value={currentDate}
+            onChange={(newValue) => newValue && setCurrentDate(newValue)}
+            slotProps={{
+              textField: { variant: 'standard', fullWidth: true },
+            }}
+          />
+          <FormRow>
+            <Input
+              label={<Trans>operation.description</Trans>}
+              tooltip={t('operation.description-hint')}
+              regex="^.{3,}$"
+              require
+              virgin
+              entity={desc}
+              onChange={setDesc}
+              startIcon={<DescriptionIcon fontSize="small" />}
+              icons={{ help: <Info fontSize="small" /> }}
+            />
+          </FormRow>
 
-        {qry.loading ? (
-          <Typography color="text.secondary" sx={{ textAlign: 'center' }}>
-            <Trans>common.loading</Trans>
-          </Typography>
-        ) : qry.error ? (
-          <Typography color="error.main" sx={{ textAlign: 'center' }}>
-            <Trans>createVir.{qry.error}</Trans>
-          </Typography>
-        ) : (
-          <form onSubmit={handleClick}>
-            <Grid container spacing={2}>
-              <Grid size={6}>
-                <Input
-                  label={<Trans>operation.amount</Trans>}
-                  tooltip="Saisir un montant numérique (ex: 125.50)"
-                  regex="^[0-9]+([.,][0-9]{1,2})?$"
-                  require
-                  virgin
-                  entity={amount}
-                  onChange={setAmount}
-                  startIcon={<EuroIcon fontSize="small" />}
-                  icons={{
-                    help: <Info fontSize="small" />,
-                  }}
-                />
-              </Grid>
-              <Grid size={6}>
-                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                  <DatePicker
-                    format="DD/MM/YYYY"
-                    label={<Trans>operation.date</Trans>}
-                    value={currentDate}
-                    onChange={(newValue: any) => setCurrentDate(newValue)}
+          <AccountsSelect
+            value={currentAccount}
+            label={<Trans>operation.account</Trans>}
+            onChange={(e) => setCurrentAccount(e.target.value)}
+          />
+          <AccountsSelect
+            value={currentAccountDest}
+            label={<Trans>operation.account_dest</Trans>}
+            onChange={(e) => {
+              setCurrentAccountDest(e.target.value);
+              setOperations(null);
+              setSelectedOperations([]);
+            }}
+          />
+          <OpeStatusSelect
+            value={currentStatus}
+            label={<Trans>operation.status</Trans>}
+            onChange={(e) => setCurrentStatus(e.target.value)}
+          />
+          <ThirdsSelect
+            value={currentThird}
+            label={<Trans>operation.third</Trans>}
+            onChange={(e) => setCurrentThird(e.target.value)}
+          />
+          <OpeCategoriesSelect
+            value={currentCategory}
+            label={<Trans>operation.category</Trans>}
+            onChange={(e) => setCurrentCategory(e.target.value)}
+          />
+        </FormSection>
+
+        <FormSection title={t('createVir.operations')} columns={1}>
+          <FormRow>
+            <FormControl variant="standard" fullWidth sx={{ m: 1 }}>
+              <InputLabel>
+                <Trans>createVir.operations</Trans>
+              </InputLabel>
+              <Select
+                variant="standard"
+                size="small"
+                value=""
+                onChange={(e) => {
+                  const picked = linkable.find(
+                    (operation) => String(operation.id) === e.target.value,
+                  );
+                  if (picked)
+                    setSelectedOperations((prev) => [...prev, picked]);
+                }}
+              >
+                {linkable.map((operation) => (
+                  <MenuItem key={operation.id} value={String(operation.id)}>
+                    <Typography noWrap sx={{ fontSize: 13.5 }}>
+                      {formatEuroAmount(operation.amount)} —{' '}
+                      {operation.description}
+                    </Typography>
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </FormRow>
+
+          {selectedOperations.length > 0 && (
+            <FormRow>
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexWrap: 'wrap',
+                  alignItems: 'center',
+                  gap: '6px',
+                  mt: '8px',
+                }}
+              >
+                {selectedOperations.map((operation) => (
+                  <RowAction
+                    key={operation.id}
+                    // Le bouton portait une icône de suppression et **aucun
+                    // gestionnaire** : il ne faisait rien. Il retire maintenant
+                    // l'opération de la liaison.
+                    label={`${t('operation.action-delete')} — ${operation.description}`}
+                    icon={<Delete />}
+                    text={`${formatEuroAmount(operation.amount)} ${operation.description}`}
+                    onClick={() =>
+                      setSelectedOperations((prev) =>
+                        prev.filter((selected) => selected.id !== operation.id),
+                      )
+                    }
                   />
-                </LocalizationProvider>
-              </Grid>
-              <Grid size={12}>
-                <Input
-                  label={<Trans>operation.description</Trans>}
-                  tooltip="Description obligatoire. Minimum 3 caractères"
-                  regex="^.{3,}$"
-                  require
-                  virgin
-                  entity={desc}
-                  onChange={setDesc}
-                  startIcon={<DescriptionIcon fontSize="small" />}
-                  icons={{
-                    help: <Info fontSize="small" />,
-                  }}
-                />
-              </Grid>
-              <Grid size={6}>
-                <AccountsSelect
-                  value={currentAccount}
-                  label={<Trans>operation.account</Trans>}
-                  onChange={(e: any) => setCurrentAccount(e.target.value)}
-                />
-              </Grid>
-              <Grid size={6}>
-                <AccountsSelect
-                  value={currentAccountDest}
-                  label={<Trans>operation.account_dest</Trans>}
-                  onChange={(e: any) => {
-                    setCurrentAccountDest(e.target.value);
-                    setOperations(null);
-                    setSelectedOperations([]);
-                  }}
-                />
-              </Grid>
-              <Grid size={6}>
-                <FormControl variant="standard" fullWidth>
-                  <InputLabel>
-                    <Trans>operation.status</Trans>
-                  </InputLabel>
-                  <Select
-                    value={currentStatus}
-                    variant="standard"
-                    onChange={(e) => setCurrentStatus(e.target.value)}
-                  >
-                    <MenuItem value="1">A suivre</MenuItem>
-                    <MenuItem value="2">Réconcilier</MenuItem>
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid size={6}>
-                <ThirdsSelect
-                  value={currentThird}
-                  label={<Trans>operation.third</Trans>}
-                  onChange={(e: any) => setCurrentThird(e.target.value)}
-                />
-              </Grid>
-              <Grid size={6}>
-                <OpeCategoriesSelect
-                  value={currentCategory}
-                  label={<Trans>operation.category</Trans>}
-                  onChange={(e: any) => setCurrentCategory(e.target.value)}
-                />
-              </Grid>
-              <Grid size={6}>{listOperations}</Grid>
-              {renderLinkedOperations}
-              {sum > 0 && (
-                <Grid size={12} sx={{ textAlign: 'center' }}>
-                  <Typography variant="subtitle2" color="primary">
-                    {sum} €
-                  </Typography>
-                </Grid>
-              )}
-              <Grid size={12} sx={{ textAlign: 'center' }}>
-                <Button
-                  type="submit"
-                  variant="contained"
-                  startIcon={<Send fontSize="small" />}
-                  disabled={
-                    !amount.valid ||
-                    !desc.valid ||
-                    currentAccount === currentAccountDest
-                  }
+                ))}
+                <Typography
+                  sx={{ ml: 'auto', fontSize: 12.5, color: TEXT.label }}
                 >
-                  <Trans>createVir.send</Trans>
-                </Button>
-              </Grid>
-            </Grid>
-          </form>
-        )}
-      </Box>
-    </Box>
+                  {formatEuroAmount(sum)}
+                </Typography>
+              </Box>
+            </FormRow>
+          )}
+        </FormSection>
+
+        <SubmitBar
+          label={<Trans>createVir.send</Trans>}
+          icon={<Send fontSize="small" />}
+          errorNamespace="createVir"
+          error={error}
+          disabled={
+            sending ||
+            !amount.valid ||
+            !desc.valid ||
+            currentAccount === currentAccountDest
+          }
+        />
+      </form>
+    </PageShell>
   );
 };
