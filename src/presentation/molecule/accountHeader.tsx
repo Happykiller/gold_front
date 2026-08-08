@@ -1,19 +1,29 @@
+// src\presentation\molecule\accountHeader.tsx
 import * as React from 'react';
-import { Tooltip } from '@mui/material';
+import { useTranslation } from 'react-i18next';
 import AddIcon from '@mui/icons-material/Add';
 import RefreshIcon from '@mui/icons-material/Refresh';
-import { useTheme, useMediaQuery } from '@mui/material';
 import CalculateIcon from '@mui/icons-material/Calculate';
 import {
   Box,
-  Grid,
+  Tooltip,
   Typography,
   IconButton,
   CircularProgress,
+  useTheme,
+  useMediaQuery,
 } from '@mui/material';
 
 import { useCalculatorStore } from '../../stores/useCalculatorStore';
 import { Account } from '@presentation/hooks/useAccountOperations';
+import { pendingBalance } from '@presentation/hooks/accountBalance';
+import { formatEuroAmount } from '@presentation/molecule/operationDisplay';
+import { LINE, MONO_FONT, SURFACE, TEXT } from '@src/theme/tokens';
+import {
+  ACCOUNT_HEADER_HEIGHT,
+  ACCOUNT_MAX_WIDTH,
+  APP_BAR_HEIGHT,
+} from '@presentation/molecule/accountLayout';
 
 type Props = {
   account: Account | null;
@@ -21,8 +31,55 @@ type Props = {
   error: string | null;
   onRefresh: () => void;
   onAddOperation?: () => void;
-  onCloneAccount?: () => void;
+  /**
+   * La barre de recherche, insérée dans la barre plutôt que rendue en dessous.
+   *
+   * Un emplacement plutôt qu'une fusion : l'en-tête n'a ainsi rien à savoir
+   * des jetons ni des référentiels, et la barre de recherche continue d'être
+   * montée seule par ses tests.
+   */
+  search?: React.ReactNode;
 };
+
+/** Un chiffre qualifié : le montant d'abord, son libellé en petit ensuite. */
+const BalanceChip: React.FC<{
+  amount: number;
+  label: string;
+  highlighted?: boolean;
+}> = ({ amount, label, highlighted }) => (
+  <Box
+    sx={(theme) => ({
+      display: 'flex',
+      alignItems: 'baseline',
+      gap: '7px',
+      padding: '3px 9px',
+      borderRadius: `${theme.radius.sm}px`,
+      background: highlighted ? 'rgba(244, 183, 0, 0.1)' : SURFACE.chip,
+      whiteSpace: 'nowrap',
+    })}
+  >
+    <Typography
+      component="span"
+      sx={(theme) => ({
+        fontFamily: MONO_FONT,
+        fontWeight: 500,
+        fontSize: 13,
+        lineHeight: 1,
+        // Toute couleur passe par `sx` : la prop `color` de MUI n'accepte que
+        // des clés de palette et n'applique rien, en silence, sur un hexa.
+        color: highlighted ? theme.palette.primary.main : TEXT.title,
+      })}
+    >
+      {formatEuroAmount(amount)}
+    </Typography>
+    <Typography
+      component="span"
+      sx={{ fontSize: 10.5, lineHeight: 1, color: TEXT.meta }}
+    >
+      {label}
+    </Typography>
+  </Box>
+);
 
 export const AccountHeader: React.FC<Props> = ({
   account,
@@ -30,104 +87,135 @@ export const AccountHeader: React.FC<Props> = ({
   error,
   onRefresh,
   onAddOperation,
+  search,
 }) => {
   const theme = useTheme();
+  const { t } = useTranslation();
   const { toggle } = useCalculatorStore();
   const isDesktop = useMediaQuery(theme.breakpoints.up('md'));
 
   if (loading)
     return (
-      <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+      <Box sx={{ display: 'flex', justifyContent: 'center', py: 2 }}>
         <CircularProgress size={32} />
       </Box>
     );
-  if (error) return <Box color="error.main">{error}</Box>;
+  if (error) return <Box sx={{ color: 'error.main' }}>{error}</Box>;
   if (!account) return null;
+
+  const iconButtonSx = {
+    width: 26,
+    height: 26,
+    borderRadius: `${theme.radius.md}px`,
+    color: TEXT.label,
+    '& .MuiSvgIcon-root': { fontSize: 16 },
+  };
 
   return (
     <Box
       sx={{
-        px: { xs: 1, sm: 2, md: 0 },
-        mb: 2,
-        mt: 2,
         width: '100%',
-        maxWidth: 950,
+        maxWidth: ACCOUNT_MAX_WIDTH,
         mx: 'auto',
+        position: 'sticky',
+        // Sous la barre de navigation du socle, jamais à 0 : elle est déjà
+        // collante en haut et le recouvrirait.
+        top: { xs: APP_BAR_HEIGHT.xs, sm: APP_BAR_HEIGHT.sm },
+        zIndex: theme.zIndex.appBar - 1,
+        // Fond opaque obligatoire : sans lui, les lignes de la table défilent
+        // visiblement au travers de la barre.
+        background: SURFACE.page,
+        borderBottom: LINE.block,
+        display: 'flex',
+        flexWrap: { xs: 'wrap', md: 'nowrap' },
+        alignItems: 'center',
+        gap: '14px',
+        px: '20px',
+        py: { xs: '10px', md: 0 },
+        // `minHeight` et non `height` : la barre fait 52 px tant qu'aucun
+        // critère n'est posé, et grandit si les puces de recherche débordent.
+        minHeight: { xs: 'auto', md: ACCOUNT_HEADER_HEIGHT },
       }}
     >
-      <Grid
-        container
-        spacing={2}
-        sx={{ alignItems: 'center', justifyContent: 'space-between' }}
-      >
-        {/* Titre + actions à droite */}
-        <Grid
-          size={{ xs: 12, sm: 5 }}
-          sx={{ display: 'flex', alignItems: 'center' }}
-        >
-          <Typography
-            variant="h4"
-            color="grey.100"
-            sx={{ fontWeight: 700, flex: 1 }}
-          >
-            {account.label}
-          </Typography>
-        </Grid>
-        <Grid
-          size={{ xs: 12, sm: 7 }}
-          sx={{
-            display: 'flex',
-            justifyContent: 'flex-end',
-            alignItems: 'center',
-            gap: 2,
-          }}
-        >
-          {isDesktop && (
-            <Tooltip title="Ouvrir la calculatrice">
-              <IconButton size="medium" onClick={toggle}>
-                <CalculateIcon />
-              </IconButton>
-            </Tooltip>
-          )}
-          <IconButton size="medium" onClick={onRefresh}>
-            <RefreshIcon />
-          </IconButton>
-          {onAddOperation && (
-            <IconButton size="medium" onClick={onAddOperation}>
-              <AddIcon />
-            </IconButton>
-          )}
-        </Grid>
-      </Grid>
-      {/* Balances sur une seule ligne */}
-      <Grid
-        container
+      <Typography
+        component="h1"
         sx={{
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          mt: 1,
-          mb: 1,
+          fontFamily: 'Montserrat',
+          fontWeight: 600,
+          fontSize: 17,
+          lineHeight: 1.1,
+          color: TEXT.title,
+          whiteSpace: 'nowrap',
         }}
       >
-        <Grid size={{ xs: 12, sm: 6 }} sx={{ textAlign: 'left' }}>
-          <Typography color="#23e47a" sx={{ fontWeight: 500 }}>
-            Balance reconciled:{' '}
-            {(account.balance_reconcilied ?? 0).toLocaleString('fr-FR', {
-              minimumFractionDigits: 2,
-            })}{' '}
-            €
-          </Typography>
-        </Grid>
-        <Grid size={{ xs: 12, sm: 6 }} sx={{ textAlign: 'right' }}>
-          <Typography color="#28abe1" sx={{ fontWeight: 500 }}>
-            Balance not reconciled:{' '}
-            {(account.balance_not_reconcilied ?? 0).toLocaleString('fr-FR', {
-              minimumFractionDigits: 2,
-            })}{' '}
-            €
-          </Typography>
-        </Grid>
-      </Grid>
+        {account.label}
+      </Typography>
+
+      <BalanceChip
+        amount={account.balance_reconcilied ?? 0}
+        label={t('account.balance.reconciled')}
+      />
+      {/*
+       * Un montant sans compteur : l'API n'expose ni total ni agrégat de
+       * comptage, et la liste se charge par lots. Un nombre compté sur les
+       * lignes déjà chargées ne concorderait jamais avec ce montant, qui est
+       * global et exact.
+       */}
+      <BalanceChip
+        amount={pendingBalance(account)}
+        label={t('account.balance.pending')}
+        highlighted
+      />
+
+      {search && (
+        <Box
+          sx={{
+            flex: { xs: '1 1 100%', md: 1 },
+            minWidth: 0,
+            order: { xs: 1, md: 0 },
+          }}
+        >
+          {search}
+        </Box>
+      )}
+
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '2px',
+          ml: 'auto',
+        }}
+      >
+        {isDesktop && (
+          <Tooltip title={t('account.calculator')}>
+            <IconButton onClick={toggle} sx={iconButtonSx}>
+              <CalculateIcon />
+            </IconButton>
+          </Tooltip>
+        )}
+        <Tooltip title={t('account.refresh')}>
+          <IconButton onClick={onRefresh} sx={iconButtonSx}>
+            <RefreshIcon />
+          </IconButton>
+        </Tooltip>
+        {onAddOperation && (
+          <Tooltip title={t('account.add-operation')}>
+            <IconButton
+              onClick={onAddOperation}
+              sx={{
+                ...iconButtonSx,
+                ml: '4px',
+                background: theme.palette.primary.main,
+                color: '#181203',
+                '&:hover': { background: theme.palette.primary.light },
+              }}
+            >
+              <AddIcon />
+            </IconButton>
+          </Tooltip>
+        )}
+      </Box>
     </Box>
   );
 };

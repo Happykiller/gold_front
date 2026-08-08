@@ -149,20 +149,14 @@ export const Operations = () => {
             }).toString(),
           })
         }
-        onCloneAccount={() =>
-          navigate({
-            pathname: '/clone',
-            search: createSearchParams({
-              account_id: accountId.toString(),
-            }).toString(),
-          })
+        search={
+          <OperationsSearch
+            tokens={tokens}
+            onChange={handleTokensChange}
+            refs={refs}
+            translate={translate}
+          />
         }
-      />
-      <OperationsSearch
-        tokens={tokens}
-        onChange={handleTokensChange}
-        refs={refs}
-        translate={translate}
       />
       <OperationsTable
         current_account_id={accountId}

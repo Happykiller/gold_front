@@ -1,8 +1,9 @@
 import { describe, expect, it, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 import { OperationsSearch } from './operationsSearch';
+import { renderWithApp } from '@src/testing/renderWithApp';
 import type { Referentials, Token } from '@presentation/hooks/searchTokens';
 
 /**
@@ -30,7 +31,7 @@ const translate = (label: string) =>
 
 const setup = (tokens: Token[] = []) => {
   const onChange = vi.fn();
-  render(
+  renderWithApp(
     <OperationsSearch
       tokens={tokens}
       onChange={onChange}
@@ -115,5 +116,26 @@ describe('OperationsSearch', () => {
 
     await user.click(screen.getAllByTestId('CancelIcon')[1]);
     expect(onChange).toHaveBeenCalledWith([tokens[0]]);
+  });
+
+  it('donne le focus au champ quand on tape « / » ailleurs dans la page', async () => {
+    const { user } = setup();
+
+    document.body.focus();
+    await user.keyboard('/');
+
+    expect(field()).toHaveFocus();
+  });
+
+  it('laisse écrire « / » dans le champ lui-même', async () => {
+    // Sans la garde sur la cible, le raccourci intercepterait la frappe et le
+    // caractère ne s'écrirait jamais — dans ce champ comme dans tous les
+    // autres de l'application.
+    const { user } = setup();
+
+    await user.click(field());
+    await user.keyboard('desc:a/b');
+
+    expect(field()).toHaveValue('desc:a/b');
   });
 });

@@ -24,6 +24,7 @@ import {
   type Suggestion,
   type Token,
 } from '@presentation/hooks/searchTokens';
+import { LINE, MONO_FONT, SURFACE, TEXT } from '@src/theme/tokens';
 
 type Props = {
   tokens: Token[];
@@ -31,9 +32,6 @@ type Props = {
   refs: Referentials;
   translate: (label: string) => string;
 };
-
-const MONO_FONT =
-  'ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace';
 
 /** Le statut se distingue à l'œil : c'est le filtre le plus consulté. */
 const chipColor = (token: Token) =>
@@ -119,6 +117,30 @@ export const OperationsSearch: React.FC<Props> = ({
     if (event.key === 'Escape') setInput('');
   };
 
+  /**
+   * `/` donne le focus au champ depuis n'importe où dans l'écran.
+   *
+   * La garde n'est pas décorative : sans elle, `/` deviendrait intapable dans
+   * tout autre champ de l'application — y compris dans celui-ci.
+   */
+  React.useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== '/' || event.ctrlKey || event.metaKey || event.altKey)
+        return;
+      const target = event.target as HTMLElement | null;
+      if (
+        target instanceof HTMLInputElement ||
+        target instanceof HTMLTextAreaElement ||
+        target?.isContentEditable
+      )
+        return;
+      event.preventDefault();
+      inputRef.current?.focus();
+    };
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
+  }, []);
+
   const pick = (suggestion: Suggestion) => {
     // Un préfixe ne valide rien : il complète la saisie et rend la main, pour
     // que la liste se rabatte aussitôt sur les valeurs de ce critère.
@@ -128,7 +150,7 @@ export const OperationsSearch: React.FC<Props> = ({
   };
 
   return (
-    <Box sx={{ maxWidth: 950, mx: 'auto', width: '100%', mb: 1 }}>
+    <Box sx={{ width: '100%' }}>
       <Paper
         ref={anchorRef}
         elevation={0}
@@ -137,16 +159,19 @@ export const OperationsSearch: React.FC<Props> = ({
           alignItems: 'center',
           flexWrap: 'wrap',
           gap: 0.5,
-          px: 1.5,
-          py: 0.75,
-          borderRadius: 2,
-          background: theme.palette.background.default,
-          border: `1px solid ${theme.palette.primary.main}55`,
+          px: '10px',
+          py: '2px',
+          // 28 px tant qu'aucune puce n'est posée : c'est la hauteur qui laisse
+          // la barre du compte tenir sur une seule ligne.
+          minHeight: 28,
+          borderRadius: `${theme.radius.md}px`,
+          background: SURFACE.field,
+          border: LINE.field,
           '&:focus-within': { borderColor: theme.palette.primary.main },
         }}
         onClick={() => inputRef.current?.focus()}
       >
-        <SearchIcon sx={{ fontSize: 18, color: '#7b8496', mr: 0.5 }} />
+        <SearchIcon sx={{ fontSize: 15, color: TEXT.tertiary, mr: 0.5 }} />
         {tokens.map((token, index) => (
           <Chip
             key={tokenKey(token)}
@@ -155,6 +180,7 @@ export const OperationsSearch: React.FC<Props> = ({
             variant="outlined"
             color={chipColor(token)}
             onDelete={() => removeAt(index)}
+            sx={{ height: 20, borderRadius: `${theme.radius.sm}px` }}
           />
         ))}
         <InputBase
@@ -164,8 +190,32 @@ export const OperationsSearch: React.FC<Props> = ({
           onKeyDown={handleKeyDown}
           onFocus={() => setFocused(true)}
           placeholder={tokens.length ? '' : t('operations.search.placeholder')}
-          sx={{ flex: 1, minWidth: 140, color: '#e8eaf0', fontSize: 14 }}
+          sx={{
+            flex: 1,
+            minWidth: 140,
+            color: TEXT.title,
+            fontSize: 12.5,
+            '& input': { padding: 0, height: 24 },
+            '& input::placeholder': { color: TEXT.tertiary, opacity: 1 },
+          }}
         />
+        {/* Le raccourci est affiché : c'est ainsi qu'on l'apprend. */}
+        <Typography
+          component="span"
+          sx={{
+            fontFamily: MONO_FONT,
+            fontWeight: 500,
+            fontSize: 10,
+            lineHeight: 1,
+            color: TEXT.meta,
+            background: SURFACE.action,
+            borderRadius: `${theme.radius.sm}px`,
+            padding: '2px 5px',
+            ml: 'auto',
+          }}
+        >
+          /
+        </Typography>
       </Paper>
 
       <Popper
@@ -191,7 +241,8 @@ export const OperationsSearch: React.FC<Props> = ({
             sx={{
               mt: 0.5,
               background: theme.palette.background.paper,
-              border: `1px solid ${theme.palette.primary.main}55`,
+              borderRadius: `${theme.radius.md}px`,
+              border: LINE.field,
             }}
           >
             <Typography
@@ -201,7 +252,7 @@ export const OperationsSearch: React.FC<Props> = ({
                 fontSize: 11,
                 letterSpacing: '0.08em',
                 textTransform: 'uppercase',
-                color: '#7b8496',
+                color: TEXT.meta,
               }}
             >
               <Trans>operations.search.suggestions</Trans>
@@ -217,7 +268,7 @@ export const OperationsSearch: React.FC<Props> = ({
                   <Typography
                     sx={{
                       fontSize: 14,
-                      color: '#e8eaf0',
+                      color: TEXT.title,
                       // Un nom de critère se reconnaît à sa chasse fixe : il
                       // se tape, là où une valeur se choisit.
                       fontFamily:
@@ -228,7 +279,7 @@ export const OperationsSearch: React.FC<Props> = ({
                   </Typography>
                   {suggestion.hint && (
                     <Typography
-                      sx={{ fontSize: 12, color: '#7b8496', ml: 1.5 }}
+                      sx={{ fontSize: 12, color: TEXT.meta, ml: 1.5 }}
                     >
                       {suggestion.hint}
                     </Typography>
