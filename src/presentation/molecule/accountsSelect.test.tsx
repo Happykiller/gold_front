@@ -15,17 +15,39 @@ vi.mock('@src/common/inversify', () => ({
 import { AccountsSelect } from './accountsSelect';
 import { renderWithApp } from '@src/testing/renderWithApp';
 
+/**
+ * La structure réelle en miniature : deux conteneurs racine, un compte qui
+ * porte des enveloppes, des feuilles, et un modèle.
+ */
 const accounts = [
+  { id: 10, label: 'Mes comptes', type_id: 1, parent_account_id: null },
+  { id: 11, label: 'Mes templates', type_id: 1, parent_account_id: null },
   {
     id: 1,
     label: 'Courant',
     type_id: 1,
+    parent_account_id: 10,
     balance_not_reconcilied: 1200.5,
+  },
+  {
+    id: 3,
+    label: 'Livret Cap Region',
+    type_id: 1,
+    parent_account_id: 10,
+    balance_not_reconcilied: 900,
+  },
+  {
+    id: 4,
+    label: 'Alimentation',
+    type_id: 1,
+    parent_account_id: 3,
+    balance_not_reconcilied: 570,
   },
   {
     id: 2,
     label: 'Mensualités',
     type_id: 2,
+    parent_account_id: 11,
     balance_not_reconcilied: -1450.53,
   },
 ];
@@ -47,7 +69,27 @@ const open = async (user: ReturnType<typeof userEvent.setup>) => {
 };
 
 describe('AccountsSelect', () => {
-  it('ne garde que les comptes du type demandé', async () => {
+  it('ne propose que les comptes sur lesquels on saisit', async () => {
+    // Une opération se pose sur une feuille réelle. Un modèle est un patron
+    // d'échéances, et un compte qui porte des enfants ne fait qu'agréger leurs
+    // soldes — ni l'un ni l'autre ne reçoit d'opération.
+    const user = setup();
+
+    const list = await open(user);
+
+    expect(within(list).getByText('Courant')).toBeInTheDocument();
+    expect(within(list).getByText('Alimentation')).toBeInTheDocument();
+    expect(within(list).queryByText('Mes comptes')).not.toBeInTheDocument();
+    expect(within(list).queryByText('Mes templates')).not.toBeInTheDocument();
+    expect(
+      within(list).queryByText('Livret Cap Region'),
+    ).not.toBeInTheDocument();
+    expect(within(list).queryByText('Mensualités')).not.toBeInTheDocument();
+  });
+
+  it('rend la liste des modèles au clonage, malgré la règle', async () => {
+    // L'écran de clonage doit montrer exactement ce que la règle exclut
+    // ailleurs : un type explicite la lève.
     const user = setup({ type: 2 });
 
     const list = await open(user);

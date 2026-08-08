@@ -48,8 +48,14 @@ export type RefSelectProps = {
   emptyValue?: string | number;
   /** Interdit de vider le champ, pour un critère obligatoire. */
   required?: boolean;
-  /** Restreint la liste — le type de compte, par exemple. */
-  filter?: (item: RefItem) => boolean;
+  /**
+   * Restreint la liste.
+   *
+   * Reçoit aussi le référentiel entier : certaines règles se décident sur
+   * l'ensemble, pas sur l'entrée seule — « ce compte a-t-il des enfants »
+   * n'est lisible qu'en regardant les autres.
+   */
+  filter?: (item: RefItem, all: RefItem[]) => boolean;
   /**
    * Une icône devant chaque entrée.
    *
@@ -141,7 +147,8 @@ export const RefSelect: React.FC<RefSelectProps> = ({
       </Typography>
     );
 
-  const options = filter ? (items ?? []).filter(filter) : (items ?? []);
+  const all = items ?? [];
+  const options = filter ? all.filter((item) => filter(item, all)) : all;
   const selected =
     options.find((item) => String(item.id) === String(value)) ?? null;
 

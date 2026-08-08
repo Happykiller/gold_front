@@ -13,14 +13,46 @@ import { MONO_FONT } from '@src/theme/tokens';
 /** Ce que la requête `accounts` renvoie en plus du libellé. */
 type AccountItem = RefItem & {
   type_id?: number;
+  parent_account_id?: number | null;
   balance_not_reconcilied?: number | null;
+};
+
+/** Référentiel fermé des types de compte (seed SQL `002-seed`). */
+export const ACCOUNT_REGULAR = 1;
+export const ACCOUNT_TEMPLATE = 2;
+
+/**
+ * Un compte sur lequel on saisit.
+ *
+ * Deux exclusions, et elles ne se devinent pas depuis une entrée seule :
+ *
+ * - les **modèles**, qui ne sont pas des comptes bancaires mais des patrons
+ *   d'échéances, alimentés depuis l'écran de clonage ;
+ * - les comptes qui **portent des enfants**, qui regroupent une branche et en
+ *   agrègent les soldes sans jamais recevoir d'opération — « Mes comptes »,
+ *   « Mes templates », « Livret Cap Region ».
+ *
+ * D'où le besoin de voir tout le référentiel : la filiation ne se lit qu'en
+ * regardant les autres comptes.
+ */
+const isPostable = (item: RefItem, all: RefItem[]) => {
+  const account = item as AccountItem;
+  if (account.type_id === ACCOUNT_TEMPLATE) return false;
+  return !all.some(
+    (other) => (other as AccountItem).parent_account_id === account.id,
+  );
 };
 
 type AccountsSelectProps = {
   value: string | number;
   label: React.ReactNode;
   onChange: (value: string) => void;
-  /** 0 = tous, 1 = compte, 2 = modèle. */
+  /**
+   * Force un type précis, et lève alors la règle par défaut.
+   *
+   * C'est ce dont l'écran de clonage a besoin pour sa liste de modèles : elle
+   * doit montrer exactement ce que la règle exclut ailleurs.
+   */
   type?: number;
 };
 
@@ -52,7 +84,7 @@ export const AccountsSelect: React.FC<AccountsSelectProps> = ({
     load={() => inversify.getAccountsUsecase.execute()}
     emptyValue={0}
     filter={
-      type === 0 ? undefined : (item) => (item as AccountItem).type_id === type
+      type === 0 ? isPostable : (item) => (item as AccountItem).type_id === type
     }
     renderTrailing={(item) => {
       const amount = (item as AccountItem).balance_not_reconcilied ?? 0;
