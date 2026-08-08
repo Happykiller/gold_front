@@ -11,7 +11,12 @@ import { CODES } from '@happykiller/sunny-ui';
 import { AccountHeader } from '@presentation/molecule/accountHeader';
 import { OperationsTable } from '@presentation/molecule/operationsTable';
 import { FloatingCalculator } from '@presentation/molecule/FloatingCalculator';
-import { useAccountOperations } from '@presentation/hooks/useAccountOperations';
+import {
+  useAccountOperations,
+  STATUS_RECONCILED,
+  type Operation,
+} from '@presentation/hooks/useAccountOperations';
+import { getSignedAmount } from '@presentation/molecule/operationDisplay';
 import { OperationsSearch } from '@presentation/molecule/operationsSearch';
 import { useSearchReferentials } from '@presentation/hooks/useSearchReferentials';
 import {
@@ -78,14 +83,15 @@ export const Operations = () => {
     reload,
     removeOperation,
     recoOperation,
-    adjustBalance,
+    reconcileBalances,
+    removeBalances,
   } = useAccountOperations(accountId, filters);
 
   // Ces trois callbacks sont passés à chaque ligne du tableau, qui est
   // mémoïsée : les laisser se recréer à chaque rendu suffirait à annuler la
   // mémoïsation et à re-rendre toute la liste accumulée à chaque nouveau lot.
   const handleEditOperation = React.useCallback(
-    (operation: any) => {
+    (operation: Operation) => {
       navigate({
         pathname: '/operation_edit',
         search: createSearchParams({
@@ -98,33 +104,34 @@ export const Operations = () => {
   );
 
   const handleDeleteOperation = React.useCallback(
-    (operation: any) => {
+    (operation: Operation) => {
       inversify.deleteOperationUsecase
         .execute({ operation_id: operation.id })
         .then(() => {
           removeOperation(operation.id);
-          adjustBalance(
-            operation.amount,
-            'delete',
-            operation.status_id === 2 ? 'not_reconciled' : 'reconciled',
+          removeBalances(
+            getSignedAmount(operation, accountId),
+            operation.status_id === STATUS_RECONCILED,
           );
         });
     },
-    [removeOperation, adjustBalance],
+    [removeOperation, removeBalances, accountId],
   );
 
   const handleRecoOperation = React.useCallback(
-    (operation: any) => {
+    (operation: Operation) => {
       inversify.setRecoUsecase
         .execute({ operation_id: operation.id })
         .then((resp) => {
           if (resp.message === CODES.SUCCESS && resp.data) {
             recoOperation(operation.id);
-            adjustBalance(operation.amount, 'reconcile', 'not_reconciled');
+            // Le montant signé, jamais `operation.amount` : celui-ci est
+            // toujours positif, et pointer un débit augmentait le solde.
+            reconcileBalances(getSignedAmount(operation, accountId));
           }
         });
     },
-    [recoOperation, adjustBalance],
+    [recoOperation, reconcileBalances, accountId],
   );
 
   return (

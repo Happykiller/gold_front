@@ -5,6 +5,10 @@ import { CODES } from '@src/common/codes';
 import { GetOperationsUsecaseModel } from '@usecase/getOperations/getOperations.usecase.model';
 import { GetAccountUsecaseModel } from '@usecase/getAccount/getAccount.usecase.model';
 import type { OperationFilters } from '@presentation/hooks/searchTokens';
+import {
+  applyDelete,
+  applyReconcile,
+} from '@presentation/hooks/accountBalance';
 
 // Ces deux types décrivaient à la main ce que le hook reçoit, et avaient
 // divergé : `vat_rate` y était optionnel alors que le serveur le renvoie
@@ -12,6 +16,15 @@ import type { OperationFilters } from '@presentation/hooks/searchTokens';
 // à l'être. Les dériver du retour des usecases rend la divergence impossible.
 export type Account = NonNullable<GetAccountUsecaseModel['data']>;
 export type Operation = NonNullable<GetOperationsUsecaseModel['data']>[number];
+
+/**
+ * Identifiants du référentiel fermé des statuts (seed SQL `002-seed`).
+ *
+ * Le `2` était écrit en clair partout où l'on teste ou pose le pointage. Le
+ * nommer une fois évite d'avoir à se rappeler lequel des deux est lequel.
+ */
+export const STATUS_FOLLOW = 1;
+export const STATUS_RECONCILED = 2;
 
 /**
  * Taille d'un lot d'opérations, seul endroit où elle est écrite.
@@ -174,46 +187,25 @@ export function useAccountOperations(
     setOperations(
       (ops) =>
         ops?.map((op) =>
-          op.id === operationId ? { ...op, status_id: 2 } : op,
+          op.id === operationId ? { ...op, status_id: STATUS_RECONCILED } : op,
         ) ?? null,
     );
   }, []);
 
-  const adjustBalance = useCallback(
-    (
-      delta: number,
-      action: 'reconcile' | 'delete',
-      from: 'reconciled' | 'not_reconciled',
-    ) => {
-      setAccount((acc) => {
-        if (!acc) return acc;
-        const next = { ...acc };
+  // Deux verbes plutôt qu'un `adjustBalance(delta, action, from)` : la
+  // combinaison des trois paramètres rendait représentables des états qui
+  // n'existent pas, et l'un des appelants passait effectivement `from` à
+  // l'envers. Le sens du montant, lui, appartient à l'appelant — voir
+  // `getSignedAmount`.
+  const reconcileBalances = useCallback((signedAmount: number) => {
+    setAccount((acc) => (acc ? applyReconcile(acc, signedAmount) : acc));
+  }, []);
 
-        if (action === 'reconcile') {
-          // Move amount from "from" to the other balance
-          if (from === 'reconciled') {
-            next.balance_reconcilied = (next.balance_reconcilied ?? 0) - delta;
-            next.balance_not_reconcilied =
-              (next.balance_not_reconcilied ?? 0) + delta;
-          } else {
-            next.balance_reconcilied = (next.balance_reconcilied ?? 0) + delta;
-            next.balance_not_reconcilied =
-              (next.balance_not_reconcilied ?? 0) - delta;
-          }
-        }
-
-        if (action === 'delete') {
-          // Remove from current balance only
-          if (from === 'reconciled') {
-            next.balance_reconcilied = (next.balance_reconcilied ?? 0) - delta;
-          } else {
-            next.balance_not_reconcilied =
-              (next.balance_not_reconcilied ?? 0) - delta;
-          }
-        }
-
-        return next;
-      });
+  const removeBalances = useCallback(
+    (signedAmount: number, wasReconciled: boolean) => {
+      setAccount((acc) =>
+        acc ? applyDelete(acc, signedAmount, wasReconciled) : acc,
+      );
     },
     [],
   );
@@ -231,6 +223,7 @@ export function useAccountOperations(
     reload,
     removeOperation,
     recoOperation,
-    adjustBalance,
+    reconcileBalances,
+    removeBalances,
   };
 }
