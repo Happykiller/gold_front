@@ -8,8 +8,9 @@
       "total": "total",
       "reconciled": "pointé"
     },
-    "empty": "Aucun compte",
     "calculator": "Ouvrir la calculatrice",
+    "empty": "Aucun compte",
+    "import-operations": "Importer des opérations",
     "refresh": "Rafraîchir",
     "type-regular": "Compte",
     "type-template": "Modèle"
@@ -30,8 +31,8 @@
     "clear": "Effacer",
     "create": "Créer",
     "done": "Valider",
-    "no_result": "Aucun résultat",
-    "loading": "Chargement..."
+    "loading": "Chargement...",
+    "no_result": "Aucun résultat"
   },
   "createVir": {
     "already-linked": "déjà prise en charge par un autre virement",
@@ -97,6 +98,45 @@
   },
   "home": {
     "title": "Service Gold"
+  },
+  "import": {
+    "apply-to-siblings_one": "Appliquer ce classement à {{count}} autre ligne du même libellé",
+    "apply-to-siblings_other": "Appliquer ce classement aux {{count}} autres lignes du même libellé",
+    "category": "Catégorie",
+    "column-amount": "Montant",
+    "column-category": "Catégorie",
+    "column-date": "Date",
+    "column-description": "Description",
+    "column-third": "Tiers",
+    "column-verdict": "État",
+    "done_one": "{{count}} opération importée et pointée.",
+    "done_other": "{{count}} opérations importées et pointées.",
+    "drop-formats": "Fichier CSV exporté depuis votre banque",
+    "drop-hint": "Glissez ici le fichier d'export de votre banque, ou cliquez pour le choisir",
+    "error-empty": "Ce fichier ne contient aucune opération.",
+    "error-load-failed": "Les opérations déjà enregistrées n'ont pas pu être lues : sans elles, tout paraîtrait nouveau. Réessayez.",
+    "error-missing-columns": "Colonnes absentes du fichier : {{columns}}. Vérifiez qu'il s'agit bien d'un export d'opérations.",
+    "failed_one": "{{count}} opération n'a pas pu être créée : {{details}}",
+    "failed_other": "{{count}} opérations n'ont pas pu être créées : {{details}}",
+    "progress": "{{done}} sur {{total}}",
+    "selected_one": "{{count}} ligne à importer sur {{total}}",
+    "selected_other": "{{count}} lignes à importer sur {{total}}",
+    "submit_one": "Importer {{count}} opération",
+    "submit_other": "Importer {{count}} opérations",
+    "summary-compared_one": "confrontée à {{count}} opération déjà enregistrée",
+    "summary-compared_other": "confrontées à {{count}} opérations déjà enregistrées",
+    "summary-read_one": "{{count}} ligne lue",
+    "summary-read_other": "{{count}} lignes lues",
+    "third": "Tiers",
+    "title": "Importer des opérations",
+    "transfer": "virement",
+    "verdict-duplicate": "Déjà là",
+    "verdict-match": "Ressemble à « {{description}} » ({{score}} %)",
+    "verdict-new": "Nouvelle",
+    "verdict-uncertain": "À vérifier",
+    "warning-skipped_one": "{{count}} ligne du fichier a été écartée (ligne {{lines}}) : date ou montant illisible.",
+    "warning-skipped_other": "{{count}} lignes du fichier ont été écartées (lignes {{lines}}) : date ou montant illisible.",
+    "warning-truncated": "L'historique n'a pas pu être chargé en entier : le rapprochement peut être incomplet et présenter comme nouvelles des opérations déjà enregistrées. Vérifiez chaque ligne avant d'importer."
   },
   "loading": "Chargement...",
   "login": {

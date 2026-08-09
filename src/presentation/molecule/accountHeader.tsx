@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import AddIcon from '@mui/icons-material/Add';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import CalculateIcon from '@mui/icons-material/Calculate';
+import FileUploadIcon from '@mui/icons-material/FileUpload';
 import {
   Box,
   Tooltip,
@@ -32,6 +33,13 @@ type Props = {
   onRefresh: () => void;
   onAddOperation?: () => void;
   /**
+   * Ouvre l'import en masse d'un relevé bancaire.
+   *
+   * Placé avant le bouton d'ajout, qui reste le dernier : l'ajout est
+   * l'action principale de l'écran, et c'est le seul bouton doré.
+   */
+  onImportOperations?: () => void;
+  /**
    * La barre de recherche, insérée dans la barre plutôt que rendue en dessous.
    *
    * Un emplacement plutôt qu'une fusion : l'en-tête n'a ainsi rien à savoir
@@ -47,6 +55,7 @@ export const AccountHeader: React.FC<Props> = ({
   error,
   onRefresh,
   onAddOperation,
+  onImportOperations,
   search,
 }) => {
   const theme = useTheme();
@@ -162,6 +171,13 @@ export const AccountHeader: React.FC<Props> = ({
             <RefreshIcon />
           </IconButton>
         </Tooltip>
+        {onImportOperations && (
+          <Tooltip title={t('account.import-operations')}>
+            <IconButton onClick={onImportOperations} sx={iconButtonSx}>
+              <FileUploadIcon />
+            </IconButton>
+          </Tooltip>
+        )}
         {onAddOperation && (
           <Tooltip title={t('account.add-operation')}>
             <IconButton

@@ -18,6 +18,7 @@ import {
 } from '@presentation/hooks/useAccountOperations';
 import { getSignedAmount } from '@presentation/molecule/operationDisplay';
 import { OperationsSearch } from '@presentation/molecule/operationsSearch';
+import { ImportOperationsDialog } from '@presentation/molecule/importOperationsDialog';
 import { useSearchReferentials } from '@presentation/hooks/useSearchReferentials';
 import {
   deserializeTokens,
@@ -33,6 +34,7 @@ export const Operations = () => {
 
   const { refs, translate } = useSearchReferentials();
   const [tokens, setTokens] = React.useState<Token[]>([]);
+  const [importOpen, setImportOpen] = React.useState(false);
   const hydratedRef = React.useRef(false);
 
   // Les critères vivent dans l'URL : on quitte la liste pour éditer une
@@ -175,6 +177,7 @@ export const Operations = () => {
             }).toString(),
           })
         }
+        onImportOperations={() => setImportOpen(true)}
         search={
           <OperationsSearch
             tokens={tokens}
@@ -199,6 +202,23 @@ export const Operations = () => {
         onRecoOperation={handleRecoOperation}
       />
       <FloatingCalculator />
+      {/*
+       * Monté seulement quand il est ouvert : la modale charge l'historique du
+       * compte dès qu'un fichier est déposé, et rien de tout cela n'a de raison
+       * d'exister tant que l'utilisateur ne l'a pas demandé.
+       *
+       * `reload` en fin d'import plutôt qu'une insertion locale : les soldes de
+       * l'en-tête sont calculés par le serveur, et une série de créations les
+       * déplace tous les deux.
+       */}
+      {importOpen && (
+        <ImportOperationsDialog
+          open
+          accountId={accountId}
+          onClose={() => setImportOpen(false)}
+          onImported={reload}
+        />
+      )}
     </>
   );
 };

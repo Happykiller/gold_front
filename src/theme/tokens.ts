@@ -106,6 +106,17 @@ export const STATE = {
   warningBg: 'rgba(244, 183, 0, 0.12)',
   successBg: 'rgba(52, 201, 123, 0.12)',
   infoBg: 'rgba(142, 202, 230, 0.12)',
+  /**
+   * Les mêmes teintes, pleines, pour le texte posé sur ces fonds.
+   *
+   * Un fond à 12 % ne suffit pas à porter un sens : sur `warningBg`, un
+   * libellé en gris de méta se lit comme n'importe quelle ligne. Seul
+   * l'avertissement manquait à la gamme des montants — `error` et `success`
+   * y renvoient plutôt que d'introduire deux verts et deux rouges voisins.
+   */
+  warning: '#F4B700',
+  error: '#F2635B',
+  success: '#34C97B',
 };
 
 /**

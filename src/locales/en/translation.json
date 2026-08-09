@@ -8,8 +8,9 @@
       "total": "total",
       "reconciled": "reconciled"
     },
-    "empty": "No account",
     "calculator": "Open the calculator",
+    "empty": "No account",
+    "import-operations": "Import operations",
     "refresh": "Refresh",
     "type-regular": "Account",
     "type-template": "Template"
@@ -30,8 +31,8 @@
     "clear": "Clear",
     "create": "Create",
     "done": "Submit",
-    "no_result": "No result",
-    "loading": "Loading..."
+    "loading": "Loading...",
+    "no_result": "No result"
   },
   "createVir": {
     "already-linked": "already covered by another transfer",
@@ -97,6 +98,45 @@
   },
   "home": {
     "title": "Gold Service"
+  },
+  "import": {
+    "apply-to-siblings_one": "Apply this classification to {{count}} other line with the same label",
+    "apply-to-siblings_other": "Apply this classification to the {{count}} other lines with the same label",
+    "category": "Category",
+    "column-amount": "Amount",
+    "column-category": "Category",
+    "column-date": "Date",
+    "column-description": "Description",
+    "column-third": "Third party",
+    "column-verdict": "Status",
+    "done_one": "{{count}} operation imported and reconciled.",
+    "done_other": "{{count}} operations imported and reconciled.",
+    "drop-formats": "CSV file exported from your bank",
+    "drop-hint": "Drop your bank export file here, or click to pick one",
+    "error-empty": "This file contains no operation.",
+    "error-load-failed": "The already recorded operations could not be read: without them, everything would look new. Please try again.",
+    "error-missing-columns": "Columns missing from the file: {{columns}}. Check that this really is an operations export.",
+    "failed_one": "{{count}} operation could not be created: {{details}}",
+    "failed_other": "{{count}} operations could not be created: {{details}}",
+    "progress": "{{done}} of {{total}}",
+    "selected_one": "{{count}} line to import out of {{total}}",
+    "selected_other": "{{count}} lines to import out of {{total}}",
+    "submit_one": "Import {{count}} operation",
+    "submit_other": "Import {{count}} operations",
+    "summary-compared_one": "checked against {{count}} recorded operation",
+    "summary-compared_other": "checked against {{count}} recorded operations",
+    "summary-read_one": "{{count}} line read",
+    "summary-read_other": "{{count}} lines read",
+    "third": "Third party",
+    "title": "Import operations",
+    "transfer": "transfer",
+    "verdict-duplicate": "Already there",
+    "verdict-match": "Looks like “{{description}}” ({{score}}%)",
+    "verdict-new": "New",
+    "verdict-uncertain": "To check",
+    "warning-skipped_one": "{{count}} line was skipped (line {{lines}}): unreadable date or amount.",
+    "warning-skipped_other": "{{count}} lines were skipped (lines {{lines}}): unreadable date or amount.",
+    "warning-truncated": "The history could not be loaded in full: matching may be incomplete, and already recorded operations may show up as new. Check every line before importing."
   },
   "loading": "Loading...",
   "login": {

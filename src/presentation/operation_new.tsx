@@ -180,14 +180,17 @@ export const OperationNew = () => {
             }
           />
           <ThirdsSelect
-            value={operation.third_id}
+            // Tiers et catégorie sont devenus facultatifs dans le DTO, que
+            // l'import laisse vides ; ce formulaire, lui, les initialise
+            // toujours — le repli ne sert qu'à satisfaire le type.
+            value={operation.third_id ?? ''}
             label={<Trans>operation.third</Trans>}
             onChange={(value) =>
               setOperation({ ...operation, third_id: Number(value) })
             }
           />
           <OpeCategoriesSelect
-            value={operation.category_id}
+            value={operation.category_id ?? ''}
             label={<Trans>operation.category</Trans>}
             onChange={(value) =>
               setOperation({

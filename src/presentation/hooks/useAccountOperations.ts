@@ -18,18 +18,30 @@ export type Account = NonNullable<GetAccountUsecaseModel['data']>;
 export type Operation = NonNullable<GetOperationsUsecaseModel['data']>[number];
 
 /**
- * Identifiants du référentiel fermé des statuts (seed SQL `002-seed`).
+ * Identifiants des référentiels fermés (seed SQL `002-seed`).
  *
- * Le `2` était écrit en clair partout où l'on teste ou pose le pointage. Le
- * nommer une fois évite d'avoir à se rappeler lequel des deux est lequel.
+ * Le `2` était écrit en clair partout où l'on teste ou pose le pointage. Les
+ * nommer une fois évite d'avoir à se rappeler lequel est lequel.
+ *
+ * Ils vivent désormais dans un module sans dépendance — ce fichier-ci tire le
+ * conteneur d'injection, ce qui les rendait inatteignables depuis de la
+ * logique pure. Réexportés ici pour que les écrans qui les importaient de ce
+ * module continuent de fonctionner.
  */
-export const STATUS_FOLLOW = 1;
-export const STATUS_RECONCILED = 2;
+// Réexporter ne crée pas de liaison locale : ce module se sert aussi de
+// `STATUS_RECONCILED`, il doit donc l'importer pour lui-même.
+import { STATUS_RECONCILED } from '@presentation/hooks/referentialIds';
 
-/** Types d'opération (même seed). Le virement porte deux comptes. */
-export const TYPE_CREDIT = 1;
-export const TYPE_DEBIT = 2;
-export const TYPE_TRANSFER = 3;
+export {
+  STATUS_FOLLOW,
+  STATUS_RECONCILED,
+  TYPE_CREDIT,
+  TYPE_DEBIT,
+  TYPE_TRANSFER,
+  CATEGORY_OTHER,
+  THIRD_OTHER_CREDIT,
+  THIRD_OTHER_DEBIT,
+} from '@presentation/hooks/referentialIds';
 
 /**
  * Taille d'un lot d'opérations, seul endroit où elle est écrite.
