@@ -88,6 +88,11 @@ export class GetOperationsUsecase {
                 creation_date
                 modificator_id
                 modification_date
+                # Deux compteurs, calculés par la même requête SQL que les
+                # lignes : la liste marque les opérations prises en charge sans
+                # un seul aller-retour de plus.
+                linked_count
+                linked_by_count
               }
             }
           `,

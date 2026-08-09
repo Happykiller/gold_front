@@ -3,13 +3,15 @@ import * as React from 'react';
 import dayjs, { Dayjs } from 'dayjs';
 import { Trans, useTranslation } from 'react-i18next';
 import SaveAltIcon from '@mui/icons-material/SaveAlt';
+import LinkOffIcon from '@mui/icons-material/LinkOff';
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import {
   createSearchParams,
   useNavigate,
   useSearchParams,
 } from 'react-router-dom';
-import { TextField } from '@mui/material';
+import { Box, TextField } from '@mui/material';
 
 import { CODES } from '@src/common/codes';
 import inversify from '@src/common/inversify';
@@ -30,8 +32,17 @@ import {
   FormRow,
   SubmitBar,
 } from '@presentation/molecule/formLayout';
-import { GetOperationUsecaseModel } from '@usecase/getOperation/getOperation.usecase.model';
+import {
+  GetOperationUsecaseModel,
+  LinkedOperationUsecaseModel,
+} from '@usecase/getOperation/getOperation.usecase.model';
 import { CreateOperationUsecaseModel } from '@usecase/createOperation/createOperation.usecase.model';
+import { RowAction } from '@presentation/molecule/rowAction';
+import { TYPE_TRANSFER } from '@presentation/hooks/useAccountOperations';
+import {
+  formatEuroAmount,
+  formatOperationDate,
+} from '@presentation/molecule/operationDisplay';
 
 export const EditOperation = () => {
   const navigate = useNavigate();
@@ -48,6 +59,37 @@ export const EditOperation = () => {
     React.useState<OperationUsecaseModel | null>(null);
   const [opDate, setOpDate] = React.useState<Dayjs>(dayjs());
   const [vatRateValue, setVatRateValue] = React.useState('20');
+
+  // Les liens sont tenus à part de `operation` : ils ne se saisissent pas, et
+  // le retrait doit pouvoir retirer une puce sans repasser par le formulaire.
+  const [links, setLinks] = React.useState<{
+    down: LinkedOperationUsecaseModel[];
+    up: LinkedOperationUsecaseModel[];
+  }>({ down: [], up: [] });
+
+  const linkedLabel = (linked: LinkedOperationUsecaseModel) =>
+    `${formatOperationDate(linked.date)} · ${formatEuroAmount(linked.amount)}${
+      linked.description ? ` · ${linked.description}` : ''
+    }`;
+
+  const handleUnlink = (operationLinkId: number) => {
+    inversify.deleteOperationLinkUsecase
+      .execute({ operation_link_id: operationLinkId })
+      .then((response) => {
+        // La puce ne disparaît qu'APRÈS confirmation du serveur : il peut
+        // refuser, et c'est le seul endroit où ce refus serait visible.
+        if (response.message === CODES.SUCCESS && response.data) {
+          setLinks((current) => ({
+            ...current,
+            down: current.down.filter((elt) => elt.link_id !== operationLinkId),
+          }));
+          flash.open(t('editOperation.link-removed'));
+        } else {
+          flash.open(t('editOperation.link-remove-failed'));
+        }
+      })
+      .catch(() => flash.open(t('editOperation.link-remove-failed')));
+  };
 
   const vatRateIsValid = /^(100(\.0+)?|[0-9]{1,2}(\.[0-9]{1,2})?)$/.test(
     vatRateValue,
@@ -96,8 +138,12 @@ export const EditOperation = () => {
         .then((response: GetOperationUsecaseModel) => {
           if (response.message === CODES.SUCCESS && response.data) {
             setOpDate(dayjs(parseInt(response.data.date)));
-            setOperation(response.data);
+            setOperation(response.data as unknown as OperationUsecaseModel);
             setVatRateValue(String(response.data.vat_rate ?? 20));
+            setLinks({
+              down: response.data.linked_operations ?? [],
+              up: response.data.linked_by_operations ?? [],
+            });
           } else {
             setQry({ ...qry, error: response.message });
           }
@@ -231,6 +277,60 @@ export const EditOperation = () => {
                 }
               />
             </FormSection>
+
+            {/* Les opérations que ce virement prend en charge. Une lecture, pas
+                une saisie : la section vit hors du flux des champs, entre le
+                formulaire et son bouton d'envoi. */}
+            {operation.type_id === TYPE_TRANSFER && links.down.length > 0 && (
+              <FormSection title={t('editOperation.linked-title')} columns={1}>
+                <FormRow>
+                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                    {links.down.map((linked) => (
+                      <RowAction
+                        key={linked.link_id}
+                        label={t('editOperation.link-remove')}
+                        icon={<LinkOffIcon />}
+                        text={linkedLabel(linked)}
+                        onClick={() => handleUnlink(linked.link_id)}
+                      />
+                    ))}
+                  </Box>
+                </FormRow>
+              </FormSection>
+            )}
+
+            {/* Les virements qui prennent cette opération en charge. Plusieurs
+                sont possibles : en base, plus de cent dépenses sont couvertes
+                par deux virements ou plus. Lecture seule — le retrait se fait
+                depuis le virement porteur, où le geste a un sens. */}
+            {links.up.length > 0 && (
+              <FormSection
+                title={t('editOperation.linked-by-title')}
+                columns={1}
+              >
+                <FormRow>
+                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                    {links.up.map((carrier) => (
+                      <RowAction
+                        key={carrier.link_id}
+                        label={t('editOperation.open-carrier')}
+                        icon={<OpenInNewIcon />}
+                        text={linkedLabel(carrier)}
+                        onClick={() =>
+                          navigate({
+                            pathname: '/operation_edit',
+                            search: createSearchParams({
+                              account_id: String(carrier.account_id),
+                              operation_id: String(carrier.id),
+                            }).toString(),
+                          })
+                        }
+                      />
+                    ))}
+                  </Box>
+                </FormRow>
+              </FormSection>
+            )}
 
             <SubmitBar
               label={<Trans>editOperation.send</Trans>}

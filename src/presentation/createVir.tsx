@@ -78,7 +78,9 @@ export const CreateVir = () => {
         third_id: parseInt(currentThird),
         category_id: parseInt(currentCategory),
         account_id_dest: parseInt(currentAccountDest),
-        linkedOps: selectedOperations.map((ope) => ope.id),
+        // Le serveur pose les liens dans la même mutation que le virement :
+        // les deux écritures réussissent ou échouent ensemble.
+        linked_operation_ids: selectedOperations.map((ope) => ope.id),
       })
       .then((response: CreateOperationUsecaseModel) => {
         if (response.message === CODES.SUCCESS && response.data) {

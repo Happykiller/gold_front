@@ -34,6 +34,7 @@
     "loading": "Chargement..."
   },
   "createVir": {
+    "already-linked": "déjà prise en charge par un autre virement",
     "operations": "Opérations",
     "send": "Envoyer",
     "succeed": "Virement créé : ",
@@ -48,6 +49,12 @@
     "edit": "Éditer le compte"
   },
   "editOperation": {
+    "link-remove": "Retirer le lien",
+    "link-remove-failed": "Le lien n'a pas pu être retiré",
+    "link-removed": "Lien retiré",
+    "linked-by-title": "Prise en charge par",
+    "linked-title": "Opérations prises en charge",
+    "open-carrier": "Ouvrir le virement",
     "send": "Mettre à jour",
     "succeed": "Mise à jour réussie",
     "title": "Édition"
@@ -104,15 +111,17 @@
     "account_dest": "Destination",
     "action-delete": "Supprimer",
     "action-edit": "Éditer",
-    "amount-hint": "Un montant numérique, par exemple 125,50",
     "amount": "Montant",
+    "amount-hint": "Un montant numérique, par exemple 125,50",
     "category": "Catégorie",
     "category-other": "Autre",
+    "covers": "Prend en charge {{count}} opération(s)",
     "date": "Date",
-    "description-hint": "Trois caractères au minimum",
     "description": "Description",
+    "description-hint": "Trois caractères au minimum",
     "ht_amount": "Montant HT",
     "id": "ID",
+    "linked-by": "Prise en charge par {{count}} virement(s)",
     "no-description": "Sans description",
     "reconcile": "Pointer cette opération",
     "status": "Statut",
@@ -125,8 +134,8 @@
     "type": "Type",
     "vat": "TVA",
     "vat_amount": "Montant TVA",
-    "vat_rate-hint": "Une valeur entre 0 et 100",
-    "vat_rate": "Taux de TVA (%)"
+    "vat_rate": "Taux de TVA (%)",
+    "vat_rate-hint": "Une valeur entre 0 et 100"
   },
   "operation_create": {
     "send": "Créer",
@@ -141,7 +150,9 @@
     "deleteSucced": "Suppression réussie",
     "empty": "Aucune opération sur ce compte",
     "end_of_list": "Fin de la liste",
+    "legend-covers": "prend en charge des opérations",
     "legend-hint": "clic sur le statut pour pointer · ␣ sur la ligne sélectionnée",
+    "legend-linked": "prise en charge par un virement",
     "legend-pending": "en attente — saisi, pas encore passé",
     "legend-reconciled": "pointé — présent sur le relevé",
     "no_result": "Aucune opération ne correspond à ces critères",

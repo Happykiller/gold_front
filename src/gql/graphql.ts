@@ -97,6 +97,7 @@ export type CreateOperationInputResolver = {
   category_id?: InputMaybe<Scalars['Int']['input']>;
   date: Scalars['String']['input'];
   description?: InputMaybe<Scalars['String']['input']>;
+  linked_operation_ids?: InputMaybe<Array<Scalars['Int']['input']>>;
   status_id: Scalars['Int']['input'];
   third_id?: InputMaybe<Scalars['Int']['input']>;
   type_id: Scalars['Int']['input'];
@@ -161,6 +162,20 @@ export type GetOperationsInputResolver = {
 export type GetUserResolverDto = {
   code?: InputMaybe<Scalars['String']['input']>;
   id?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type LinkedOperationModelResolver = {
+  account_id: Scalars['Int']['output'];
+  account_id_dest?: Maybe<Scalars['Int']['output']>;
+  amount: Scalars['Float']['output'];
+  category_id?: Maybe<Scalars['Int']['output']>;
+  date: Scalars['String']['output'];
+  description?: Maybe<Scalars['String']['output']>;
+  id: Scalars['Int']['output'];
+  link_id: Scalars['Int']['output'];
+  status_id: Scalars['Int']['output'];
+  third_id?: Maybe<Scalars['Int']['output']>;
+  type_id: Scalars['Int']['output'];
 };
 
 export type Mutation = {
@@ -267,6 +282,10 @@ export type OperationModelResolver = {
   date: Scalars['String']['output'];
   description: Scalars['String']['output'];
   id: Scalars['Int']['output'];
+  linked_by_count: Scalars['Int']['output'];
+  linked_by_operations: Array<LinkedOperationModelResolver>;
+  linked_count: Scalars['Int']['output'];
+  linked_operations: Array<LinkedOperationModelResolver>;
   modification_date?: Maybe<Scalars['String']['output']>;
   modificator_id?: Maybe<Scalars['Int']['output']>;
   status: OperationStatutModelResolver;
@@ -503,6 +522,7 @@ export type CreateOperationMutationVariables = Exact<{
   third_id?: number | null | undefined;
   category_id?: number | null | undefined;
   description?: string | null | undefined;
+  linked_operation_ids?: Array<number> | number | null | undefined;
 }>;
 
 export type CreateOperationMutation = {
@@ -522,6 +542,7 @@ export type CreateOperationMutation = {
     creation_date: string;
     modificator_id: number | null;
     modification_date: string | null;
+    linked_count: number;
   };
 };
 
@@ -530,6 +551,12 @@ export type DeleteOperationMutationVariables = Exact<{
 }>;
 
 export type DeleteOperationMutation = { deleteOperation: boolean };
+
+export type DeleteOperationLinkMutationVariables = Exact<{
+  operation_link_id: number;
+}>;
+
+export type DeleteOperationLinkMutation = { deleteOperationLink: boolean };
 
 export type AccountQueryVariables = Exact<{
   account_id: number;
@@ -629,10 +656,33 @@ export type OperationQuery = {
     creation_date: string;
     modificator_id: number | null;
     modification_date: string | null;
+    linked_count: number;
+    linked_by_count: number;
     account: { id: number; label: string };
     account_dest: { id: number; label: string } | null;
     third: { id: number; label: string };
     category: { id: number; label: string };
+    linked_operations: Array<{
+      link_id: number;
+      id: number;
+      amount: number;
+      date: string;
+      description: string | null;
+      type_id: number;
+      status_id: number;
+      account_id: number;
+    }>;
+    linked_by_operations: Array<{
+      link_id: number;
+      id: number;
+      amount: number;
+      date: string;
+      description: string | null;
+      type_id: number;
+      status_id: number;
+      account_id: number;
+      account_id_dest: number | null;
+    }>;
   };
 };
 
@@ -670,6 +720,8 @@ export type OperationsQuery = {
     creation_date: string;
     modificator_id: number | null;
     modification_date: string | null;
+    linked_count: number;
+    linked_by_count: number;
     account: { id: number; label: string };
     account_dest: { id: number; label: string } | null;
     third: { id: number; label: string };
@@ -755,6 +807,8 @@ export type UpdateOperationMutation = {
     creation_date: string;
     modificator_id: number | null;
     modification_date: string | null;
+    linked_count: number;
+    linked_by_count: number;
     account: { id: number; label: string };
     account_dest: { id: number; label: string } | null;
     third: { id: number; label: string };

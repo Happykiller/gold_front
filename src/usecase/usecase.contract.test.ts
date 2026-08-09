@@ -7,6 +7,7 @@ import { graphqlError, mockInversify } from '@usecase/testing/inversify.mock';
 import { CloneOperationsUsecase } from '@usecase/cloneOperations/cloneOperations.usecase';
 import { CreateOperationUsecase } from '@usecase/createOperation/createOperation.usecase';
 import { DeleteOperationUsecase } from '@usecase/deleteOperation/deleteOperation.usecase';
+import { DeleteOperationLinkUsecase } from '@usecase/deleteOperationLink/deleteOperationLink.usecase';
 import { GetAccountUsecase } from '@usecase/getAccount/getAccount.usecase';
 import { GetAccountsUsecase } from '@usecase/getAccounts/getAccounts.usecase';
 import { GetCashflowUsecase } from '@usecase/getCashflow/getCashflow.usecase';
@@ -132,6 +133,13 @@ const cases: Case[] = [
       type_id: 1,
     },
     failCode: CODES.CREATE_OPERATION_FAIL,
+  },
+  {
+    name: 'DeleteOperationLinkUsecase',
+    build: (i) => new DeleteOperationLinkUsecase(i),
+    operationName: 'deleteOperationLink',
+    dataKey: 'deleteOperationLink',
+    dto: { operation_link_id: 1 },
   },
   {
     name: 'UpdateOperationUsecase',

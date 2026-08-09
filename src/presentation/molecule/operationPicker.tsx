@@ -2,6 +2,7 @@
 import * as React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Autocomplete, Box, TextField, Typography } from '@mui/material';
+import LinkIcon from '@mui/icons-material/Link';
 
 import { Operation } from '@presentation/hooks/useAccountOperations';
 import {
@@ -9,7 +10,7 @@ import {
   getCategoryIcon,
   getVisualAmountMeta,
 } from '@presentation/molecule/operationDisplay';
-import { MONO_FONT, TEXT } from '@src/theme/tokens';
+import { AMOUNT, MONO_FONT, TEXT } from '@src/theme/tokens';
 
 type Props = {
   label: React.ReactNode;
@@ -94,7 +95,7 @@ export const OperationPicker: React.FC<Props> = ({
             <Box
               sx={{
                 display: 'grid',
-                gridTemplateColumns: '42px 18px 1fr 104px',
+                gridTemplateColumns: '42px 18px 14px 1fr 104px',
                 alignItems: 'center',
                 columnGap: '10px',
                 width: '100%',
@@ -120,6 +121,28 @@ export const OperationPicker: React.FC<Props> = ({
                 }}
               >
                 {getCategoryIcon(operation.category?.label ?? '')}
+              </Box>
+              {/* Déjà prise en charge par un autre virement — signalée, jamais
+                  masquée : une même dépense se répartit légitimement sur
+                  plusieurs virements, c'est le cas de plus de cent d'entre
+                  elles en base. La cellule reste là même vide, pour que les
+                  descriptions restent alignées d'une ligne à l'autre. */}
+              <Box
+                component="span"
+                title={
+                  operation.linked_by_count
+                    ? t('createVir.already-linked')
+                    : undefined
+                }
+                sx={{
+                  display: 'inline-flex',
+                  justifyContent: 'center',
+                  lineHeight: 0,
+                  color: AMOUNT.destination,
+                  '& .MuiSvgIcon-root': { fontSize: 11 },
+                }}
+              >
+                {operation.linked_by_count ? <LinkIcon /> : null}
               </Box>
               <Typography
                 component="span"

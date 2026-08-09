@@ -116,7 +116,6 @@ export const Ventilation = () => {
             third_id: 1, // Default to a standard third id, assuming 1 is valid/self
             category_id: parseInt(categoryId),
             account_id_dest: parseInt(dest.accountId),
-            linkedOps: [],
           });
 
         if (response.message !== CODES.SUCCESS) {

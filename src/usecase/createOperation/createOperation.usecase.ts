@@ -29,6 +29,7 @@ export class CreateOperationUsecase {
               $third_id: Int
               $category_id: Int
               $description: String
+              $linked_operation_ids: [Int!]
             ) {
               createOperation(
                 dto: {
@@ -42,6 +43,7 @@ export class CreateOperationUsecase {
                   third_id: $third_id
                   category_id: $category_id
                   description: $description
+                  linked_operation_ids: $linked_operation_ids
                 }
               ) {
                 id
@@ -59,6 +61,7 @@ export class CreateOperationUsecase {
                 creation_date
                 modificator_id
                 modification_date
+                linked_count
               }
             }
           `,

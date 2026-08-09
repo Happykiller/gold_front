@@ -7,6 +7,8 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import EditNoteIcon from '@mui/icons-material/EditNote';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
+import LinkIcon from '@mui/icons-material/Link';
+import CallSplitIcon from '@mui/icons-material/CallSplit';
 import {
   Operation,
   STATUS_RECONCILED,
@@ -40,9 +42,9 @@ import { RowAction } from '@presentation/molecule/rowAction';
  * jour, et la colonne Actions au profit d'une cellule superposée.
  */
 const GRID_TEMPLATE = {
-  xs: '24px 1fr 26px 88px 60px',
-  sm: '24px 1fr 26px 104px 128px',
-  md: '50px 24px 1fr 26px 104px 128px 100px',
+  xs: '24px 16px 1fr 26px 88px 60px',
+  sm: '24px 16px 1fr 26px 104px 128px',
+  md: '50px 24px 16px 1fr 26px 104px 128px 100px',
 };
 
 const GRID_SX = {
@@ -60,7 +62,7 @@ const ROW_HEIGHT = { xs: 44, md: 26 };
 const BAND_HEIGHT = 24;
 
 type ColumnKey =
-  'id' | 'category' | 'desc' | 'statut' | 'amount' | 'dest' | 'third';
+  'id' | 'category' | 'link' | 'desc' | 'statut' | 'amount' | 'dest' | 'third';
 
 /**
  * Visibilité et libellé de chaque colonne.
@@ -80,6 +82,15 @@ const COLUMNS: Array<{
     display: { xs: 'none', sm: 'none', md: 'block' },
   },
   { key: 'category', labelKey: '', display: { xs: 'flex', md: 'flex' } },
+  // Prise en charge par un virement. Sans libellé d'en-tête, comme la
+  // catégorie : deux glyphes et une légende disent tout, et la colonne reste à
+  // 16 px.
+  {
+    key: 'link',
+    labelKey: '',
+    display: { xs: 'flex' },
+    align: 'center',
+  },
   { key: 'desc', labelKey: 'operation.description', display: { xs: 'block' } },
   {
     key: 'statut',
@@ -187,6 +198,17 @@ const OperationRow = React.memo(function OperationRow({
   const { value, color } = getVisualAmountMeta(operation, current_account_id);
   const { vatRate, ttc, ht, vatAmount } = getOperationVatBreakdown(operation);
 
+  // Aucune prop supplémentaire : les deux compteurs arrivent dans l'objet
+  // `operation`, déjà passé à cette ligne mémoïsée. Un callback par ligne
+  // casserait le `React.memo` sur plusieurs centaines de lignes.
+  const coveredBy = operation.linked_by_count ?? 0;
+  const covers = operation.linked_count ?? 0;
+  const linkLabel = coveredBy
+    ? t('operation.linked-by', { count: coveredBy })
+    : covers
+      ? t('operation.covers', { count: covers })
+      : '';
+
   const tooltipContent = (
     <Box sx={{ py: 0.5 }}>
       <Typography variant="body2">
@@ -280,6 +302,30 @@ const OperationRow = React.memo(function OperationRow({
           }}
         >
           {getCategoryIcon(operation.category?.label ?? '')}
+        </Box>
+      </Tooltip>
+
+      {/* Prise en charge par un virement — à ne pas confondre avec le pointage,
+          qui garde sa colonne, ses couleurs et sa légende. Les deux états sont
+          exclusifs en pratique : une opération couverte est une dépense, une
+          opération couvrante est un virement. La cellule occupe sa colonne même
+          vide, comme celle de destination, sinon l'alignement des descriptions
+          saute d'une ligne à l'autre. */}
+      <Tooltip title={linkLabel} placement="top">
+        <Box
+          component="span"
+          aria-label={linkLabel || undefined}
+          sx={{
+            display: DISPLAY.link,
+            alignItems: 'center',
+            justifyContent: 'center',
+            lineHeight: 0,
+            cursor: linkLabel ? 'help' : 'default',
+            color: coveredBy ? AMOUNT.destination : AMOUNT.regulation,
+            '& .MuiSvgIcon-root': { fontSize: 12 },
+          }}
+        >
+          {coveredBy ? <LinkIcon /> : covers ? <CallSplitIcon /> : null}
         </Box>
       </Tooltip>
 
@@ -847,6 +893,14 @@ export const OperationsTable: React.FC<Props> = ({
             sx={{ fontSize: 12, color: theme.palette.primary.main }}
           />
           {t('operations.legend-pending')}
+        </Box>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <LinkIcon sx={{ fontSize: 12, color: AMOUNT.destination }} />
+          {t('operations.legend-linked')}
+        </Box>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <CallSplitIcon sx={{ fontSize: 12, color: AMOUNT.regulation }} />
+          {t('operations.legend-covers')}
         </Box>
         <Box sx={{ ml: 'auto' }}>{t('operations.legend-hint')}</Box>
       </Box>

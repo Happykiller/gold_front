@@ -94,12 +94,16 @@ type OperationModelResolver {
   creation_date: String!
   modificator_id: Int
   modification_date: String
+  linked_count: Int!
+  linked_by_count: Int!
   account: AccountModelResolver!
   account_dest: AccountModelResolver
   status: OperationStatutModelResolver!
   type: OperationTypeModelResolver!
   third: OperationThirdModelResolver!
   category: OperationCategoryModelResolver!
+  linked_operations: [LinkedOperationModelResolver!]!
+  linked_by_operations: [LinkedOperationModelResolver!]!
 }
 
 type OperationLinkModelResolver {
@@ -111,6 +115,20 @@ type OperationLinkModelResolver {
   creation_date: String!
   modificator_id: Int
   modification_date: String
+}
+
+type LinkedOperationModelResolver {
+  link_id: Int!
+  id: Int!
+  account_id: Int!
+  account_id_dest: Int
+  amount: Float!
+  date: String!
+  status_id: Int!
+  type_id: Int!
+  third_id: Int
+  category_id: Int
+  description: String
 }
 
 type OperationTypeModelResolver {
@@ -341,6 +359,7 @@ input CreateOperationInputResolver {
   category_id: Int
   vat_rate: Float
   description: String
+  linked_operation_ids: [Int!]
 }
 
 input UpdateOperationInputResolver {

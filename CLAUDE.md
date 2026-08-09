@@ -24,7 +24,7 @@ historique ([`HISTORY.md`](../docs/KB/HISTORY.md)).
 
 ```bash
 npm install
-npm start          # vite → http://localhost:8083 (lire le port réellement annoncé)
+npm start          # vite → http://localhost:24083 (strictPort : échoue si le port est pris)
 npm run check      # lint + build + test : les trois barrières, dans l'ordre de la CI
 npm run codegen    # régénère src/gql/graphql.ts depuis le schéma
 npm run release:patch | release:minor | release:major

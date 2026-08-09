@@ -29,6 +29,8 @@ const operation = (over: Partial<Operation> & { id: number }) =>
     third: null,
     account: { id: CURRENT, label: 'Courant' },
     account_dest: null,
+    linked_count: 0,
+    linked_by_count: 0,
     ...over,
   }) as unknown as Operation;
 
@@ -114,6 +116,47 @@ describe('OperationsTable — colonnes', () => {
     expect(rows[0].children).toHaveLength(rows[1].children.length);
     expect(within(rows[1]).getByText('Épargne')).toBeInTheDocument();
     expect(within(rows[1]).getByText('→')).toBeInTheDocument();
+  });
+
+  it('marque une opération prise en charge par un virement', () => {
+    setup([operation({ id: 1, linked_by_count: 2 })]);
+
+    // Le marqueur n'est pas le pointage : une opération peut être rapprochée
+    // sans être prise en charge, et l'inverse.
+    expect(
+      screen.getByLabelText('Prise en charge par 2 virement(s)'),
+    ).toBeInTheDocument();
+  });
+
+  it('marque un virement qui prend des opérations en charge', () => {
+    setup([operation({ id: 1, type_id: 3, linked_count: 3 })]);
+
+    expect(
+      screen.getByLabelText('Prend en charge 3 opération(s)'),
+    ).toBeInTheDocument();
+  });
+
+  it('garde la cellule de liaison sur une opération sans lien', () => {
+    setup([operation({ id: 1 }), operation({ id: 2, linked_by_count: 1 })]);
+
+    const rows = screen
+      .getAllByText(/^Opération \d$/)
+      .map((node) => node.parentElement as HTMLElement);
+
+    // Même raison que pour la destination : la colonne de 16 px est toujours
+    // occupée, sinon les descriptions se décalent d'une ligne à l'autre.
+    expect(rows[0].children).toHaveLength(rows[1].children.length);
+  });
+
+  it('explique les deux marqueurs dans la légende', () => {
+    setup([operation({ id: 1 })]);
+
+    expect(
+      screen.getByText('prise en charge par un virement'),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText('prend en charge des opérations'),
+    ).toBeInTheDocument();
   });
 
   it('ouvre l’autre compte d’un virement émis au clic sur sa destination', () => {

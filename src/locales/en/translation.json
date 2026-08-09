@@ -34,6 +34,7 @@
     "loading": "Loading..."
   },
   "createVir": {
+    "already-linked": "already covered by another transfer",
     "operations": "Operations",
     "send": "Send",
     "succeed": "Transfer created: ",
@@ -48,6 +49,12 @@
     "edit": "Edit account"
   },
   "editOperation": {
+    "link-remove": "Remove link",
+    "link-remove-failed": "The link could not be removed",
+    "link-removed": "Link removed",
+    "linked-by-title": "Covered by",
+    "linked-title": "Covered operations",
+    "open-carrier": "Open the transfer",
     "send": "Update",
     "succeed": "Update successful",
     "title": "Edit"
@@ -104,15 +111,17 @@
     "account_dest": "Destination",
     "action-delete": "Delete",
     "action-edit": "Edit",
-    "amount-hint": "A numeric amount, for example 125.50",
     "amount": "Amount",
+    "amount-hint": "A numeric amount, for example 125.50",
     "category": "Category",
     "category-other": "Other",
+    "covers": "Covers {{count}} operation(s)",
     "date": "Date",
-    "description-hint": "Three characters minimum",
     "description": "Description",
+    "description-hint": "Three characters minimum",
     "ht_amount": "Amount excl. VAT",
     "id": "ID",
+    "linked-by": "Covered by {{count}} transfer(s)",
     "no-description": "No description",
     "reconcile": "Reconcile this operation",
     "status": "Status",
@@ -125,8 +134,8 @@
     "type": "Type",
     "vat": "VAT",
     "vat_amount": "VAT amount",
-    "vat_rate-hint": "A value between 0 and 100",
-    "vat_rate": "VAT rate (%)"
+    "vat_rate": "VAT rate (%)",
+    "vat_rate-hint": "A value between 0 and 100"
   },
   "operation_create": {
     "send": "Create",
@@ -141,7 +150,9 @@
     "deleteSucced": "Deletion successful",
     "empty": "No operation on this account",
     "end_of_list": "End of list",
+    "legend-covers": "covers operations",
     "legend-hint": "click the status to reconcile · ␣ on the selected row",
+    "legend-linked": "covered by a transfer",
     "legend-pending": "pending — entered, not cleared yet",
     "legend-reconciled": "reconciled — on the statement",
     "no_result": "No operation matches these criteria",

@@ -50,6 +50,32 @@ export class GetOperationUsecase {
                 creation_date
                 modificator_id
                 modification_date
+                linked_count
+                linked_by_count
+                # Les deux sens du lien. Chacun coûte une requête SQL côté
+                # serveur, et seul le détail les demande — la liste se contente
+                # des compteurs ci-dessus.
+                linked_operations {
+                  link_id
+                  id
+                  amount
+                  date
+                  description
+                  type_id
+                  status_id
+                  account_id
+                }
+                linked_by_operations {
+                  link_id
+                  id
+                  amount
+                  date
+                  description
+                  type_id
+                  status_id
+                  account_id
+                  account_id_dest
+                }
               }
             }
           `,

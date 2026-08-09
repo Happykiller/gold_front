@@ -81,6 +81,11 @@ export class UpdateOperationUsecase {
                 creation_date
                 modificator_id
                 modification_date
+                # Le retour d'une mise à jour alimente les mêmes écrans que la
+                # liste : sans ces deux champs, son type ne serait plus celui
+                # d'une opération.
+                linked_count
+                linked_by_count
               }
             }
           `,
