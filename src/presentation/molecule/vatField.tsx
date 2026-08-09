@@ -40,10 +40,14 @@ export const VatField: React.FC<{
         );
       }}
       error={!value.valid}
-      // Une chaîne d'espace insécable plutôt que rien : sans elle, le champ
-      // change de hauteur dès que le message apparaît, et toute la ligne du
-      // formulaire sursaute.
-      helperText={value.valid ? ' ' : t('operation.vat_rate-hint')}
+      // Ce champ réservait la hauteur d'un message par une chaîne d'espace
+      // insécable, pour que la ligne ne sursaute pas quand le message apparaît.
+      // Le remède coûtait plus que le mal : cette réserve comptait dans la
+      // hauteur de la cellule, et la grille alignant ses cellules par le bas,
+      // elle laissait le champ 22px plus haut que le montant et la date. Les
+      // messages sont désormais hors du flux et la ligne leur garde sa gouttière
+      // — plus de sursaut, et plus rien à réserver ici.
+      helperText={value.valid ? null : t('operation.vat_rate-hint')}
       slotProps={{
         htmlInput: { min: 0, max: 100, step: 0.1, inputMode: 'decimal' },
       }}

@@ -36,6 +36,82 @@ export const sharedShape = {
   borderRadius: sharedRadius.lg,
 };
 
+/**
+ * Taille des étiquettes de champ. Sortie en constante parce que **trois** règles
+ * doivent tomber dessus : l'étiquette elle-même, l'encoche du champ `outlined`
+ * qui doit faire exactement la largeur du texte, et le décalage vertical qui
+ * l'amène dedans.
+ */
+const LABEL_FONT_SIZE = 13;
+
+/** Taille des messages sous les champs (aide, erreur de saisie). */
+const HELPER_FONT_SIZE = 11.5;
+
+/** Espace entre le bas d'un champ et son message. */
+const HELPER_GAP = 3;
+
+/**
+ * Gouttière qu'une ligne de formulaire doit garder sous ses champs pour leurs
+ * messages, qui sont rendus hors du flux (cf. `MuiFormHelperText` plus bas).
+ *
+ * `1.66` est le `lineHeight` par défaut de `caption`, dont hérite le message.
+ */
+export const HELPER_GUTTER = Math.ceil(HELPER_FONT_SIZE * 1.66) + HELPER_GAP;
+
+/**
+ * Géométrie d'un champ `outlined`, dont l'étiquette vit **hors du flux**.
+ *
+ * Le projet est en `standard` partout, sauf deux endroits qu'il ne choisit pas :
+ * le graphique, et surtout le composant `Input` de `@happykiller/sunny-ui`, qui
+ * écrit `variant="outlined"` en dur *après* le spread de ses props — donc
+ * insurchargeable depuis un appelant. Il sert le montant et la description de
+ * six écrans, plus les écrans du socle (connexion, profil). Le thème doit donc
+ * savoir rendre l'`outlined` correctement, faute de pouvoir l'éviter.
+ *
+ * Deux défauts, tous deux invisibles pour le typage, le lint, les tests et le
+ * build — et trouvés sur une capture d'écran de `operation_new` :
+ *
+ * 1. **L'étiquette réduite ne réserve aucune place.** Elle est en
+ *    `position: absolute` et remonte au-dessus du champ ; le trait du cadre en
+ *    fait autant, de 5px. `FormSection` n'espace ses lignes que de 6px et deux
+ *    `FormSection` successifs se touchent : l'étiquette « Description » venait
+ *    donc se poser SUR le champ « Montant » de la section du dessus.
+ * 2. **L'étiquette ne tombait plus dans son encoche.** MUI code son décalage en
+ *    dur (`translate(14px, -9px)`), calibré pour une étiquette de 16px ; le
+ *    thème les met à 13px, ce qui raccourcit la boîte de 4px et la laissait
+ *    2,5px trop haut. L'encoche, elle, se dimensionne sur la taille du *champ*
+ *    (14px) et non de l'étiquette : le trou était 13px plus large que le texte.
+ *
+ * D'où les valeurs ci-dessous, dérivées et non devinées.
+ */
+export const OUTLINED = {
+  /** Place rendue au-dessus du champ, celle que l'étiquette occupe hors du flux. */
+  reserve: 9,
+  /** Ce dont MUI remonte le cadre au-dessus du champ (`top: -5px` du fieldset). */
+  outlineRise: 5,
+  /** Hauteur de l'encoche, codée en dur par MUI sur le `legend` réduit. */
+  notchHeight: 11,
+  /** Facteur de réduction de l'étiquette, codé en dur par MUI. */
+  shrinkScale: 0.75,
+  /** `lineHeight` de `InputLabel`, en em. */
+  labelLineHeight: 1.4375,
+};
+
+/** Hauteur réelle de l'étiquette réduite, une fois la mise à l'échelle appliquée. */
+const shrunkLabelHeight =
+  LABEL_FONT_SIZE * OUTLINED.labelLineHeight * OUTLINED.shrinkScale;
+
+/**
+ * Décalage vertical de l'étiquette réduite : sa boîte doit être centrée sur le
+ * **milieu de l'encoche**, pas sur le trait — c'est ce que fait MUI par défaut,
+ * à 0,9px près.
+ */
+export const outlinedShrunkLabelOffset =
+  OUTLINED.reserve -
+  OUTLINED.outlineRise +
+  OUTLINED.notchHeight / 2 -
+  shrunkLabelHeight / 2;
+
 export const sharedTypography = {
   fontFamily: ['Montserrat', 'Roboto', 'sans-serif'].join(','),
   h1: {
@@ -146,6 +222,14 @@ export const createSharedComponents = (buttonPalette: {
       root: {
         backgroundColor: SURFACE.field,
         borderRadius: sharedRadius.md,
+        // La place de l'étiquette, qui est hors du flux et ne la demande donc à
+        // personne. Sans elle, elle se sert sur le champ du dessus — cf. OUTLINED.
+        //
+        // Conditionnée au frère qui précède : un champ sans étiquette n'a rien à
+        // réserver, et MUI rend toujours l'étiquette juste avant le champ.
+        'label + &': {
+          marginTop: OUTLINED.reserve,
+        },
         '& .MuiOutlinedInput-notchedOutline': {
           borderColor: 'rgba(255, 255, 255, 0.09)',
         },
@@ -158,6 +242,34 @@ export const createSharedComponents = (buttonPalette: {
         },
         '&.Mui-error .MuiOutlinedInput-notchedOutline': {
           borderColor: AMOUNT.debit,
+        },
+      },
+      // L'encoche mesure sa largeur sur la taille de police du `fieldset`, qui
+      // hérite de celle du champ (14px) et non de celle de l'étiquette : le trou
+      // était plus large que le texte qu'il doit dégager.
+      notchedOutline: {
+        fontSize: LABEL_FONT_SIZE,
+      },
+    },
+  },
+  MuiInputLabel: {
+    styleOverrides: {
+      // Ciblé par sa classe et non par l'emplacement `outlined` : un emplacement
+      // que le composant ne câble pas ne produit rien, en silence (cf.
+      // docs/KB/DAT/interface-mui.md).
+      root: {
+        '&.MuiInputLabel-outlined': {
+          // Champ vide et non focalisé : l'étiquette est DEDANS, et le champ
+          // vient d'être poussé de `reserve`. `top: 50%` porte sur le conteneur
+          // entier (réserve + champ) ; la moitié de la réserve ramène le centre
+          // sur celui du champ seul. Aucune hauteur de champ n'est écrite ici —
+          // `sunny-ui` fixe la sienne par un padding, le graphique la sienne.
+          top: `calc(50% + ${OUTLINED.reserve / 2}px)`,
+          transform: 'translate(14px, -50%)',
+          '&.MuiInputLabel-shrink': {
+            top: 0,
+            transform: `translate(14px, ${outlinedShrunkLabelOffset}px) scale(${OUTLINED.shrinkScale})`,
+          },
         },
       },
     },
@@ -187,9 +299,21 @@ export const createSharedComponents = (buttonPalette: {
     styleOverrides: {
       root: {
         color: TEXT.meta,
-        fontSize: 11.5,
+        fontSize: HELPER_FONT_SIZE,
         marginLeft: 0,
         '&.Mui-error': { color: AMOUNT.debit },
+        // Hors du flux, sous le champ. Un message qui compte dans la hauteur de
+        // son conteneur fait deux dégâts : il pousse la ligne quand il apparaît,
+        // et il désaligne durablement le champ qui le réserve — c'est ce qui
+        // mettait le taux de TVA 22px plus haut que le montant et la date, la
+        // grille de `FormSection` alignant des boîtes par le bas et non des
+        // champs. `FormControl` étant déjà `position: relative`, il suffit de
+        // l'en sortir ; `FormSection` réserve la gouttière correspondante.
+        position: 'absolute',
+        top: '100%',
+        left: 0,
+        right: 0,
+        marginTop: HELPER_GAP,
       },
     },
   },

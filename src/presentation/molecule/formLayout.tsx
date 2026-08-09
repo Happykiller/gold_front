@@ -4,6 +4,7 @@ import { Trans } from 'react-i18next';
 import { Box, Button, Typography } from '@mui/material';
 
 import { LINE, TEXT } from '@src/theme/tokens';
+import { HELPER_GUTTER } from '@src/theme/shared';
 
 /**
  * Une grille de champs.
@@ -43,7 +44,17 @@ export const FormSection: React.FC<{
           sm: `repeat(${columns}, minmax(0, 1fr))`,
         },
         columnGap: '18px',
-        rowGap: '6px',
+        // Les messages des champs sont rendus hors du flux (cf. le thème) : sans
+        // eux dans la hauteur, `alignItems: 'end'` aligne enfin des champs et non
+        // des boîtes de natures différentes — mais c'est à la ligne de leur
+        // garder la place. Les 6px d'origine les laissaient recouvrir l'étiquette
+        // du champ suivant.
+        rowGap: `${HELPER_GUTTER}px`,
+        // `rowGap` n'espace qu'entre deux lignes : la dernière n'aurait pas de
+        // gouttière, et deux `FormSection` successives se touchent. Son message
+        // passait alors sous le champ de la section suivante, dont le fond est
+        // opaque.
+        paddingBottom: `${HELPER_GUTTER}px`,
         alignItems: 'end',
       }}
     >
