@@ -1,6 +1,6 @@
 {
   "name": "gold_front",
-  "version": "1.9.1",
+  "version": "1.10.0",
   "description": "Front for service Gold",
   "type": "module",
   "scripts": {
