@@ -23,16 +23,10 @@ import {
   SubmitBar,
 } from '@presentation/molecule/formLayout';
 import { RowAction } from '@presentation/molecule/rowAction';
-import { OperationPicker } from '@presentation/molecule/operationPicker';
+import { LinkableOperations } from '@presentation/molecule/linkableOperations';
 import { formatEuroAmount } from '@presentation/molecule/operationDisplay';
 import { TEXT } from '@src/theme/tokens';
-import {
-  Operation,
-  OPERATIONS_PAGE_SIZE,
-  STATUS_RECONCILED,
-  TYPE_DEBIT,
-} from '@presentation/hooks/useAccountOperations';
-import { GetOperationsUsecaseModel } from '@usecase/getOperations/getOperations.usecase.model';
+import { Operation } from '@presentation/hooks/useAccountOperations';
 import { CreateOperationUsecaseModel } from '@usecase/createOperation/createOperation.usecase.model';
 
 export const CreateVir = () => {
@@ -43,7 +37,6 @@ export const CreateVir = () => {
   const [sending, setSending] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
 
-  const [operations, setOperations] = React.useState<Operation[] | null>(null);
   const [selectedOperations, setSelectedOperations] = React.useState<
     Operation[]
   >([]);
@@ -100,37 +93,12 @@ export const CreateVir = () => {
       .finally(() => setSending(false));
   };
 
-  // Les opérations du compte de destination, proposées à la liaison. Rechargées
-  // dès que ce compte change.
-  React.useEffect(() => {
-    if (operations !== null) return;
-
-    inversify.getOperationsUsecase
-      .execute({
-        account_id: parseInt(currentAccountDest),
-        limit: OPERATIONS_PAGE_SIZE,
-        offset: 0,
-        // Les critères partent au **serveur**, et non après coup : la requête
-        // ramène un lot de 50, donc filtrer la liste reçue ne verrait que ce
-        // lot-là et pourrait ne rien en garder. On lie une dépense déjà
-        // validée par la banque, donc un débit pointé.
-        type_ids: [TYPE_DEBIT],
-        status_ids: [STATUS_RECONCILED],
-      })
-      .then((response: GetOperationsUsecaseModel) => {
-        if (response.message === CODES.SUCCESS && response.data)
-          setOperations(response.data);
-        else inversify.loggerService.debug(response.error);
-      })
-      .catch((err: Error) => inversify.loggerService.debug(err.message));
-  }, [currentAccountDest, operations]);
-
-  // Seule exclusion restante côté client : ce qui est déjà lié. Elle ne peut
-  // pas partir au serveur, elle dépend de la saisie en cours.
-  const linkable = (operations ?? []).filter(
-    (operation) =>
-      !selectedOperations.some((selected) => selected.id === operation.id),
-  );
+  // Le chargement des candidates, son filtre et son sélecteur vivent désormais
+  // dans `LinkableOperations`, partagé avec l'édition d'un virement.
+  //
+  // Seule exclusion qui reste ici : ce qui est déjà choisi. Elle ne peut pas
+  // partir au serveur, elle dépend de la saisie en cours.
+  const selectedIds = selectedOperations.map((selected) => selected.id);
 
   return (
     <PageShell title={t('createVir.title')}>
@@ -180,7 +148,9 @@ export const CreateVir = () => {
             label={<Trans>operation.account_dest</Trans>}
             onChange={(value) => {
               setCurrentAccountDest(value);
-              setOperations(null);
+              // Les candidates se rechargent seules (LinkableOperations est
+              // monté sur ce compte) ; ce qui était choisi appartenait à
+              // l'ancien compte et n'a plus de sens ici.
               setSelectedOperations([]);
             }}
           />
@@ -203,10 +173,10 @@ export const CreateVir = () => {
 
         <FormSection title={t('createVir.operations')} columns={1}>
           <FormRow>
-            <OperationPicker
+            <LinkableOperations
               label={<Trans>createVir.operations</Trans>}
-              operations={linkable}
-              currentAccountId={parseInt(currentAccountDest)}
+              accountId={parseInt(currentAccountDest)}
+              excludeIds={selectedIds}
               onPick={(operation) =>
                 setSelectedOperations((prev) => [...prev, operation])
               }

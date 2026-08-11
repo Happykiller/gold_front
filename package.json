@@ -20,6 +20,7 @@
     "test:coverage": "vitest run --coverage",
     "codegen": "graphql-codegen --config codegen.ts",
     "codegen:check": "npm run codegen && git diff --exit-code -- src/gql",
+    "lock:check": "npm install --package-lock-only --ignore-scripts && git diff --exit-code -- package-lock.json",
     "check": "npm run lint && npm run build && npm test"
   },
   "author": "Fabrice Rosito<fabrice.rosito@gmail.com>",

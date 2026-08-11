@@ -38,7 +38,11 @@ import {
 } from '@usecase/getOperation/getOperation.usecase.model';
 import { CreateOperationUsecaseModel } from '@usecase/createOperation/createOperation.usecase.model';
 import { RowAction } from '@presentation/molecule/rowAction';
-import { TYPE_TRANSFER } from '@presentation/hooks/useAccountOperations';
+import { LinkableOperations } from '@presentation/molecule/linkableOperations';
+import {
+  Operation,
+  TYPE_TRANSFER,
+} from '@presentation/hooks/useAccountOperations';
 import {
   formatEuroAmount,
   formatOperationDate,
@@ -71,6 +75,48 @@ export const EditOperation = () => {
     `${formatOperationDate(linked.date)} · ${formatEuroAmount(linked.amount)}${
       linked.description ? ` · ${linked.description}` : ''
     }`;
+
+  // Le compte de destination porte les dépenses que ce virement couvre.
+  const destAccountId = operation?.account_id_dest ?? null;
+
+  // Ce qui est déjà lié ne se propose plus : le serveur accepterait le doublon
+  // — il en existe un en base depuis 2019, qui fait afficher « prend en charge
+  // 2 opérations » là où il n'y en a qu'une.
+  const linkedIds = links.down.map((linked) => linked.id);
+
+  const handleLink = (picked: Operation) => {
+    if (!operation) return;
+
+    inversify.createOperationLinkUsecase
+      .execute({
+        // Le sens compte : le virement édité PORTE la dépense choisie.
+        // L'inverser ferait apparaître le lien du mauvais côté.
+        operation_id: operation.id,
+        operation_ref_id: picked.id,
+      })
+      .then((response) => {
+        // La puce n'apparaît qu'APRÈS confirmation du serveur, comme au
+        // retrait : c'est le seul endroit où un refus serait visible.
+        if (response.message === CODES.SUCCESS && response.data) {
+          // Reconstruit la puce sans relire le serveur. Pas de `as` : c'est
+          // tsc qui vérifie que l'opération choisie porte bien tout ce qu'une
+          // opération liée déclare — le jour où la requête `operation`
+          // demandera un champ de plus, la compilation le dira ici.
+          const linked: LinkedOperationUsecaseModel = {
+            ...picked,
+            link_id: response.data.id,
+          };
+          setLinks((current) => ({
+            ...current,
+            down: [...current.down, linked],
+          }));
+          flash.open(t('editOperation.link-added'));
+        } else {
+          flash.open(t('editOperation.link-add-failed'));
+        }
+      })
+      .catch(() => flash.open(t('editOperation.link-add-failed')));
+  };
 
   const handleUnlink = (operationLinkId: number) => {
     inversify.deleteOperationLinkUsecase
@@ -278,24 +324,52 @@ export const EditOperation = () => {
               />
             </FormSection>
 
-            {/* Les opérations que ce virement prend en charge. Une lecture, pas
-                une saisie : la section vit hors du flux des champs, entre le
-                formulaire et son bouton d'envoi. */}
-            {operation.type_id === TYPE_TRANSFER && links.down.length > 0 && (
+            {/* Les opérations que ce virement prend en charge. La section vit
+                hors du flux des champs, entre le formulaire et son bouton
+                d'envoi.
+
+                Elle s'affiche désormais même sans aucun lien : la masquer
+                quand la liste était vide ne laissait aucun endroit d'où en
+                ajouter un, et c'est précisément le cas d'un virement qu'on
+                vient de créer sans rattachement.
+
+                Rattacher et retirer prennent effet IMMÉDIATEMENT, sans passer
+                par « Mettre à jour » — comme le retrait le faisait déjà. Ces
+                gestes visent le lien, pas l'opération : les différer
+                obligerait à réconcilier deux états à l'envoi. */}
+            {operation.type_id === TYPE_TRANSFER && (
               <FormSection title={t('editOperation.linked-title')} columns={1}>
                 <FormRow>
-                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
-                    {links.down.map((linked) => (
-                      <RowAction
-                        key={linked.link_id}
-                        label={t('editOperation.link-remove')}
-                        icon={<LinkOffIcon />}
-                        text={linkedLabel(linked)}
-                        onClick={() => handleUnlink(linked.link_id)}
-                      />
-                    ))}
-                  </Box>
+                  <LinkableOperations
+                    label={<Trans>editOperation.link-add</Trans>}
+                    accountId={destAccountId}
+                    excludeIds={linkedIds}
+                    onPick={handleLink}
+                  />
                 </FormRow>
+
+                {links.down.length > 0 && (
+                  <FormRow>
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        flexWrap: 'wrap',
+                        gap: '6px',
+                        mt: '8px',
+                      }}
+                    >
+                      {links.down.map((linked) => (
+                        <RowAction
+                          key={linked.link_id}
+                          label={t('editOperation.link-remove')}
+                          icon={<LinkOffIcon />}
+                          text={linkedLabel(linked)}
+                          onClick={() => handleUnlink(linked.link_id)}
+                        />
+                      ))}
+                    </Box>
+                  </FormRow>
+                )}
               </FormSection>
             )}
 

@@ -546,6 +546,20 @@ export type CreateOperationMutation = {
   };
 };
 
+export type CreateOperationLinkMutationVariables = Exact<{
+  operation_id: number;
+  operation_ref_id: number;
+}>;
+
+export type CreateOperationLinkMutation = {
+  createOperationLink: {
+    id: number;
+    operation_id: number;
+    operation_ref_id: number;
+    active: boolean;
+  };
+};
+
 export type DeleteOperationMutationVariables = Exact<{
   operation_id: number;
 }>;

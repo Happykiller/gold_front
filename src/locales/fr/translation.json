@@ -50,6 +50,9 @@
     "edit": "Éditer le compte"
   },
   "editOperation": {
+    "link-add": "Rattacher une opération",
+    "link-add-failed": "L'opération n'a pas pu être rattachée",
+    "link-added": "Opération rattachée",
     "link-remove": "Retirer le lien",
     "link-remove-failed": "Le lien n'a pas pu être retiré",
     "link-removed": "Lien retiré",
@@ -179,6 +182,10 @@
     "vat_amount": "Montant TVA",
     "vat_rate": "Taux de TVA (%)",
     "vat_rate-hint": "Une valeur entre 0 et 100"
+  },
+  "operationLink": {
+    "include-unreconciled": "Afficher aussi les opérations non pointées",
+    "include-unreconciled-hint": "Par défaut, seules les dépenses déjà validées par la banque sont proposées."
   },
   "operation_create": {
     "send": "Créer",

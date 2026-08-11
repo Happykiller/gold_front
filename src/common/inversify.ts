@@ -17,6 +17,7 @@ import {
 import config from '@src/config';
 import { SetRecoUsecase } from '@usecase/setReco/setReco.usecase';
 import { DeleteOperationLinkUsecase } from '@usecase/deleteOperationLink/deleteOperationLink.usecase';
+import { CreateOperationLinkUsecase } from '@usecase/createOperationLink/createOperationLink.usecase';
 import { GetThirdsUsecase } from '@usecase/getThirds/getThirds.usecase';
 import { GraphqlServiceFake } from '@service/graphql/graphql.service.fake';
 import { GetAccountUsecase } from '@usecase/getAccount/getAccount.usecase';
@@ -43,6 +44,7 @@ export class Inversify {
   graphqlService: GraphqlService;
   setRecoUsecase: SetRecoUsecase;
   deleteOperationLinkUsecase: DeleteOperationLinkUsecase;
+  createOperationLinkUsecase: CreateOperationLinkUsecase;
   sessionInfo: SessionInfoUsecase;
   getThirdsUsecase: GetThirdsUsecase;
   systemInfoUsecase: SystemInfoUsecase;
@@ -74,6 +76,7 @@ export class Inversify {
     this.loggerService = new LoggerServiceReal();
     this.setRecoUsecase = new SetRecoUsecase(this);
     this.deleteOperationLinkUsecase = new DeleteOperationLinkUsecase(this);
+    this.createOperationLinkUsecase = new CreateOperationLinkUsecase(this);
     this.sessionInfo = new SessionInfoUsecase(this);
     this.getThirdsUsecase = new GetThirdsUsecase(this);
     this.systemInfoUsecase = new SystemInfoUsecase(this);

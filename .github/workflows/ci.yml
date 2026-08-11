@@ -22,6 +22,14 @@ jobs:
 
       - run: npm ci
 
+      # `npm ci` ne suffit pas : il n'écrit jamais le lockfile et tolère une
+      # entrée orpheline — une dépendance retirée de package.json y reste
+      # déclarée indéfiniment. `sass` y a survécu à deux migrations, jusqu'au
+      # 11/08/2026 où un simple `npm install` l'a élaguée en 362 lignes.
+      # `--package-lock-only` régénère le lockfile depuis package.json sans
+      # toucher à node_modules : le diff dit si les deux ont divergé.
+      - run: npm run lock:check
+
       - run: npm run lint
 
       # Confronte les requêtes écrites à la main au schéma du serveur, et

@@ -50,6 +50,9 @@
     "edit": "Edit account"
   },
   "editOperation": {
+    "link-add": "Attach an operation",
+    "link-add-failed": "The operation could not be attached",
+    "link-added": "Operation attached",
     "link-remove": "Remove link",
     "link-remove-failed": "The link could not be removed",
     "link-removed": "Link removed",
@@ -179,6 +182,10 @@
     "vat_amount": "VAT amount",
     "vat_rate": "VAT rate (%)",
     "vat_rate-hint": "A value between 0 and 100"
+  },
+  "operationLink": {
+    "include-unreconciled": "Also show unreconciled operations",
+    "include-unreconciled-hint": "By default, only expenses already cleared by the bank are offered."
   },
   "operation_create": {
     "send": "Create",

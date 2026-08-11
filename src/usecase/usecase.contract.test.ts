@@ -8,6 +8,7 @@ import { CloneOperationsUsecase } from '@usecase/cloneOperations/cloneOperations
 import { CreateOperationUsecase } from '@usecase/createOperation/createOperation.usecase';
 import { DeleteOperationUsecase } from '@usecase/deleteOperation/deleteOperation.usecase';
 import { DeleteOperationLinkUsecase } from '@usecase/deleteOperationLink/deleteOperationLink.usecase';
+import { CreateOperationLinkUsecase } from '@usecase/createOperationLink/createOperationLink.usecase';
 import { GetAccountUsecase } from '@usecase/getAccount/getAccount.usecase';
 import { GetAccountsUsecase } from '@usecase/getAccounts/getAccounts.usecase';
 import { GetCashflowUsecase } from '@usecase/getCashflow/getCashflow.usecase';
@@ -140,6 +141,13 @@ const cases: Case[] = [
     operationName: 'deleteOperationLink',
     dataKey: 'deleteOperationLink',
     dto: { operation_link_id: 1 },
+  },
+  {
+    name: 'CreateOperationLinkUsecase',
+    build: (i) => new CreateOperationLinkUsecase(i),
+    operationName: 'createOperationLink',
+    dataKey: 'createOperationLink',
+    dto: { operation_id: 1, operation_ref_id: 2 },
   },
   {
     name: 'UpdateOperationUsecase',
