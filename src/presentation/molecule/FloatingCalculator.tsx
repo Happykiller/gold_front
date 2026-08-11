@@ -13,9 +13,35 @@ import { LINE, MONO_FONT, SHADOW, SURFACE, TEXT } from '@src/theme/tokens';
 import { Operation } from '@presentation/hooks/useAccountOperations';
 import {
   formatEuroAmount,
+  getCategoryIcon,
   getSignedAmount,
   getVisualAmountMeta,
 } from '@presentation/molecule/operationDisplay';
+
+const WIDTH = 320;
+
+/**
+ * Ramène le panneau dans la fenêtre.
+ *
+ * Sans cela, un glisser un peu vif le sortait de l'écran — et comme la poignée
+ * de déplacement sort avec lui, il n'y avait plus aucun moyen de le ramener :
+ * la position vit dans l'état du composant, que la fermeture ne réinitialise
+ * pas. On garde toujours le panneau entièrement visible.
+ */
+function clampToViewport(
+  x: number,
+  y: number,
+  el: HTMLElement | null,
+): { x: number; y: number } {
+  const width = el?.offsetWidth || WIDTH;
+  const height = el?.offsetHeight || 0;
+  const maxX = Math.max(0, window.innerWidth - width);
+  const maxY = Math.max(0, window.innerHeight - height);
+  return {
+    x: Math.min(Math.max(0, x), maxX),
+    y: Math.min(Math.max(0, y), maxY),
+  };
+}
 
 export const FloatingCalculator: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -44,10 +70,13 @@ export const FloatingCalculator: React.FC = () => {
 
   const handleMouseMove = (e: MouseEvent) => {
     if (!dragging) return;
-    setPosition({
-      x: e.clientX - offset.current.x,
-      y: e.clientY - offset.current.y,
-    });
+    setPosition(
+      clampToViewport(
+        e.clientX - offset.current.x,
+        e.clientY - offset.current.y,
+        boxRef.current,
+      ),
+    );
   };
 
   const handleMouseUp = () => setDragging(false);
@@ -66,6 +95,24 @@ export const FloatingCalculator: React.FC = () => {
     };
   }, [dragging]);
 
+  // Rétrécir la fenêtre laisserait sinon le panneau dehors, hors d'atteinte.
+  React.useEffect(() => {
+    const onResize = () =>
+      setPosition((p) => clampToViewport(p.x, p.y, boxRef.current));
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
+
+  // La position survit à la fermeture — elle vit dans l'état du composant, que
+  // `return null` ne démonte pas. Sans ce recadrage à l'ouverture, un panneau
+  // laissé hors champ (fenêtre rétrécie entre-temps, position héritée)
+  // reviendrait invisible, et la seule façon de le récupérer serait de
+  // recharger la page.
+  React.useEffect(() => {
+    if (!open) return;
+    setPosition((p) => clampToViewport(p.x, p.y, boxRef.current));
+  }, [open]);
+
   if (!open) return null;
 
   return (
@@ -75,7 +122,7 @@ export const FloatingCalculator: React.FC = () => {
         position: 'fixed',
         left: position.x,
         top: position.y,
-        width: 280,
+        width: WIDTH,
         borderRadius: (theme) => `${theme.radius.lg}px`,
         background: SURFACE.raised,
         border: LINE.block,
@@ -113,21 +160,67 @@ export const FloatingCalculator: React.FC = () => {
           </Typography>
         ) : (
           <Box>
+            {/*
+              Une colonne de montants seuls ne dit pas de quoi elle est faite :
+              on additionne quatre nombres sans pouvoir vérifier qu'ils
+              correspondent aux lignes qu'on a cliquées, ni retirer la bonne.
+              Chaque ligne porte donc la même icône de catégorie et le même
+              libellé que la table, pour qu'on la reconnaisse d'un coup d'œil.
+            */}
             {operations.map((op: Operation, idx) => {
               const { value, color } = getVisualAmountMeta(op, accountId);
               return (
-                <Typography
-                  key={idx}
+                <Box
+                  key={`${op.id}-${idx}`}
                   sx={{
-                    fontFamily: MONO_FONT,
-                    fontSize: 12.5,
-                    fontVariantNumeric: 'tabular-nums',
-                    textAlign: 'right',
-                    color,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 0.75,
+                    py: 0.15,
                   }}
                 >
-                  {value}
-                </Typography>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      flex: '0 0 auto',
+                      '& svg': { fontSize: 15 },
+                    }}
+                  >
+                    {getCategoryIcon(op.category?.label ?? '')}
+                  </Box>
+                  {/*
+                    minWidth: 0 est indispensable — sans lui un enfant flex
+                    refuse de descendre sous sa largeur de contenu et le
+                    montant se ferait pousser hors du panneau au lieu de voir
+                    le libellé se tronquer.
+                  */}
+                  <Typography
+                    title={op.description}
+                    sx={{
+                      flex: '1 1 auto',
+                      minWidth: 0,
+                      fontSize: 12,
+                      color: TEXT.description,
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    {op.description}
+                  </Typography>
+                  <Typography
+                    sx={{
+                      flex: '0 0 auto',
+                      fontFamily: MONO_FONT,
+                      fontSize: 12.5,
+                      fontVariantNumeric: 'tabular-nums',
+                      textAlign: 'right',
+                      color,
+                    }}
+                  >
+                    {value}
+                  </Typography>
+                </Box>
               );
             })}
             <Box
