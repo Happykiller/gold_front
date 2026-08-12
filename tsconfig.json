@@ -21,7 +21,9 @@
     "noEmit": true,
 
     // Types de l'environnement Vite : import.meta.env, import de fichiers .svg…
-    "types": ["vite/client"],
+    // `node` s'y ajoute pour le harnais e2e et les fichiers de configuration,
+    // qui tournent hors navigateur (process.env, node:fs).
+    "types": ["vite/client", "node"],
 
     "skipLibCheck": false,
 
@@ -38,6 +40,9 @@
       "@stores/*": ["src/stores/*"]
     }
   },
-  "include": ["src", "vite.config.ts"],
+  // `e2e` et `playwright.config.ts` sont inclus délibérément : le harnais n'est
+  // joué qu'à la demande, donc sans cette vérification de types au build il
+  // dériverait en silence jusqu'au jour où on en a besoin.
+  "include": ["src", "vite.config.ts", "playwright.config.ts", "e2e"],
   "exclude": ["node_modules", "dist"]
 }

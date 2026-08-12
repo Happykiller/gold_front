@@ -15,7 +15,17 @@ import prettierRecommended from 'eslint-plugin-prettier/recommended';
 
 export default tseslint.config(
   {
-    ignores: ['dist/**', 'node_modules/**', 'coverage/**'],
+    // Les trois dernières sont des sorties de Playwright : le rapport HTML
+    // embarque son propre visualiseur (~3 Mo de JS minifié), qu'ESLint se met à
+    // parcourir — `npm run lint` semble alors ne plus rendre la main.
+    ignores: [
+      'dist/**',
+      'node_modules/**',
+      'coverage/**',
+      'playwright-report/**',
+      'test-results/**',
+      'e2e/captures/**',
+    ],
   },
   js.configs.recommended,
   ...tseslint.configs.recommended,

@@ -35,8 +35,33 @@ Testing Library, `*.test.ts(x)` à côté du code couvert) et `build` (`tsc --no
 `vite build`). `npm run check` enchaîne les trois qu'on lance à la main.
 
 **Aucune ne voit le rendu.** jsdom ne calcule pas de géométrie : un test de mise en page passe au
-vert sur du CSS cassé. Le passage à l'œil, écran par écran, reste la seule barrière pour cette
-classe de défaut — voir [`../docs/KB/DAT/interface-mui.md`](../docs/KB/DAT/interface-mui.md).
+vert sur du CSS cassé — voir [`../docs/KB/DAT/interface-mui.md`](../docs/KB/DAT/interface-mui.md).
+
+C'est le trou que comble le harnais Playwright de `e2e/`, cinquième barrière, **hors CI et hors
+`npm run check`** : il lui faut la stack locale allumée et un compte.
+
+```bash
+../bin/dev-e2e.sh              # le chemin normal : vérifie la stack, puis joue
+npx playwright test --ui       # mode interactif, une fois la stack montée
+npx playwright show-report
+```
+
+Il ouvre les écrans protégés dans Chromium, authentifié une fois pour toutes
+(`e2e/connexion.setup.ts`, session rejouée par `storageState`), et échoue sur toute erreur
+GraphQL, exception JS ou `console.error` — c'est le seul filet automatique du couplage front ↔
+back décrit dans `../CLAUDE.md`. Chaque écran laisse une capture dans `e2e/captures/`.
+
+Trois points à connaître avant d'y toucher :
+
+- **ne jamais attendre `networkidle` seul** pour juger qu'un écran est prêt. En dev, Vite sert
+  les modules par vagues et laisse un silence réseau *avant* l'arrivée du chunk `React.lazy` :
+  l'attente se termine sur une page vide, le test passe au vert et la capture est un rectangle
+  noir. Le repère est le rendu lui-même — `attendreEcran()` dans `e2e/outils.ts` ;
+- **lecture seule.** Aucune mutation, aucun formulaire soumis : la base de dev porte un dump de
+  production ;
+- **les sorties ne quittent pas le poste** (`e2e/captures`, `e2e/.auth`, `test-results`,
+  `playwright-report`, tous gitignorés) : elles contiennent des données bancaires réelles, et
+  `.auth/` un jeton de session valide.
 
 Docker : `make start` / `make startall` / `make down` (conteneur `gold_front`, 8083→80, nginx).
 

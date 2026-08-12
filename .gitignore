@@ -7,3 +7,12 @@ dist
 .idea
 .env.local
 gold_front.tar
+
+# Sorties du harnais Playwright. Elles ne sont jamais versionnables : la base de
+# développement porte un dump de production, donc les captures, traces et
+# rapports contiennent des données bancaires réelles — et `.auth/` un jeton de
+# session valide.
+e2e/.auth
+e2e/captures
+test-results
+playwright-report

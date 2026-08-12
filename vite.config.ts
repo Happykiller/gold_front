@@ -71,6 +71,10 @@ export default defineConfig(({ mode }) => {
       environment: 'jsdom',
       globals: true,
       setupFiles: ['./src/setupTests.ts'],
+      // `e2e/` appartient à Playwright, pas à Vitest : sans cette exclusion,
+      // `npm test` ramasse les `*.spec.ts` du harnais et échoue sur l'import de
+      // `@playwright/test`, qui exige son propre lanceur.
+      exclude: ['node_modules/**', 'dist/**', 'e2e/**'],
       coverage: {
         provider: 'v8',
         // La couverture sert à voir ce qui n'est pas testé, pas à atteindre un
