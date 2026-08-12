@@ -5,6 +5,8 @@ import {
   AuthPasskeyUsecase,
   AuthUsecase,
   CreatePasskeyUsecase,
+  PasskeyAuthOptionsUsecase,
+  PasskeyRegisterOptionsUsecase,
   DeletePasskeyUsecase,
   GetPasskeyForUserUsecase,
   GraphqlService,
@@ -58,6 +60,8 @@ export class Inversify {
   getOperationsUsecase: GetOperationsUsecase;
   deletePasskeyUsecase: DeletePasskeyUsecase;
   createPasskeyUsecase: CreatePasskeyUsecase;
+  passkeyAuthOptionsUsecase: PasskeyAuthOptionsUsecase;
+  passkeyRegisterOptionsUsecase: PasskeyRegisterOptionsUsecase;
   createOperationUsecase: CreateOperationUsecase;
   cloneOperationsUsecase: CloneOperationsUsecase;
   updateOperationUsecase: UpdateOperationUsecase;
@@ -90,6 +94,10 @@ export class Inversify {
     this.getOperationsUsecase = new GetOperationsUsecase(this);
     this.deletePasskeyUsecase = new DeletePasskeyUsecase(this);
     this.createPasskeyUsecase = new CreatePasskeyUsecase(this);
+    this.passkeyAuthOptionsUsecase = new PasskeyAuthOptionsUsecase(this);
+    this.passkeyRegisterOptionsUsecase = new PasskeyRegisterOptionsUsecase(
+      this,
+    );
     this.cloneOperationsUsecase = new CloneOperationsUsecase(this);
     this.createOperationUsecase = new CreateOperationUsecase(this);
     this.updateOperationUsecase = new UpdateOperationUsecase(this);

@@ -26,6 +26,7 @@ export const ProfilePage: React.FC = () => (
     }}
     services={{
       createPasskeyUsecase: inversify.createPasskeyUsecase,
+      passkeyRegisterOptionsUsecase: inversify.passkeyRegisterOptionsUsecase,
       deletePasskeyUsecase: inversify.deletePasskeyUsecase,
       getPasskeyForUserUsecase: inversify.getPasskeyForUserUsecase,
       updPasswordUsecase: inversify.updPasswordUsecase,

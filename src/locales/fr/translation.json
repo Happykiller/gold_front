@@ -144,8 +144,11 @@
   "loading": "Chargement...",
   "login": {
     "AUTH_FAIL_WRONG_CREDENTIAL": "Identifiants incorrects",
+    "AUTH_PASSKEY_USECASE_FAIL": "Cette clé d'accès n'a pas pu être vérifiée",
+    "authentication_failed": "L'authentification n'a pas abouti",
     "login": "Entrer votre nom d'utilisateur",
     "passkey": "Clé d'accès",
+    "passkey_failed": "La connexion par clé d'accès a échoué",
     "password": "Entrer votre mot de passe",
     "title": "Authentification"
   },
@@ -223,11 +226,14 @@
     "newPassword": "Nouveau mot de passe",
     "oldPassword": "Mot de passe actuel",
     "passkey": {
+      "device_only": "sur cet appareil seulement",
+      "synced": "synchronisée",
       "table": {
         "active": "Activer",
         "delete": "Supprimer",
         "label": "Nom"
-      }
+      },
+      "unknown_provider": "Fournisseur inconnu"
     },
     "passkey_label": "Nom de l'appareil",
     "passkeys": "Clés d'accès",

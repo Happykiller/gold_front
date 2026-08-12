@@ -27,6 +27,7 @@ export const LoginPage: React.FC = () => (
     services={{
       authUsecase: inversify.authUsecase,
       authPasskeyUsecase: inversify.authPasskeyUsecase,
+      passkeyAuthOptionsUsecase: inversify.passkeyAuthOptionsUsecase,
       loggerService: inversify.loggerService,
     }}
     contextStore={contextStore}

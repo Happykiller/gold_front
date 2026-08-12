@@ -144,8 +144,11 @@
   "loading": "Loading...",
   "login": {
     "AUTH_FAIL_WRONG_CREDENTIAL": "Incorrect credentials",
+    "AUTH_PASSKEY_USECASE_FAIL": "This passkey could not be verified",
+    "authentication_failed": "Authentication did not complete",
     "login": "Enter your username",
     "passkey": "Access key",
+    "passkey_failed": "Passkey sign-in failed",
     "password": "Enter your password",
     "title": "Authentication"
   },
@@ -223,11 +226,14 @@
     "newPassword": "New password",
     "oldPassword": "Current password",
     "passkey": {
+      "device_only": "this device only",
+      "synced": "synced",
       "table": {
         "active": "Activate",
         "delete": "Delete",
         "label": "Name"
-      }
+      },
+      "unknown_provider": "Unknown provider"
     },
     "passkey_label": "Device name",
     "passkeys": "Access keys",
