@@ -564,6 +564,11 @@ type Props = {
   loadingMore?: boolean;
   hasMore?: boolean;
   onLoadMore?: () => void;
+  /**
+   * Sentinelle de tête de liste, posée par `useAtTop` de l'écran. Optionnelle :
+   * les tests et les autres appelants n'ont pas à s'en soucier.
+   */
+  topSentinel?: (node: HTMLDivElement | null) => void;
   error: string | null;
   onOpenAccount?: (accountId: number) => void;
   onEditOperation?: (op: Operation) => void;
@@ -579,6 +584,7 @@ export const OperationsTable: React.FC<Props> = ({
   loadingMore = false,
   hasMore = false,
   onLoadMore,
+  topSentinel,
   error,
   onOpenAccount,
   onEditOperation,
@@ -772,6 +778,13 @@ export const OperationsTable: React.FC<Props> = ({
           </Box>
         ))}
       </Box>
+
+      {/* Sentinelle de tête : sa visibilité dit qu'on est en haut de liste, ce
+          qui autorise un rafraîchissement automatique. L'en-tête collante la
+          recouvre, sans effet — `IntersectionObserver` mesure une intersection
+          géométrique, pas une occlusion. Le pendant de la sentinelle de fin,
+          plus bas. */}
+      <Box ref={topSentinel} sx={{ height: 1 }} />
 
       {groups.map((group) => (
         // Ce conteneur n'est pas décoratif : c'est lui qui donne au bandeau son

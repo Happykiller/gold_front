@@ -327,6 +327,13 @@ export type OperationTypeModelResolver = {
   modificator_id?: Maybe<Scalars['Int']['output']>;
 };
 
+export type OperationsChangedModelResolver = {
+  account_ids: Array<Scalars['Int']['output']>;
+  kind: Scalars['String']['output'];
+  operation_ids: Array<Scalars['Int']['output']>;
+  origin?: Maybe<Scalars['String']['output']>;
+};
+
 export type PasskeyAuthAuthenticationResolverDto = {
   authenticatorAttachment?: InputMaybe<Scalars['String']['input']>;
   id: Scalars['String']['input'];
@@ -335,9 +342,13 @@ export type PasskeyAuthAuthenticationResolverDto = {
   type: Scalars['String']['input'];
 };
 
+export type PasskeyAuthOptionsResolverModel = {
+  challenge: Scalars['String']['output'];
+};
+
 export type PasskeyAuthResolverDto = {
   authentication: PasskeyAuthAuthenticationResolverDto;
-  user_code: Scalars['String']['input'];
+  user_code?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type PasskeyAuthResponseResolverDto = {
@@ -347,12 +358,19 @@ export type PasskeyAuthResponseResolverDto = {
   userHandle?: InputMaybe<Scalars['String']['input']>;
 };
 
-export type PasskeyResolverModel = {
+export type PasskeyRegisterOptionsResolverModel = {
   challenge: Scalars['String']['output'];
+  exclude_credentials: Array<Scalars['String']['output']>;
+  user_handle: Scalars['String']['output'];
+};
+
+export type PasskeyResolverModel = {
+  authenticator_name?: Maybe<Scalars['String']['output']>;
   credential_id: Scalars['String']['output'];
   hostname: Scalars['String']['output'];
   id: Scalars['String']['output'];
   label: Scalars['String']['output'];
+  synced?: Maybe<Scalars['Boolean']['output']>;
   user_code: Scalars['String']['output'];
   user_id: Scalars['String']['output'];
 };
@@ -376,6 +394,8 @@ export type Query = {
   operationThirds: Array<OperationThirdModelResolver>;
   operationTypes: Array<OperationTypeModelResolver>;
   operations: Array<OperationModelResolver>;
+  passkey_auth_options: PasskeyAuthOptionsResolverModel;
+  passkey_register_options: PasskeyRegisterOptionsResolverModel;
   passkeys_for_user: Array<PasskeyResolverModel>;
   ping: PingResponse;
   systemInfo: SystemInfoResolverModel;
@@ -435,6 +455,7 @@ export type RegisterResponsePasskeyResolverDto = {
 };
 
 export type RegisterUserPasskeyResolverDto = {
+  displayName?: InputMaybe<Scalars['String']['input']>;
   id: Scalars['String']['input'];
   name: Scalars['String']['input'];
 };
@@ -442,6 +463,10 @@ export type RegisterUserPasskeyResolverDto = {
 export type SendMailSystemResolverModel = {
   message: Scalars['String']['output'];
   success: Scalars['Boolean']['output'];
+};
+
+export type Subscription = {
+  operationsChanged: OperationsChangedModelResolver;
 };
 
 export type SystemInfoResolverModel = {
@@ -747,6 +772,19 @@ export type OperationThirdsQueryVariables = Exact<{ [key: string]: never }>;
 
 export type OperationThirdsQuery = {
   operationThirds: Array<{ id: number; label: string }>;
+};
+
+export type OperationsChangedSubscriptionVariables = Exact<{
+  [key: string]: never;
+}>;
+
+export type OperationsChangedSubscription = {
+  operationsChanged: {
+    kind: string;
+    account_ids: Array<number>;
+    operation_ids: Array<number>;
+    origin: string | null;
+  };
 };
 
 export type GetSessionInfoQueryVariables = Exact<{ [key: string]: never }>;

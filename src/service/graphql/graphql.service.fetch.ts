@@ -1,4 +1,5 @@
 import config from '@src/config';
+import { CLIENT_ID } from '@src/common/clientId';
 import { Inversify } from '@src/common/inversify';
 import { GraphqlService } from '@happykiller/sunny-ui';
 
@@ -20,6 +21,11 @@ export class GraphqlServiceFetch implements GraphqlService {
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token ?? 'token'}`,
+          // Le serveur recopie cette valeur dans les événements que la requête
+          // provoque, pour que cet onglet reconnaisse son propre écho — voir
+          // `clientId.ts`. Un seul endroit à poser : toutes les mutations du
+          // front passent par ici.
+          'x-gold-client': CLIENT_ID,
         },
         body: JSON.stringify(datas),
       });

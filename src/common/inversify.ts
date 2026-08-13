@@ -38,6 +38,10 @@ import { GetOpeCategoriesUsecase } from '@usecase/getOpeCategories/getOpeCategor
 import { GetOpeTypesUsecase } from '@usecase/getOpeTypes/getOpeTypes.usecase';
 import { GetOpeStatusUsecase } from '@usecase/getOpeStatus/getOpeStatus.usecase';
 import { GetCashflowUsecase } from '@usecase/getCashflow/getCashflow.usecase';
+import { SubscriptionService } from '@service/subscription/subscription.service';
+import { SubscriptionServiceFake } from '@service/subscription/subscription.service.fake';
+import { SubscriptionServiceGraphqlWs } from '@service/subscription/subscription.service.graphqlWs';
+import { OperationsChangedUsecase } from '@usecase/operationsChanged/operationsChanged.usecase';
 
 export class Inversify {
   authUsecase: AuthUsecase;
@@ -73,6 +77,8 @@ export class Inversify {
   getOpeStatusUsecase: GetOpeStatusUsecase;
   getPasskeyForUserUsecase: GetPasskeyForUserUsecase;
   getCashflowUsecase: GetCashflowUsecase;
+  subscriptionService: SubscriptionService;
+  operationsChangedUsecase: OperationsChangedUsecase;
 
   constructor() {
     // Usecases
@@ -107,13 +113,16 @@ export class Inversify {
     this.getOpeStatusUsecase = new GetOpeStatusUsecase(this);
     this.getPasskeyForUserUsecase = new GetPasskeyForUserUsecase(this);
     this.getCashflowUsecase = new GetCashflowUsecase(this);
+    this.operationsChangedUsecase = new OperationsChangedUsecase(this);
 
     // Services
     this.storageService = new StorageServiceCookie();
     if (config.mode === 'prod' || config.mode === 'dev') {
       this.graphqlService = new GraphqlServiceFetch(this);
+      this.subscriptionService = new SubscriptionServiceGraphqlWs(this);
     } else {
       this.graphqlService = new GraphqlServiceFake();
+      this.subscriptionService = new SubscriptionServiceFake();
     }
   }
 }

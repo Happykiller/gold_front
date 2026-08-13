@@ -6,6 +6,7 @@ import RefreshIcon from '@mui/icons-material/Refresh';
 import CalculateIcon from '@mui/icons-material/Calculate';
 import FileUploadIcon from '@mui/icons-material/FileUpload';
 import {
+  Badge,
   Box,
   Tooltip,
   Typography,
@@ -31,6 +32,17 @@ type Props = {
   loading: boolean;
   error: string | null;
   onRefresh: () => void;
+  /**
+   * Nombre de changements survenus ailleurs et pas encore affichés — un import
+   * par l'extension, un autre onglet, un autre appareil.
+   *
+   * Une pastille sur le bouton qui les efface, plutôt qu'un bandeau : le geste
+   * pour les voir est celui qu'on faisait déjà, et rien ne se déplace à
+   * l'écran pendant qu'on lit.
+   */
+  pendingCount?: number;
+  /** Ce qu'annonce la pastille : des ajouts, ou des changements. */
+  pendingKind?: 'new' | 'changed';
   onAddOperation?: () => void;
   /**
    * Ouvre l'import en masse d'un relevé bancaire.
@@ -54,6 +66,8 @@ export const AccountHeader: React.FC<Props> = ({
   loading,
   error,
   onRefresh,
+  pendingCount = 0,
+  pendingKind = 'new',
   onAddOperation,
   onImportOperations,
   search,
@@ -166,9 +180,24 @@ export const AccountHeader: React.FC<Props> = ({
             </IconButton>
           </Tooltip>
         )}
-        <Tooltip title={t('account.refresh')}>
+        <Tooltip
+          title={
+            pendingCount > 0
+              ? t(`account.pending-${pendingKind}`, { count: pendingCount })
+              : t('account.refresh')
+          }
+        >
           <IconButton onClick={onRefresh} sx={iconButtonSx}>
-            <RefreshIcon />
+            {/* La pastille ne s'affiche qu'à partir de 1 : `invisible` évite un
+                point vide en permanence sur un bouton qui ne bouge pas. */}
+            <Badge
+              color="primary"
+              badgeContent={pendingCount}
+              invisible={pendingCount === 0}
+              sx={{ '& .MuiBadge-badge': { fontSize: 10, minWidth: 16 } }}
+            >
+              <RefreshIcon />
+            </Badge>
           </IconButton>
         </Tooltip>
         {onImportOperations && (

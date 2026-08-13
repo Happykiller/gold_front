@@ -12,6 +12,10 @@
     "empty": "No account",
     "import-operations": "Import operations",
     "refresh": "Refresh",
+    "pending-new_one": "{{count}} new operation — click to show it",
+    "pending-new_other": "{{count}} new operations — click to show them",
+    "pending-changed_one": "{{count}} operation changed — click to refresh",
+    "pending-changed_other": "{{count}} operations changed — click to refresh",
     "type-regular": "Account",
     "type-template": "Template"
   },

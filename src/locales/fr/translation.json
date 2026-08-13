@@ -12,6 +12,10 @@
     "empty": "Aucun compte",
     "import-operations": "Importer des opérations",
     "refresh": "Rafraîchir",
+    "pending-new_one": "{{count}} nouvelle opération — cliquer pour l'afficher",
+    "pending-new_other": "{{count}} nouvelles opérations — cliquer pour les afficher",
+    "pending-changed_one": "{{count}} opération modifiée — cliquer pour actualiser",
+    "pending-changed_other": "{{count}} opérations modifiées — cliquer pour actualiser",
     "type-regular": "Compte",
     "type-template": "Modèle"
   },

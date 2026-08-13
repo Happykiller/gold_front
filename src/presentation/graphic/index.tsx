@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   Box,
   Button,
@@ -30,6 +30,8 @@ import {
   formatEuroAmount,
   getBalanceColor,
 } from '@presentation/molecule/operationDisplay';
+import { CLIENT_ID } from '@src/common/clientId';
+import { useOperationsChanged } from '@presentation/hooks/useOperationsChanged';
 
 export const Graphic: React.FC = () => {
   const { t } = useTranslation();
@@ -115,6 +117,30 @@ export const Graphic: React.FC = () => {
       setLoading(false);
     }
   };
+
+  /*
+   * Le graphe se remet à jour tout seul — mais seulement s'il en est un.
+   *
+   * Deux gardes, et les deux comptent : le cashflow n'est calculé que sur clic,
+   * relancer sur un écran vierge lancerait une requête lourde que personne n'a
+   * demandée ; et l'écho de ses propres écritures n'apprend rien.
+   *
+   * Les deux valeurs passent par des refs pour que la callback d'abonnement
+   * garde une identité stable : elle ne doit pas se recréer à chaque saisie de
+   * date, sinon l'abonnement se ferme et se rouvre en boucle.
+   */
+  const regenerateRef = useRef(handleGenerate);
+  regenerateRef.current = handleGenerate;
+  const hasChartRef = useRef(false);
+  hasChartRef.current = chartData.length > 0;
+
+  useOperationsChanged(
+    useCallback((events) => {
+      if (events.every((event) => event.origin === CLIENT_ID)) return;
+      if (!hasChartRef.current) return;
+      void regenerateRef.current();
+    }, []),
+  );
 
   const uniqueDates = Array.from(new Set(chartData.map((d) => d.date))).sort();
 

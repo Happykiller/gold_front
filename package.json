@@ -38,6 +38,7 @@
     "@passwordless-id/webauthn": "^2.3.0",
     "dayjs": "^1.11.13",
     "framer-motion": "^12.43.0",
+    "graphql-ws": "^6.2.1",
     "highcharts": "^13.0.0",
     "highcharts-react-official": "^3.2.3",
     "i18next": "^26.3.6",

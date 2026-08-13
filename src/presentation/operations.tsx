@@ -7,7 +7,17 @@ import {
 } from 'react-router-dom';
 
 import inversify from '@src/common/inversify';
+import { CLIENT_ID } from '@src/common/clientId';
 import { CODES } from '@happykiller/sunny-ui';
+import { useAtTop } from '@presentation/hooks/useAtTop';
+import { useOperationsChanged } from '@presentation/hooks/useOperationsChanged';
+import {
+  decide,
+  mergePending,
+  NO_PENDING,
+  pendingCount,
+  type PendingChanges,
+} from '@presentation/hooks/operationsChanged';
 import { AccountHeader } from '@presentation/molecule/accountHeader';
 import { OperationsTable } from '@presentation/molecule/operationsTable';
 import { FloatingCalculator } from '@presentation/molecule/FloatingCalculator';
@@ -89,6 +99,56 @@ export const Operations = () => {
     removeBalances,
   } = useAccountOperations(accountId, filters);
 
+  /*
+   * Le temps réel.
+   *
+   * Toute la mécanique passe par le `reload` existant — celui du bouton
+   * « rafraîchir » — pour que `runRef`, `fetchingRef`, `loadedRef` et le
+   * chargement continu gardent exactement la sémantique déjà éprouvée.
+   */
+  const { atTopRef, setTopSentinel } = useAtTop();
+  const [pending, setPending] = React.useState<PendingChanges>(NO_PENDING);
+  // Le cumul se lit dans une ref : la callback d'événement ne doit pas se
+  // recréer à chaque changement d'attente, sinon elle change d'identité entre
+  // deux événements d'un même import.
+  const pendingRef = React.useRef(pending);
+  pendingRef.current = pending;
+
+  const refresh = React.useCallback(() => {
+    setPending(NO_PENDING);
+    reload();
+  }, [reload]);
+
+  useOperationsChanged(
+    React.useCallback(
+      (events) => {
+        let attente: PendingChanges | null = null;
+        for (const event of events) {
+          const verdict = decide(event, {
+            accountId,
+            clientId: CLIENT_ID,
+            atTop: atTopRef.current,
+          });
+          // En tête de liste, on recharge : rien ne bouge sous les yeux, et un
+          // rechargement couvre tout le paquet. Inutile d'examiner la suite.
+          if (verdict === 'reload') {
+            refresh();
+            return;
+          }
+          if (verdict === 'pending') {
+            attente = mergePending(attente ?? pendingRef.current, event);
+          }
+        }
+        if (attente) setPending(attente);
+      },
+      [accountId, refresh, atTopRef],
+    ),
+    // Les événements émis pendant une coupure sont perdus : le protocole ne les
+    // rejoue pas. On se resynchronise une fois au retour plutôt que de rester
+    // silencieusement en retard.
+    refresh,
+  );
+
   // Ces trois callbacks sont passés à chaque ligne du tableau, qui est
   // mémoïsée : les laisser se recréer à chaque rendu suffirait à annuler la
   // mémoïsation et à re-rendre toute la liste accumulée à chaque nouveau lot.
@@ -168,7 +228,9 @@ export const Operations = () => {
         account={account}
         loading={loadingAccount}
         error={errorAccount}
-        onRefresh={reload}
+        onRefresh={refresh}
+        pendingCount={pendingCount(pending)}
+        pendingKind={pending.kind}
         onAddOperation={() =>
           navigate({
             pathname: '/operation_new',
@@ -188,6 +250,7 @@ export const Operations = () => {
         }
       />
       <OperationsTable
+        topSentinel={setTopSentinel}
         current_account_id={accountId}
         operations={operations}
         filtered={tokens.length > 0}
@@ -216,7 +279,7 @@ export const Operations = () => {
           open
           accountId={accountId}
           onClose={() => setImportOpen(false)}
-          onImported={reload}
+          onImported={refresh}
         />
       )}
     </>

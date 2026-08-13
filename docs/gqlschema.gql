@@ -18,14 +18,25 @@ type AuthModelResolver {
   role: String!
 }
 
+type PasskeyAuthOptionsResolverModel {
+  challenge: String!
+}
+
+type PasskeyRegisterOptionsResolverModel {
+  challenge: String!
+  user_handle: String!
+  exclude_credentials: [String!]!
+}
+
 type PasskeyResolverModel {
   id: String!
   label: String!
   user_id: String!
   hostname: String!
   user_code: String!
-  challenge: String!
   credential_id: String!
+  authenticator_name: String
+  synced: Boolean
 }
 
 type SystemInfoResolverModel {
@@ -179,11 +190,20 @@ type CashflowModelResolver {
   total_balance: Float!
 }
 
+type OperationsChangedModelResolver {
+  kind: String!
+  account_ids: [Int!]!
+  operation_ids: [Int!]!
+  origin: String
+}
+
 type Query {
   ping: PingResponse!
   auth(dto: AuthAuthResolverDto!): AuthModelResolver!
   auth_passkey(dto: PasskeyAuthResolverDto!): AuthModelResolver!
   getSessionInfo: AuthModelResolver!
+  passkey_auth_options: PasskeyAuthOptionsResolverModel!
+  passkey_register_options: PasskeyRegisterOptionsResolverModel!
   passkeys_for_user: [PasskeyResolverModel!]!
   systemInfo: SystemInfoResolverModel!
   test_mail: SendMailSystemResolverModel!
@@ -211,7 +231,7 @@ input AuthAuthResolverDto {
 }
 
 input PasskeyAuthResolverDto {
-  user_code: String!
+  user_code: String
   authentication: PasskeyAuthAuthenticationResolverDto!
 }
 
@@ -316,6 +336,7 @@ input RegisterResponsePasskeyResolverDto {
 input RegisterUserPasskeyResolverDto {
   name: String!
   id: String!
+  displayName: String
 }
 
 input DeletePasskeyResolverDto {
@@ -389,4 +410,8 @@ input CloneOperationInputResolver {
   account_id: Int!
   template_account_id: Int!
   date: String!
+}
+
+type Subscription {
+  operationsChanged: OperationsChangedModelResolver!
 }

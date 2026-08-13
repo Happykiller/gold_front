@@ -9,6 +9,9 @@ export function useAccounts() {
   const [data, setData] = React.useState<FormattedAccount[] | null>(null);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
+  // Même patron que `useAccountOperations` : un compteur en dépendance de
+  // l'effet, pour que le rechargement passe par le chemin déjà éprouvé.
+  const [refreshToken, setRefreshToken] = React.useState(0);
 
   React.useEffect(() => {
     let cancelled = false;
@@ -29,7 +32,11 @@ export function useAccounts() {
     return () => {
       cancelled = true;
     };
+  }, [refreshToken]);
+
+  const reload = React.useCallback(() => {
+    setRefreshToken((prev) => prev + 1);
   }, []);
 
-  return { data, loading, error };
+  return { data, loading, error, reload };
 }
