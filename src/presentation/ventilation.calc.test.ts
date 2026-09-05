@@ -4,7 +4,6 @@ import {
   destinationAmount,
   isExceeded,
   isFullyAllocated,
-  parseAmount,
   totalAllocated,
 } from '@presentation/ventilation.calc';
 
@@ -15,19 +14,6 @@ const pct = (value: string) => ({
 const fixed = (value: string) => ({
   isPercentage: false,
   amountStr: { value },
-});
-
-describe('parseAmount', () => {
-  it('accepte la virgule décimale', () => {
-    expect(parseAmount('12,34')).toBe(12.34);
-  });
-
-  it('renvoie 0 plutôt que NaN sur une saisie vide ou invalide', () => {
-    // NaN contaminerait tous les totaux en aval et rendrait la validation
-    // incompréhensible pour l'utilisateur.
-    expect(parseAmount('')).toBe(0);
-    expect(parseAmount('abc')).toBe(0);
-  });
 });
 
 describe('destinationAmount', () => {

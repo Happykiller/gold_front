@@ -14,6 +14,7 @@ import {
 import EuroIcon from '@mui/icons-material/Euro';
 
 import { CODES } from '@src/common/codes';
+import { AMOUNT_PATTERN, parseAmount } from '@src/common/amount';
 import inversify from '@src/common/inversify';
 import { useFlashStore, Input } from '@happykiller/sunny-ui';
 import { AccountsSelect } from '@presentation/molecule/accountsSelect';
@@ -33,7 +34,6 @@ import {
   destinationAmount,
   isExceeded,
   isFullyAllocated,
-  parseAmount,
   totalAllocated,
 } from '@presentation/ventilation.calc';
 
@@ -190,7 +190,7 @@ export const Ventilation = () => {
             <Input
               label={<Trans>ventilation.total_amount</Trans>}
               tooltip={t('operation.amount-hint')}
-              regex="^[0-9]+([.,][0-9]{1,2})?$"
+              regex={AMOUNT_PATTERN}
               require
               virgin={amount.value === '0.00'}
               entity={amount}
@@ -256,7 +256,7 @@ export const Ventilation = () => {
                 <Box>
                   <Input
                     label={<Trans>ventilation.amount</Trans>}
-                    regex="^[0-9]+([.,][0-9]{1,2})?$"
+                    regex={AMOUNT_PATTERN}
                     require
                     entity={dest.amountStr}
                     onChange={(val: { value: string; valid: boolean }) =>

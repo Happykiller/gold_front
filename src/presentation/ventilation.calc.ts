@@ -5,20 +5,13 @@
 // Extrait du composant pour être testable : c'est de l'argent qu'on répartit,
 // et une erreur d'arrondi ici produit des opérations fausses en base.
 
+import { parseAmount } from '@src/common/amount';
+
 /** Une ligne de destination, telle que saisie dans le formulaire. */
 export interface VentilationDestinationInput {
   isPercentage: boolean;
   /** Saisie brute : la virgule décimale est acceptée. */
   amountStr: { value: string };
-}
-
-/**
- * Convertit une saisie utilisateur en nombre.
- * Une saisie vide ou non numérique vaut 0 — jamais NaN, qui contaminerait
- * tous les totaux en aval.
- */
-export function parseAmount(value: string): number {
-  return parseFloat(value.replace(',', '.')) || 0;
 }
 
 /** Montant réel d'une ligne, selon qu'elle est en pourcentage ou en valeur. */

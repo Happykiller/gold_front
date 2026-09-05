@@ -10,6 +10,7 @@ import EuroIcon from '@mui/icons-material/Euro';
 import DescriptionIcon from '@mui/icons-material/Description';
 
 import { CODES } from '@src/common/codes';
+import { AMOUNT_PATTERN, parseAmount } from '@src/common/amount';
 import inversify from '@src/common/inversify';
 import { useFlashStore, Input } from '@happykiller/sunny-ui';
 import { ThirdsSelect } from '@presentation/molecule/thirdsSelect';
@@ -61,7 +62,7 @@ export const CreateVir = () => {
 
     inversify.createOperationUsecase
       .execute({
-        amount: parseFloat(amount.value.replace(',', '.')),
+        amount: parseAmount(amount.value),
         vat_rate: 20,
         description: desc.value,
         date: currentDate.format('YYYY-MM-DD'),
@@ -107,7 +108,7 @@ export const CreateVir = () => {
           <Input
             label={<Trans>operation.amount</Trans>}
             tooltip={t('operation.amount-hint')}
-            regex="^[0-9]+([.,][0-9]{1,2})?$"
+            regex={AMOUNT_PATTERN}
             require
             virgin
             entity={amount}

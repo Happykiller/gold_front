@@ -14,6 +14,7 @@ import {
 import { Box, TextField } from '@mui/material';
 
 import { CODES } from '@src/common/codes';
+import { AMOUNT_PATTERN, isAmount, parseAmount } from '@src/common/amount';
 import inversify from '@src/common/inversify';
 import { useFlashStore } from '@happykiller/sunny-ui';
 import { ThirdsSelect } from '@presentation/molecule/thirdsSelect';
@@ -63,6 +64,12 @@ export const EditOperation = () => {
     React.useState<OperationUsecaseModel | null>(null);
   const [opDate, setOpDate] = React.useState<Dayjs>(dayjs());
   const [vatRateValue, setVatRateValue] = React.useState('20');
+  // Le montant est tenu en chaîne, et non en nombre : c'est la saisie qui fait
+  // foi tant que le formulaire est ouvert. Un `<input type="number">` rendait
+  // une chaîne vide dès que le navigateur jugeait la saisie invalide — « 91,17 »
+  // sous une locale anglaise, par exemple — et le montant partait alors à NaN,
+  // que la garde `amount <= 0` laissait passer.
+  const [amountValue, setAmountValue] = React.useState('0');
 
   // Les liens sont tenus à part de `operation` : ils ne se saisissent pas, et
   // le retrait doit pouvoir retirer une puce sans repasser par le formulaire.
@@ -140,6 +147,7 @@ export const EditOperation = () => {
   const vatRateIsValid = /^(100(\.0+)?|[0-9]{1,2}(\.[0-9]{1,2})?)$/.test(
     vatRateValue,
   );
+  const amountIsValid = isAmount(amountValue);
 
   const handleClick = async (event: React.SyntheticEvent) => {
     event.preventDefault();
@@ -147,6 +155,7 @@ export const EditOperation = () => {
 
     const dto = {
       ...operation,
+      amount: parseAmount(amountValue),
       vat_rate: parseFloat(vatRateValue.replace(',', '.')),
       date: opDate.format('YYYY-MM-DD'),
     };
@@ -185,6 +194,7 @@ export const EditOperation = () => {
           if (response.message === CODES.SUCCESS && response.data) {
             setOpDate(dayjs(parseInt(response.data.date)));
             setOperation(response.data as unknown as OperationUsecaseModel);
+            setAmountValue(String(response.data.amount ?? 0));
             setVatRateValue(String(response.data.vat_rate ?? 20));
             setLinks({
               down: response.data.linked_operations ?? [],
@@ -217,14 +227,16 @@ export const EditOperation = () => {
                 label={<Trans>operation.amount</Trans>}
                 variant="standard"
                 fullWidth
-                type="number"
-                value={operation.amount}
-                onChange={(event) =>
-                  setOperation({
-                    ...operation,
-                    amount: parseFloat(event.target.value),
-                  })
-                }
+                // Champ texte, comme à la création : c'est le seul moyen de
+                // recevoir la virgule quelle que soit la locale du navigateur.
+                // `inputMode` conserve le clavier numérique sur mobile.
+                value={amountValue}
+                onChange={(event) => setAmountValue(event.target.value)}
+                error={!amountIsValid}
+                helperText={amountIsValid ? null : t('operation.amount-hint')}
+                slotProps={{
+                  htmlInput: { inputMode: 'decimal', pattern: AMOUNT_PATTERN },
+                }}
               />
               <VatField
                 value={{ value: vatRateValue, valid: vatRateIsValid }}
@@ -410,7 +422,8 @@ export const EditOperation = () => {
               label={<Trans>editOperation.send</Trans>}
               icon={<SaveAltIcon />}
               disabled={
-                operation.amount <= 0 ||
+                !amountIsValid ||
+                parseAmount(amountValue) <= 0 ||
                 !operation.description ||
                 !vatRateIsValid ||
                 vatRateValue === '' ||

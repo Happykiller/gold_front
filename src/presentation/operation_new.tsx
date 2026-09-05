@@ -14,6 +14,7 @@ import {
 } from 'react-router-dom';
 
 import { CODES } from '@src/common/codes';
+import { AMOUNT_PATTERN, parseAmount } from '@src/common/amount';
 import inversify from '@src/common/inversify';
 import { ThirdsSelect } from '@presentation/molecule/thirdsSelect';
 import { AccountsSelect } from '@presentation/molecule/accountsSelect';
@@ -68,7 +69,9 @@ export const OperationNew = () => {
 
     const dto = {
       ...operation,
-      amount: parseFloat(amount.value),
+      // Le champ accepte la virgule (cf. sa regex) : `parseFloat` seul
+      // rendrait 91 pour « 91,17 ».
+      amount: parseAmount(amount.value),
       vat_rate: parseFloat(vatRate.value.replace(',', '.')),
       description: desc.value,
       date: opDate.format('YYYY-MM-DD'),
@@ -104,7 +107,7 @@ export const OperationNew = () => {
           <Input
             label={<Trans>operation.amount</Trans>}
             tooltip={t('operation.amount-hint')}
-            regex="^[0-9]+([.,][0-9]{1,2})?$"
+            regex={AMOUNT_PATTERN}
             require
             virgin
             entity={amount}
